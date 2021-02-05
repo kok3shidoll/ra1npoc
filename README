@@ -10,7 +10,7 @@ target devices:
 - iPhone 8(t8015): for iOS 13(.5)  
 *KPF has been modified to give xargs "rootdev=md0 -v"  
 
-tested devices(host slide):  
+tested devices(host side):  
 iPhone 5s (iOS 12.5.1): works  
 iPhone 8 (iOS 13.5): works  
 iPhone 5s (iOS 9.1): successful checkm8 and loaded stage2, but Unable to send pongoOS. (Power consumption is too high)  
