@@ -8,7 +8,7 @@ This tool is for testing purposes. Do not use it on a normal device.
 target devices:  
 - iPhone 7(t8010): for iOS 14(.3)  
 - iPhone 8(t8015): for iOS 13(.5)  
-*pongoOS has been modified to give xargs "rootdev=md0 -v"  
+*KPF has been modified to give xargs "rootdev=md0 -v"  
 
 tested devices(host slide):  
 iPhone 5s (iOS 12.5.1): works  
