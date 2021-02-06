@@ -2,7 +2,9 @@
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 
+#ifndef kUSBHostReturnPipeStalled
 #define kUSBHostReturnPipeStalled (IOReturn)0xe0005000
+#endif
 
 #define DEVICE_DFU              (0x1227)
 #define DEVICE_STAGE2           (0x1338)

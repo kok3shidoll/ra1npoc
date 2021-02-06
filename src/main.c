@@ -91,9 +91,7 @@ int main(int argc, char** argv){
     
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for 14.x)
-    }
-    
-    if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
+    } else if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for ~13.7)
     }
     

