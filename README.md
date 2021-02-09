@@ -52,8 +52,8 @@ cd src/
 
 ## run  
 ```
-ra1npoc --a10 t8010_t8015_overwrite t8010_overwrite t8010_stage2 t8010_pongoOS  
-ra1npoc --a11 t8010_t8015_overwrite t8015_overwrite t8015_stage2 t8015_pongoOS  
+ra1npoc --a10 t8010_overwrite1 t8010_overwrite2 t8010_stage2 t8010_pongoOS  
+ra1npoc --a11 t8015_overwrite1 t8015_overwrite2 t8015_stage2 t8015_pongoOS  
 ```
 
 
