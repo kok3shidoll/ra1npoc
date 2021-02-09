@@ -25,7 +25,7 @@ This tool is for testing purposes. Do not use it on a normal device.
     *successful checkm8 and loaded stage2, but unable to send pongoOS (via lightning to USB camera adapter). However, this device is able to send pongoOS by switching to the lightning to USB 3 camera adapter with power supply.*  
 
 - iPhone 5 (iOS 9.1)  
-    - Not Works
+    - Not Works  
     *successful checkm8 and loaded stage2, but unable to send pongoOS (via lightning to USB camera adapter).*  
 
 
