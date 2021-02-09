@@ -148,6 +148,31 @@ void pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     
 }
 
+int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+    
+    LOG_DEBUG("reconnect");
+    io_reset(client);
+    io_close(client);
+    client = NULL;
+    sleep(5);
+    get_device_stage2(&client, 15);
+    if(!client) {
+        LOG_ERROR("ERROR: Failed to connect to checkra1n DFU");
+        return -1;
+    }
+    
+    LOG_DONE("[checkra1n] connected to Stage2");
+    
+    LOG_DEBUG("[checkra1n] sending pongoOS");
+    pongo(client, cpid, payload);
+    
+    io_reset(client);
+    io_close(client);
+    
+    LOG_DONE("[checkra1n] BOOTED");
+    return 0;
+}
+
 
 int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;
@@ -211,25 +236,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     LOG_DEBUG("[checkra1n] sending stage2 payload");
     payload_stage2(client, cpid, payload);
     
-    LOG_DEBUG("reconnect");
-    io_reset(client);
-    io_close(client);
-    client = NULL;
-    sleep(5);
-    get_device_stage2(&client, 15);
-    if(!client) {
-        LOG_ERROR("ERROR: Failed to connect to checkra1n DFU");
-        return -1;
-    }
+    connect_to_stage2(client, cpid, payload);
     
-    LOG_DONE("[checkra1n] connected to Stage2");
-    
-    LOG_DEBUG("[checkra1n] sending pongoOS");
-    pongo(client, cpid, payload);
-    
-    io_reset(client);
-    io_close(client);
-    
-    LOG_DONE("[checkra1n] BOOTED");
     return 0;
 }

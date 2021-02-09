@@ -236,6 +236,53 @@ void io_close(io_client_t client){
     client = NULL;
 }
 
+// for iOS 10 or lower
+void SNR(io_client_t client){
+    IOReturn r;
+    uint8_t size;
+    unsigned char buf[0x100];
+    unsigned char str[0x100];
+    bzero(str, 0x100);
+    bzero(buf, 0x100);
+    
+    if(client->devinfo.srtg == NULL){
+        r = usb_ctrl_transfer(client, 0x80, 6, 0x0306, 0x040a, buf, 0x100); // 8950 or up
+        if(r != kIOReturnSuccess) return;
+        size = *(uint8_t*)buf;
+        for(int i=0;i<(size/2);i++){
+            str[i] = *(uint8_t*)(buf+2+(i*2));
+        }
+        load_devinfo(client, (const char*)str);
+    }
+    
+    if(client->devinfo.srtg == NULL){
+        r = usb_ctrl_transfer(client, 0x80, 6, 0x0304, 0x040a, buf, 0x100); // 8950 or up
+        if(r != kIOReturnSuccess) return;
+        size = *(uint8_t*)buf;
+        for(int i=0;i<(size/2);i++){
+            str[i] = *(uint8_t*)(buf+2+(i*2));
+        }
+        load_devinfo(client, (const char*)str);
+    }
+    
+    if(client->devinfo.srtg == NULL){
+        bzero(buf, 0x100);
+        bzero(str, 0x80);
+        r = usb_ctrl_transfer(client, 0x80, 6, 0x0303, 0x040a, buf, 0x100); // 8930
+        if(r != kIOReturnSuccess) return;
+        size = *(uint8_t*)buf;
+        for(int i=0;i<(size/2);i++){
+            str[i] = *(uint8_t*)(buf+2+(i*2));
+        }
+        load_devinfo(client, (const char*)str);
+    }
+    
+    if(client->devinfo.srtg != NULL){
+        client->hasSerialStr = TRUE;
+    }
+    
+}
+
 static int io_usb_open_service(io_client_t *pclient, io_service_t service){
     int r;
     IOReturn result;
@@ -268,7 +315,7 @@ static int io_usb_open_service(io_client_t *pclient, io_service_t service){
         return -1;
     }
     
-#ifndef LOW_IPHONEOS_VERSION
+//#ifndef LOW_IPHONEOS_VERSION
     // Older iOS versions (such as iOS 10) can't get the serial number, so don't get it.
     char serial_str[256];
     serial_str[0] = '\0';
@@ -276,10 +323,13 @@ static int io_usb_open_service(io_client_t *pclient, io_service_t service){
     if (serialString) {
         CFStringGetCString(serialString, serial_str, sizeof(serial_str), kCFStringEncodingUTF8);
         CFRelease(serialString);
+        load_devinfo(client, serial_str);
+        client->hasSerialStr = TRUE;
+    } else {
+        client->hasSerialStr = FALSE;
     }
     
-    load_devinfo(client, serial_str);
-#endif
+//#endif
     IOObjectRelease(service);
     
     // Create the device interface

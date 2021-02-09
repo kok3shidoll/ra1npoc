@@ -61,12 +61,12 @@ int main(int argc, char** argv){
     if(open_file(stage2_path, &payload.stage2_len, &payload.stage2) != 0) return -1;
     if(open_file(pongoOS_path, &payload.pongoOS_len, &payload.pongoOS) != 0) return -1;
     
-    printf("kIOReturnSuccess: %x\n", kIOReturnSuccess);
-    printf("kIOUSBPipeStalled: %x\n", kIOUSBPipeStalled);
-    printf("kUSBHostReturnPipeStalled: %x\n", kUSBHostReturnPipeStalled);
-    printf("kIOReturnTimeout: %x\n", kIOReturnTimeout);
-    printf("kIOUSBTransactionTimeout: %x\n", kIOUSBTransactionTimeout);
-    printf("kIOReturnNotResponding: %x\n", kIOReturnNotResponding);
+    //printf("kIOReturnSuccess: %x\n", kIOReturnSuccess);
+    //printf("kIOUSBPipeStalled: %x\n", kIOUSBPipeStalled);
+    //printf("kUSBHostReturnPipeStalled: %x\n", kUSBHostReturnPipeStalled);
+    //printf("kIOReturnTimeout: %x\n", kIOReturnTimeout);
+    //printf("kIOUSBTransactionTimeout: %x\n", kIOUSBTransactionTimeout);
+    //printf("kIOReturnNotResponding: %x\n", kIOReturnNotResponding);
     
     if(!strcmp(argv[1], "--a10")) {
         devmode = 0x8010;
@@ -81,12 +81,27 @@ int main(int argc, char** argv){
     
     LOG_WAIT("Waiting for device in DFU mode...");
     
+    // For iOS 10 and lower:
+    //    This device cannot connect to Stage2 because lack of power supply when using lightning to USB camera adapter.
+    //    This device can be connected by powering the lightning to USB 3 camera adapter.
+    
+    // If the device is in Stage2, send pongoOS.
+    if(get_device(DEVICE_STAGE2) == 0){
+        LOG_DONE("CONNECTED: STAGE2");
+        if(devmode == 0x8010 || devmode == 0x8015){
+            connect_to_stage2(client, devmode, payload);
+        }
+        return 0;
+    }
+    
     while(get_device(DEVICE_DFU) != 0) {
         sleep(1);
     }
     LOG_DONE("CONNECTED");
     
-#ifndef LOW_IPHONEOS_VERSION
+    if(client->hasSerialStr == FALSE){
+        SNR(client); // For iOS 10 and lower
+    }
     printf("%x, %s\n", client->devinfo.cpid, client->devinfo.srtg);
     
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
@@ -94,18 +109,6 @@ int main(int argc, char** argv){
     } else if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for ~13.7)
     }
-    
-#else
-    printf("%x\n", devmode);
-    if(devmode == 0x8010){
-        checkra1n_t8010_t8015(client, devmode, payload); // checkra1n (for 14.x)
-    }
-    
-    if(devmode == 0x8015){
-        checkra1n_t8010_t8015(client, devmode, payload); // checkra1n (for ~13.7)
-    }
-#endif
-    
     
     return 0;
 }

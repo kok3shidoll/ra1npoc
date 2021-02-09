@@ -42,6 +42,7 @@ struct io_client_p {
     int usb_interface;
     int usb_alt_interface;
     struct io_devinfo devinfo;
+    bool hasSerialStr;
 };
 
 typedef struct {
@@ -77,3 +78,4 @@ uint32_t async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request
 IOReturn usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
 IOReturn usb_ctrl_transfer_with_time(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int time);
 
+void SNR(io_client_t client);
