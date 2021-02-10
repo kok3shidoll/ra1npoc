@@ -8,6 +8,7 @@ This tool is for testing purposes. Do not use it on a normal device.
 
 ## support  
 ### target devices  
+- iPhone 6s (s8000): for iOS 14(.3)  
 - iPhone 7 (t8010): for iOS 14(.3)  
 - iPhone 8 (t8015): for iOS 13(.5)  
 
@@ -52,6 +53,7 @@ cd src/
 
 ## run  
 ```
+ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 t8010_pongoOS  
 ra1npoc --a10 t8010_overwrite1 t8010_overwrite2 t8010_stage2 t8010_pongoOS  
 ra1npoc --a11 t8015_overwrite1 t8015_overwrite2 t8015_stage2 t8015_pongoOS  
 ```

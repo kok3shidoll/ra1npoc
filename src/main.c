@@ -1,5 +1,8 @@
 #include <iousb.h>
+
+#include <checkra1n_common.h>
 #include <checkra1n_t8010_t8015.h>
+#include <checkra1n_s8000.h>
 
 int open_file(char *file, unsigned int *sz, void **buf){
     FILE *fd = fopen(file, "r");
@@ -36,6 +39,7 @@ void log_dev(){
 static void usage(char** argv) {
     printf("Usage: %s [option] over1 over2 stage2 payload\n", argv[0]);
     //printf("\t-p [flag]\tPut device in pwned DFU mode\n");
+    printf("\t--a9   \x1b[36ms8000\x1b[39m    - \x1b[35mcheckra1n\x1b[39m\n");
     printf("\t--a10  \x1b[36mt8010\x1b[39m    - \x1b[35mcheckra1n\x1b[39m\n");
     printf("\t--a11  \x1b[36mt8015\x1b[39m    - \x1b[35mcheckra1n\x1b[39m\n");
     printf("\n");
@@ -72,6 +76,8 @@ int main(int argc, char** argv){
         devmode = 0x8010;
     } else if(!strcmp(argv[1], "--a11")) {
         devmode = 0x8015;
+    } else if(!strcmp(argv[1], "--a9")) {
+        devmode = 0x8000;
     } else {
         usage(argv);
         return -1;
@@ -88,7 +94,7 @@ int main(int argc, char** argv){
     // If the device is in Stage2, send pongoOS.
     if(get_device(DEVICE_STAGE2) == 0){
         LOG_DONE("CONNECTED: STAGE2");
-        if(devmode == 0x8010 || devmode == 0x8015){
+        if(devmode == 0x8010 || devmode == 0x8015 || devmode == 0x8000){
             connect_to_stage2(client, devmode, payload);
         }
         return 0;
@@ -108,6 +114,8 @@ int main(int argc, char** argv){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for 14.x)
     } else if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for ~13.7)
+    } else if((client->devinfo.cpid == 0x8000)&&(devmode == 0x8000)){
+        checkra1n_s8000(client, client->devinfo.cpid, payload); // checkra1n (for A9)
     }
     
     return 0;
