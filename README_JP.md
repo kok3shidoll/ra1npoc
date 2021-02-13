@@ -80,11 +80,11 @@ ra1npoc --a11 t8015_overwrite1 t8015_overwrite2 t8015_stage2 t8015_pongoOS
 
 ## 注意点
 - iPhoneからlightning to USB camera adapter経由でDFU modeにする際にはLCDが点灯した状態のDFU modeに入れないと電源供給が足りず、DFU Modeに出来ない可能性があります。  
-    - 対象デバイス: `iPhone 7` (脱獄される側)  
+    - 対象デバイス: 残充電の少ない`iPhone 7` (脱獄される側)  
     - 解決策: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU Modeにした上でiOSデバイスに接続し直す。  
 
 - iPhoneからlightning to USB camera adapter経由でDFU modeにする際に電源供給が足りず、DFU Modeに出来ない可能性があります。  
-    - 対象デバイス: `iPhone 7`, `iPhone 8` (脱獄される側)  
+    - 対象デバイス: 残充電の少ない`iPhone 7`, `iPhone 8` (脱獄される側)  
     - 解決策: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU Modeにした上でiOSデバイスに接続し直す。  
 
 - stage2からpongoOSを送信する際に電源供給が足りず、再接続が出来ない可能性があります。  
