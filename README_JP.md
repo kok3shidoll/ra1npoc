@@ -8,6 +8,7 @@ checkra1n dump and poc for iOS
 
 ## サポート  
 ### ターゲットデバイス (脱獄される側)  
+- iPhone 5s (s5l8960x): iOS 12(.5.1)  
 - iPhone 6s (s8000): iOS 14(.3)  
 - iPhone 7 (t8010): iOS 14(.3)  
 - iPhone 8 (t8015): iOS 13(.5)  
@@ -56,9 +57,23 @@ cd src/
 
 
 ## 実行  
+### A7 device  
+```
+ra1npoc --a7 s5l8950x_overwrite1 s5l8950x_overwrite2 s5l8950x_stage2 t8015_pongoOS  
+```
+
+### A9 device (s8000)  
 ```
 ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 t8010_pongoOS  
+```
+
+### A10 device  
+```
 ra1npoc --a10 t8010_overwrite1 t8010_overwrite2 t8010_stage2 t8010_pongoOS  
+```
+
+### A11 device  
+```
 ra1npoc --a11 t8015_overwrite1 t8015_overwrite2 t8015_stage2 t8015_pongoOS  
 ```
 
