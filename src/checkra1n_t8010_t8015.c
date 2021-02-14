@@ -122,7 +122,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
@@ -136,7 +136,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
@@ -149,7 +149,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
@@ -162,7 +162,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;

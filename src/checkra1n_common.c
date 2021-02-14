@@ -63,7 +63,7 @@ int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t pay
     io_close(client);
     client = NULL;
     sleep(5);
-    get_device_stage2(&client, 15);
+    get_device_time_stage(&client, 15, DEVICE_STAGE2);
     if(!client) {
         LOG_ERROR("ERROR: Failed to connect to checkra1n DFU");
         return -1;

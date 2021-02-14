@@ -64,7 +64,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
@@ -77,7 +77,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;
@@ -90,7 +90,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time(&client, 5);
+    get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
         LOG_ERROR("ERROR: Failed to reconnect to device");
         return -1;

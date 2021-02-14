@@ -35,7 +35,6 @@ typedef io_client_p* io_client_t;
 
 struct io_client_p {
     IOUSBDeviceInterface320 **handle;
-    IOUSBInterfaceInterface300 **usbInterface;
     CFRunLoopSourceRef async_event_source;
     unsigned int mode;
     unsigned int vid;
@@ -58,15 +57,14 @@ typedef struct {
 
 typedef struct {
     uint32_t len;
-    kern_return_t ret;
+    IOReturn ret;
 } async_transfer_t;
 
 int get_device(unsigned int mode);
 void io_close(io_client_t client);
 int io_open(io_client_t *pclient, uint16_t pid);
 int io_reset(io_client_t client);
-int get_device_time(io_client_t *pclient, unsigned int time);
-int get_device_stage2(io_client_t *pclient, unsigned int time);
+int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage);
 
 IOReturn io_abort_pipe_zero(io_client_t client);
 
