@@ -59,7 +59,7 @@ cd src/
 ## 実行  
 ### A7 device  
 ```
-ra1npoc --a7 s5l8950x_overwrite1 s5l8950x_overwrite2 s5l8950x_stage2 t8015_pongoOS  
+ra1npoc --a7 s5l8960x_overwrite1 s5l8960x_overwrite2 s5l8960x_stage2 t8015_pongoOS  
 ```
 
 ### A9 device (s8000)  
