@@ -34,7 +34,7 @@ checkra1n_payload_t payload;
 
 void log_dev(){
     LOG_WAIT("* checkRAIN clone for iOS (by interception)");
-    LOG_DONE("*** made by @dora2ios");
+    LOG_DONE("** made by @dora2ios");
 }
 
 static void usage(char** argv) {
@@ -67,12 +67,14 @@ int main(int argc, char** argv){
     if(open_file(stage2_path, &payload.stage2_len, &payload.stage2) != 0) return -1;
     if(open_file(pongoOS_path, &payload.pongoOS_len, &payload.pongoOS) != 0) return -1;
     
-    //printf("kIOReturnSuccess: %x\n", kIOReturnSuccess);
-    //printf("kIOUSBPipeStalled: %x\n", kIOUSBPipeStalled);
-    //printf("kUSBHostReturnPipeStalled: %x\n", kUSBHostReturnPipeStalled);
-    //printf("kIOReturnTimeout: %x\n", kIOReturnTimeout);
-    //printf("kIOUSBTransactionTimeout: %x\n", kIOUSBTransactionTimeout);
-    //printf("kIOReturnNotResponding: %x\n", kIOReturnNotResponding);
+#ifdef HAVE_DEBUG
+    printf("kIOReturnSuccess: %x\n", kIOReturnSuccess);
+    printf("kIOUSBPipeStalled: %x\n", kIOUSBPipeStalled);
+    printf("kUSBHostReturnPipeStalled: %x\n", kUSBHostReturnPipeStalled);
+    printf("kIOReturnTimeout: %x\n", kIOReturnTimeout);
+    printf("kIOUSBTransactionTimeout: %x\n", kIOUSBTransactionTimeout);
+    printf("kIOReturnNotResponding: %x\n", kIOReturnNotResponding);
+#endif
     
     if(!strcmp(argv[1], "--a10")) {
         devmode = 0x8010;
@@ -89,7 +91,7 @@ int main(int argc, char** argv){
     
     log_dev();
     
-    LOG_WAIT("Waiting for device in DFU mode...");
+    LOG_WAIT("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     
     // For iOS 10 and lower:
     //    This device cannot connect to Stage2 because lack of power supply when using lightning to USB camera adapter.
@@ -97,7 +99,7 @@ int main(int argc, char** argv){
     
     // If the device is in Stage2, send pongoOS.
     if(get_device(DEVICE_STAGE2) == 0){
-        LOG_DONE("CONNECTED: STAGE2");
+        LOG_DONE("[%s] CONNECTED: STAGE2", __FUNCTION__);
         if(devmode == 0x8010 || devmode == 0x8015 || devmode == 0x8000 || devmode == 0x8960){
             connect_to_stage2(client, devmode, payload);
         }
@@ -107,12 +109,13 @@ int main(int argc, char** argv){
     while(get_device(DEVICE_DFU) != 0) {
         sleep(1);
     }
-    LOG_DONE("CONNECTED");
+    LOG_DONE("[%s] CONNECTED", __FUNCTION__);
     
     if(client->hasSerialStr == FALSE){
         SNR(client); // For iOS 10 and lower
     }
-    printf("%x, %s\n", client->devinfo.cpid, client->devinfo.srtg);
+    
+    LOG_DONE("[%s] CPID: 0x%02x, STRG: [%s]", __FUNCTION__, client->devinfo.cpid, client->devinfo.srtg);
     
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
         checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for 14.x)

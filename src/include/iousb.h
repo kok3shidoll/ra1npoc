@@ -14,12 +14,12 @@
 #define DEVICE_RECOVERY_MODE_3  (0x1282)
 #define DEVICE_RECOVERY_MODE_4  (0x1283)
 
-#define LOG_WAIT(fmt, ...) do { printf("\x1b[36m%s\x1b[39m\n", fmt, ##__VA_ARGS__);} while(0)
-#define LOG_ERROR(fmt, ...) do { printf("\x1b[31m%s\x1b[39m\n", fmt, ##__VA_ARGS__);} while(0)
-#define LOG_DONE(fmt, ...) do { printf("\x1b[31;1m%s\x1b[39;0m\n", fmt, ##__VA_ARGS__);} while(0)
-#define LOG_EXPLOIT_NAME(fmt, ...) do { printf("\x1b[1m** \x1b[31mexploiting with %s\x1b[39;0m\n", fmt, ##__VA_ARGS__);} while(0)
-
-#define LOG_DEBUG(fmt, ...) do { printf("\x1b[32m%s\x1b[39m\n", fmt, ##__VA_ARGS__);} while(0)
+/* LOG macro */
+#define LOG_ERROR(x, ...) do { printf("\x1b[31m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+#define LOG_EXPLOIT_NAME(x, ...) do { printf("\x1b[1m** \x1b[31mexploiting with "x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
+#define LOG_DONE(x, ...) do { printf("\x1b[31;1m"x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
+#define LOG_WAIT(x, ...) do { printf("\x1b[36m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+#define LOG_PROGRESS(x, ...) do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
 
 struct io_devinfo {
     unsigned int sdom;
@@ -56,9 +56,11 @@ typedef struct {
 } checkra1n_payload_t;
 
 typedef struct {
-    uint32_t len;
+    UInt32 wLenDone;
     IOReturn ret;
-} async_transfer_t;
+} transfer_t;
+
+typedef transfer_t async_transfer_t;
 
 int get_device(unsigned int mode);
 void io_close(io_client_t client);
@@ -68,12 +70,12 @@ int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stag
 
 IOReturn io_abort_pipe_zero(io_client_t client);
 
-IOReturn async_usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, async_transfer_t* transfer);
-uint32_t async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
-uint32_t async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
-uint32_t async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
+transfer_t usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
+transfer_t usb_ctrl_transfer_with_time(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int time);
+transfer_t async_usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, async_transfer_t* transfer);
+UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
+UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
+UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
 
-IOReturn usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
-IOReturn usb_ctrl_transfer_with_time(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int time);
 
 void SNR(io_client_t client);

