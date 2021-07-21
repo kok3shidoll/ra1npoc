@@ -2,14 +2,15 @@
 checkra1n dump and poc for iOS  
 
 ## note  
-This poc uses the payload dumped from checkra1n 0.12.2 beta.  
+This poc uses the payload dumped from checkra1n 0.12.2 beta, but s8000 device used pongoOS from checkra1n 0.12.4 beta.
+
 This tool is for testing purposes. Do not use it on a normal device.  
 
 
 ## support  
 ### target devices  
 - iPhone 5s (s5l8960x): for iOS 12(.5.1)  
-- iPhone 6s (s8000): for iOS 14(.3)  
+- iPhone 6s (s8000): for iOS 14(.5.1)  
 - iPhone 7 (t8010): for iOS 14(.3)  
 - iPhone 8 (t8015): for iOS 13(.5)  
 
@@ -60,7 +61,7 @@ ra1npoc --a7 s5l8960x_overwrite1 s5l8960x_overwrite2 s5l8960x_stage2 t8015_pongo
 
 ### A9 device (s8000)  
 ```
-ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 t8010_pongoOS  
+ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 s8000_pongoOS_251  
 ```
 
 ### A10 device  

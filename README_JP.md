@@ -3,13 +3,14 @@ checkra1n dump and poc for iOS
 
 ## 注意  
 これはcheckra1n 0.12.2 betaからダンプしたPayloadに基づいて作成された、iOS上でcheckra1nを動かすための実証コードです。  
+しかし、s8000デバイスはcheckra1n 0.12.4 betaのpongoOSを使用した。
 このツールは検証用です。通常のデバイスでは実行しないでください。  
 
 
 ## サポート  
 ### ターゲットデバイス (脱獄される側)  
 - iPhone 5s (s5l8960x): iOS 12(.5.1)  
-- iPhone 6s (s8000): iOS 14(.3)  
+- iPhone 6s (s8000): iOS 14(.5.1)  
 - iPhone 7 (t8010): iOS 14(.3)  
 - iPhone 8 (t8015): iOS 13(.5)  
 
@@ -64,7 +65,7 @@ ra1npoc --a7 s5l8960x_overwrite1 s5l8960x_overwrite2 s5l8960x_stage2 t8015_pongo
 
 ### A9 device (s8000)  
 ```
-ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 t8010_pongoOS  
+ra1npoc --a9 /dev/null 8000_overwrite2 s8000_stage2 s8000_pongoOS_251  
 ```
 
 ### A10 device  
