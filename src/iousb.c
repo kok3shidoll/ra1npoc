@@ -154,7 +154,7 @@ void read_serial_number(io_client_t client){
     
     if(client->devinfo.srtg != NULL){
         client->hasSN = true;
-        LOG_DONE("[%s] Found serial number!", __FUNCTION__);
+        DEBUGLOG("[%s] Found serial number!", __FUNCTION__);
     }
 }
 
@@ -184,7 +184,7 @@ static void io_get_serial(io_client_t client, io_service_t service){
         CFRelease(serialstr);
         load_devinfo(client, serial_str);
         client->hasSN = true;
-        LOG_DONE("[%s] Found serial number!", __FUNCTION__);
+        DEBUGLOG("[%s] Found serial number!", __FUNCTION__);
     }
     
 }
@@ -268,35 +268,29 @@ int get_device(unsigned int mode, bool srnm) {
 }
 
 
-void io_reenumerate(io_client_t client) {
-    if (client == NULL || client->handle == NULL) {
-        return;
+IOReturn io_reenumerate(io_client_t client){
+    if (client == NULL || client->handle == NULL){
+        return kIOReturnError;
     }
-    
-    IOReturn result;
-    
-    result = (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
-    if (result != kIOReturnSuccess && result != kIOReturnNotResponding) {
-        // error
-    }
+    return (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
 }
 
-int io_reset(io_client_t client) {
-    
-    if (client == NULL || client->handle == NULL) {
-        return -1;
+IOReturn io_resetdevice(io_client_t client){
+    if (client == NULL || client->handle == NULL){
+        return kIOReturnError;
     }
-    
+    return (*client->handle)->ResetDevice(client->handle);
+}
+
+IOReturn io_reset(io_client_t client){
     IOReturn result;
-    
-    result = (*client->handle)->ResetDevice(client->handle);
-    if (result != kIOReturnSuccess && result != kIOReturnNotResponding) {
-        return -1;
+    result = io_resetdevice(client);
+    DEBUGLOG("[%s] ResetDevice: %x", __FUNCTION__, result);
+    if(result == kIOReturnSuccess){
+        result = io_reenumerate(client);
+        DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
     }
-    
-    io_reenumerate(client);
-    
-    return 0;
+    return result;
 }
 
 int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool srnm){

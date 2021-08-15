@@ -8,7 +8,7 @@
 static int open_file(char *file, unsigned int *sz, void **buf){
     FILE *fd = fopen(file, "r");
     if (!fd) {
-        printf("error opening %s\n", file);
+        ERROR("[%s] error opening %s", __FUNCTION__, file);
         return -1;
     }
     
@@ -18,7 +18,7 @@ static int open_file(char *file, unsigned int *sz, void **buf){
     
     *buf = malloc(*sz);
     if (!*buf) {
-        printf("error allocating file buffer\n");
+        ERROR("[%s] error allocating file buffer", __FUNCTION__);
         fclose(fd);
         return -1;
     }
@@ -33,13 +33,11 @@ io_client_t client;
 checkra1n_payload_t payload;
 
 static void log_dev(){
-    LOG_WAIT("* checkRAIN clone for iOS (by interception)");
-    LOG_DONE("** made by @dora2ios");
+    LOG_DONE("* checkRAIN clone for iOS by interception");
 }
 
 static void usage(char** argv) {
     printf("Usage: %s [option] over1 over2 stage2 payload\n", argv[0]);
-    //printf("\t-p [flag]\tPut device in pwned DFU mode\n");
     printf("\t--a7   \x1b[36ms5l8960x\x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
     printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
     printf("\t--a10  \x1b[36mt8010   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
@@ -109,6 +107,7 @@ int main(int argc, char** argv){
     while(get_device(DEVICE_DFU, true) != 0) {
         sleep(1);
     }
+    
     LOG_DONE("[%s] CONNECTED", __FUNCTION__);
     
     if(client->hasSN == false){
@@ -118,7 +117,7 @@ int main(int argc, char** argv){
     LOG_DONE("[%s] CPID: 0x%02x, STRG: [%s]", __FUNCTION__, client->devinfo.cpid, client->devinfo.srtg);
     
     if(client->hasSN != true){
-        LOG_ERROR("[%s] Serial number was not found!", __FUNCTION__);
+        ERROR("[%s] Serial number was not found!", __FUNCTION__);
         return -1;
     }
     

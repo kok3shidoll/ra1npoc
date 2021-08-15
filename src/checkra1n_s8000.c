@@ -14,20 +14,21 @@ static void set_global_state(io_client_t client){
     
     int i=0;
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) != 0x40){
-        DEBUG_LOG("[%s] sent: %x\n", __FUNCTION__, sent);
         i++;
-        DEBUG_LOG("[%s] retry: %x\n", __FUNCTION__, i);
+        DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
         result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 64);
-        DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+        DEBUGLOG("[%s] (*) %x", __FUNCTION__, result.ret);
         usleep(10000);
     }
     
+    DEBUGLOG("[%s] (1/3) val: %x", __FUNCTION__, val);
+    
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
-    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+    DEBUGLOG("[%s] (2/3) %x", __FUNCTION__, result.ret);
     
     result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+    DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
 }
 
 static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
@@ -37,9 +38,9 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
     
     // over1 = dummy
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
-    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+    DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
     result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
-    DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
+    DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
 }
 
 int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
@@ -54,13 +55,18 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     usleep(1000);
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
-    io_reset(client);
+    if(io_reset(client) != kIOReturnSuccess){
+        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        io_close(client);
+        client = NULL;
+        return -1;
+    }
     io_close(client);
     client = NULL;
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
-        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
@@ -73,7 +79,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
-        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     
@@ -86,7 +92,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     usleep(10000);
     get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
-        LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
     }
     

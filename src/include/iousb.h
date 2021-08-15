@@ -15,11 +15,29 @@
 #define DEVICE_RECOVERY_MODE_4  (0x1283)
 
 /* LOG macro */
-#define LOG_ERROR(x, ...) do { printf("\x1b[31m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-#define LOG_EXPLOIT_NAME(x, ...) do { printf("\x1b[1m** \x1b[31mexploiting with "x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
-#define LOG_DONE(x, ...) do { printf("\x1b[31;1m"x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
-#define LOG_WAIT(x, ...) do { printf("\x1b[36m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-#define LOG_PROGRESS(x, ...) do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+#ifndef IPHONEOS_ARM
+  #define ERROR(x, ...)             do { printf("\x1b[31m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+  #ifdef HAVE_DEBUG
+    #define DEBUGLOG(x, ...)        do { printf("\x1b[34m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+  #else
+    #define DEBUGLOG(x, ...)
+  #endif
+  #define LOG_EXPLOIT_NAME(x, ...)  do { printf("\x1b[1m** \x1b[31mexploiting with "x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
+  #define LOG_DONE(x, ...)          do { printf("\x1b[31;1m"x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
+  #define LOG_WAIT(x, ...)          do { printf("\x1b[36m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+  #define LOG_PROGRESS(x, ...)      do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+#else
+  #define ERROR(x, ...)             do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+  #ifdef HAVE_DEBUG
+    #define DEBUGLOG(x, ...)        do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+  #else
+    #define DEBUGLOG(x, ...)
+  #endif
+  #define LOG_EXPLOIT_NAME(x, ...)  do { printf("** exploiting with "x"\n", ##__VA_ARGS__); } while(0)
+  #define LOG_DONE(x, ...)          do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+  #define LOG_WAIT(x, ...)          do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+  #define LOG_PROGRESS(x, ...)      do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+#endif
 
 struct io_devinfo {
     unsigned int sdom;
@@ -64,8 +82,9 @@ typedef transfer_t async_transfer_t;
 int get_device(unsigned int mode, bool srnm);
 void io_close(io_client_t client);
 int io_open(io_client_t *pclient, uint16_t pid, bool srnm);
-int io_reset(io_client_t client);
-void io_reenumerate(io_client_t client);
+IOReturn io_reset(io_client_t client);
+IOReturn io_reenumerate(io_client_t client);
+IOReturn io_resetdevice(io_client_t client);
 int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool snrm);
 
 IOReturn io_abort_pipe_zero(io_client_t client);
