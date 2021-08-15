@@ -24,7 +24,6 @@
 struct io_devinfo {
     unsigned int sdom;
     unsigned int cpid;
-    unsigned int bdid;
     bool hasSRNM;
     bool hasPWND;
     char* srtg;
@@ -34,14 +33,14 @@ typedef struct io_client_p io_client_p;
 typedef io_client_p* io_client_t;
 
 struct io_client_p {
-    IOUSBDeviceInterface320 **handle;
+    IOUSBDeviceInterface650 **handle;
     CFRunLoopSourceRef async_event_source;
     unsigned int mode;
     unsigned int vid;
     int usb_interface;
     int usb_alt_interface;
     struct io_devinfo devinfo;
-    bool hasSerialStr;
+    bool hasSN;
 };
 
 typedef struct {
@@ -62,11 +61,12 @@ typedef struct {
 
 typedef transfer_t async_transfer_t;
 
-int get_device(unsigned int mode);
+int get_device(unsigned int mode, bool srnm);
 void io_close(io_client_t client);
-int io_open(io_client_t *pclient, uint16_t pid);
+int io_open(io_client_t *pclient, uint16_t pid, bool srnm);
 int io_reset(io_client_t client);
-int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage);
+void io_reenumerate(io_client_t client);
+int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool snrm);
 
 IOReturn io_abort_pipe_zero(io_client_t client);
 
@@ -78,4 +78,4 @@ UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_t
 UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
 
 
-void SNR(io_client_t client);
+void read_serial_number(io_client_t client);

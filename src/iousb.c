@@ -4,7 +4,6 @@
 
 #include <iousb.h>
 
-
 extern io_client_t client;
 
 static const char *darwin_device_class = kIOUSBDeviceClassName;
@@ -14,13 +13,6 @@ static int nsleep(long nanoseconds) {
     req.tv_sec = 0;
     req.tv_nsec = nanoseconds;
     return nanosleep(&req, &rem);
-}
-
-static int check_context(io_client_t client) {
-    if (client == NULL || client->handle == NULL) {
-        return -1;
-    }
-    return 0;
 }
 
 static void cfdictionary_set_short(CFMutableDictionaryRef dict, const void *key, SInt16 value)
@@ -78,11 +70,6 @@ static void load_devinfo(io_client_t client, const char* str)
         sscanf(ptr, "CPID:%x", &client->devinfo.cpid);
     }
     
-    ptr = strstr(str, "BDID:");
-    if (ptr != NULL) {
-        sscanf(ptr, "BDID:%x", &client->devinfo.bdid);
-    }
-    
     ptr = strstr(str, "SRNM:[");
     if(ptr != NULL) {
         client->devinfo.hasSRNM = TRUE;
@@ -123,15 +110,15 @@ void io_close(io_client_t client){
     client = NULL;
 }
 
-// for iOS 10 or lower
-void SNR(io_client_t client){
+// for iPhoneOS 10 or lower
+void read_serial_number(io_client_t client){
     transfer_t result;
     uint8_t size;
     
     unsigned char buf[0x100];
     unsigned char str[0x100];
-    bzero(str, 0x100);
-    bzero(buf, 0x100);
+    memset(&str, '\0', 0x100);
+    memset(&buf, '\0', 0x100);
     
     if(client->devinfo.srtg == NULL){
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0306, 0x040a, buf, 0x100); // 8950 or up (PWND)
@@ -154,8 +141,8 @@ void SNR(io_client_t client){
     }
     
     if(client->devinfo.srtg == NULL){
-        bzero(buf, 0x100);
-        bzero(str, 0x80);
+        memset(&buf, '\0', 0x100);
+        memset(&str, '\0', 0x80);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0303, 0x040a, buf, 0x100); // 8930
         if(result.ret != kIOReturnSuccess) return;
         size = *(uint8_t*)buf;
@@ -166,7 +153,8 @@ void SNR(io_client_t client){
     }
     
     if(client->devinfo.srtg != NULL){
-        client->hasSerialStr = TRUE;
+        client->hasSN = true;
+        LOG_DONE("[%s] Found serial number!", __FUNCTION__);
     }
 }
 
@@ -181,17 +169,62 @@ static void io_async_cb(void *refcon, IOReturn ret, void *arg_0)
     }
 }
 
-int io_open(io_client_t *pclient, uint16_t pid){
+static void io_get_serial(io_client_t client, io_service_t service){
+    CFStringRef serialstr;
+    
+    // Older iOS versions (such as iOS 10) can't get the serial number, so don't get it.
+    char serial_str[256];
+    memset(&serial_str, '\0', 256);
+    
+    client->hasSN = false;
+    
+    serialstr = IORegistryEntryCreateCFProperty(service, CFSTR(kUSBSerialNumberString), kCFAllocatorDefault, kNilOptions);
+    if(serialstr){
+        CFStringGetCString(serialstr, serial_str, sizeof(serial_str), kCFStringEncodingUTF8);
+        CFRelease(serialstr);
+        load_devinfo(client, serial_str);
+        client->hasSN = true;
+        LOG_DONE("[%s] Found serial number!", __FUNCTION__);
+    }
+    
+}
+
+static IOReturn io_create_plugin_interface(io_client_t client, io_service_t service){
+    IOReturn result;
+    IOCFPlugInInterface **plugin = NULL;
+    SInt32 score;
+    
+    result = IOCreatePlugInInterfaceForService(service, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
+    if(result == kIOReturnSuccess){
+        result = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID650), (LPVOID *)&(client->handle));
+        IODestroyPlugInInterface(plugin);
+        if(result == kIOReturnSuccess){
+            result = (*client->handle)->USBDeviceOpen(client->handle);
+            if (result == kIOReturnSuccess) {
+                result = (*client->handle)->SetConfiguration(client->handle, 1);
+                if (result == kIOReturnSuccess) {
+                    result = (*client->handle)->CreateDeviceAsyncEventSource(client->handle, &client->async_event_source);
+                    if (result == kIOReturnSuccess) {
+                        CFRunLoopAddSource(CFRunLoopGetCurrent(), client->async_event_source, kCFRunLoopDefaultMode);
+                    }
+                }
+            } else {
+                (*client->handle)->Release(client->handle);
+            }
+        }
+    }
+    IOObjectRelease(service);
+    
+    return result;
+}
+
+int io_open(io_client_t *pclient, uint16_t pid, bool srnm){
     io_service_t service = IO_OBJECT_NULL;
     io_iterator_t iterator;
-    
     IOReturn result;
-    io_client_t _client;
-    IOCFPlugInInterface **plug = NULL;
-    SInt32 score;
     UInt16 mode;
     UInt32 locationID;
-    CFStringRef serialString;
+    io_client_t _client;
     
     client = NULL;
     iterator = io_get_iterator_for_pid(pid);
@@ -203,94 +236,56 @@ int io_open(io_client_t *pclient, uint16_t pid){
         IOObjectRelease(iterator);
         
         _client = (io_client_t) calloc(1, sizeof(struct io_client_p));
-        
-        result = IOCreatePlugInInterfaceForService(service, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plug, &score);
-        if (result != kIOReturnSuccess) {
-            IOObjectRelease(service);
-            free(_client);
-            return -1;
+        if(srnm == true){
+            io_get_serial(_client, service);
         }
-        
-        // Older iOS versions (such as iOS 10) can't get the serial number, so don't get it.
-        char serial_str[256];
-        serial_str[0] = '\0';
-        serialString = IORegistryEntryCreateCFProperty(service, CFSTR(kUSBSerialNumberString), kCFAllocatorDefault, 0);
-        if (serialString) {
-            CFStringGetCString(serialString, serial_str, sizeof(serial_str), kCFStringEncodingUTF8);
-            CFRelease(serialString);
-            load_devinfo(_client, serial_str);
-            _client->hasSerialStr = TRUE;
-        } else {
-            _client->hasSerialStr = FALSE;
+        if(io_create_plugin_interface(_client, service) == kIOReturnSuccess) {
+            (*_client->handle)->GetDeviceProduct(_client->handle, &mode);
+            (*_client->handle)->GetLocationID(_client->handle, &locationID);
+            _client->mode = mode;
+            *pclient = _client;
+            return 0;
         }
-        IOObjectRelease(service);
-        
-        // Create the device interface
-        result = (*plug)->QueryInterface(plug, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID320), (LPVOID *)&(_client->handle));
-        IODestroyPlugInInterface(plug);
-        if (result != kIOReturnSuccess) {
-            free(_client);
-            return -1;
-        }
-        
-        (*_client->handle)->GetDeviceProduct(_client->handle, &mode);
-        (*_client->handle)->GetLocationID(_client->handle, &locationID);
-        _client->mode = mode;
-        
-        result = (*_client->handle)->USBDeviceOpen(_client->handle);
-        if (result != kIOReturnSuccess) {
-            (*_client->handle)->Release(_client->handle);
-            free(_client);
-            return -1;
-        }
-        
-        result = (*_client->handle)->SetConfiguration(_client->handle, 1);
-        if (result != kIOReturnSuccess) {
-            free(_client);
-            return -1;
-        }
-        
-        result = (*_client->handle)->CreateDeviceAsyncEventSource(_client->handle, &_client->async_event_source);
-        if (result != kIOReturnSuccess) {
-            free(_client);
-            return -1;
-        }
-        
-        CFRunLoopAddSource(CFRunLoopGetCurrent(), _client->async_event_source, kCFRunLoopDefaultMode);
-        
-        *pclient = _client;
-        
-        return 0;
+        free(_client);
     }
     
     return -1;
 }
 
-int get_device(unsigned int mode) {
+int get_device(unsigned int mode, bool srnm) {
     
     if(client) {
         io_close(client);
         client = NULL;
     }
     
-    io_open(&client, mode);
+    io_open(&client, mode, srnm);
     if(!client) {
-        return -1;
-    }
-    
-    if(client->mode != mode){
-        io_close(client);
-        client = NULL;
         return -1;
     }
     
     return 0;
 }
 
+
+void io_reenumerate(io_client_t client) {
+    if (client == NULL || client->handle == NULL) {
+        return;
+    }
+    
+    IOReturn result;
+    
+    result = (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
+    if (result != kIOReturnSuccess && result != kIOReturnNotResponding) {
+        // error
+    }
+}
+
 int io_reset(io_client_t client) {
     
-    if (check_context(client) != 0)
+    if (client == NULL || client->handle == NULL) {
         return -1;
+    }
     
     IOReturn result;
     
@@ -299,27 +294,22 @@ int io_reset(io_client_t client) {
         return -1;
     }
     
-    result = (*client->handle)->USBDeviceReEnumerate(client->handle, 0);
-    if (result != kIOReturnSuccess && result != kIOReturnNotResponding) {
-        // error re-enumerating device: result (ignored)
-    }
+    io_reenumerate(client);
     
     return 0;
 }
 
-int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage){
+int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool srnm){
     
     for(int i=0; i<time; i++){
         if(*pclient) {
             io_close(*pclient);
             *pclient = NULL;
         }
-        if (io_open(pclient, stage) != 0) {
-            // Connection failed. Waiting 1 sec before retry.
-            sleep(1);
-        } else {
+        if (io_open(pclient, stage, srnm) == 0) {
             return 0;
         }
+        sleep(1);
     }
     return -1;
 }
@@ -329,8 +319,8 @@ transfer_t usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_
     transfer_t result;
     IOUSBDevRequest req;
     
-    bzero(&result, sizeof(transfer_t));
-    bzero(&req, sizeof(req));
+    memset(&result, '\0', sizeof(transfer_t));
+    memset(&req, '\0', sizeof(req));
     
     req.bmRequestType     = bm_request_type;
     req.bRequest          = b_request;
@@ -350,8 +340,8 @@ transfer_t usb_ctrl_transfer_with_time(io_client_t client, uint8_t bm_request_ty
     transfer_t result;
     IOUSBDevRequestTO req;
     
-    bzero(&result, sizeof(transfer_t));
-    bzero(&req, sizeof(req));
+    memset(&result, '\0', sizeof(transfer_t));
+    memset(&req, '\0', sizeof(req));
     
     req.bmRequestType     = bm_request_type;
     req.bRequest          = b_request;
@@ -377,8 +367,8 @@ transfer_t async_usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, 
     transfer_t result;
     IOUSBDevRequest req;
     
-    bzero(&result, sizeof(transfer_t));
-    bzero(&req, sizeof(req));
+    memset(&result, '\0', sizeof(transfer_t));
+    memset(&req, '\0', sizeof(req));
     
     req.bmRequestType     = bm_request_type;
     req.bRequest          = b_request;
@@ -399,7 +389,7 @@ UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_reques
     IOReturn error;
     async_transfer_t transfer;
     
-    bzero(&transfer, sizeof(async_transfer_t));
+    memset(&transfer, '\0', sizeof(async_transfer_t));
     
     result = async_usb_ctrl_transfer(client, bm_request_type, b_request, w_value, w_index, data, w_length, &transfer);
     if(result.ret != kIOReturnSuccess) {
@@ -422,7 +412,7 @@ UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_reques
 UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length)
 {
     async_transfer_t transfer;
-    bzero(&transfer, sizeof(async_transfer_t));
+    memset(&transfer, '\0', sizeof(async_transfer_t));
 
     async_usb_ctrl_transfer(client, bm_request_type, b_request, w_value, w_index, data, w_length, &transfer);
     return transfer.wLenDone;
@@ -431,7 +421,7 @@ UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_t
 UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time)
 {
     async_transfer_t transfer;
-    bzero(&transfer, sizeof(async_transfer_t));
+    memset(&transfer, '\0', sizeof(async_transfer_t));
 
     async_usb_ctrl_transfer(client, bm_request_type, b_request, w_value, w_index, data, w_length, &transfer);
     nsleep(ns_time);

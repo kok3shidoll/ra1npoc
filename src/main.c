@@ -5,7 +5,7 @@
 #include <checkra1n_s8000.h>
 #include <checkra1n_s5l8960x.h>
 
-int open_file(char *file, unsigned int *sz, void **buf){
+static int open_file(char *file, unsigned int *sz, void **buf){
     FILE *fd = fopen(file, "r");
     if (!fd) {
         printf("error opening %s\n", file);
@@ -32,7 +32,7 @@ int open_file(char *file, unsigned int *sz, void **buf){
 io_client_t client;
 checkra1n_payload_t payload;
 
-void log_dev(){
+static void log_dev(){
     LOG_WAIT("* checkRAIN clone for iOS (by interception)");
     LOG_DONE("** made by @dora2ios");
 }
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
     if(open_file(stage2_path, &payload.stage2_len, &payload.stage2) != 0) return -1;
     if(open_file(pongoOS_path, &payload.pongoOS_len, &payload.pongoOS) != 0) return -1;
     
-#ifdef HAVE_DEBUG
+#ifdef HAVE_DEBUG2
     printf("kIOReturnSuccess: %x\n", kIOReturnSuccess);
     printf("kIOUSBPipeStalled: %x\n", kIOUSBPipeStalled);
     printf("kUSBHostReturnPipeStalled: %x\n", kUSBHostReturnPipeStalled);
@@ -98,7 +98,7 @@ int main(int argc, char** argv){
     //    This device can be connected by powering the lightning to USB 3 camera adapter.
     
     // If the device is in Stage2, send pongoOS.
-    if(get_device(DEVICE_STAGE2) == 0){
+    if(get_device(DEVICE_STAGE2, true) == 0){
         LOG_DONE("[%s] CONNECTED: STAGE2", __FUNCTION__);
         if(devmode == 0x8010 || devmode == 0x8015 || devmode == 0x8000 || devmode == 0x8960){
             connect_to_stage2(client, devmode, payload);
@@ -106,25 +106,30 @@ int main(int argc, char** argv){
         return 0;
     }
     
-    while(get_device(DEVICE_DFU) != 0) {
+    while(get_device(DEVICE_DFU, true) != 0) {
         sleep(1);
     }
     LOG_DONE("[%s] CONNECTED", __FUNCTION__);
     
-    if(client->hasSerialStr == FALSE){
-        SNR(client); // For iOS 10 and lower
+    if(client->hasSN == false){
+        read_serial_number(client); // For iOS 10 and lower
     }
     
     LOG_DONE("[%s] CPID: 0x%02x, STRG: [%s]", __FUNCTION__, client->devinfo.cpid, client->devinfo.srtg);
     
+    if(client->hasSN != true){
+        LOG_ERROR("[%s] Serial number was not found!", __FUNCTION__);
+        return -1;
+    }
+    
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
-        checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for 14.x)
+        checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // A10 Fusion
     } else if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
-        checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // checkra1n (for ~13.7)
+        checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // A11 Bionic
     } else if((client->devinfo.cpid == 0x8000)&&(devmode == 0x8000)){
-        checkra1n_s8000(client, client->devinfo.cpid, payload); // checkra1n (for A9)
+        checkra1n_s8000(client, client->devinfo.cpid, payload);       // A9
     } else if((client->devinfo.cpid == 0x8960)&&(devmode == 0x8960)){
-        checkra1n_s5l8960x(client, client->devinfo.cpid, payload); // checkra1n (for A7)
+        checkra1n_s5l8960x(client, client->devinfo.cpid, payload);    // A7
     }
     
     return 0;

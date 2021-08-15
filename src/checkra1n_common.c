@@ -30,7 +30,7 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     transfer_t result;
     
     unsigned char blank[8];
-    bzero(blank, 8);
+    memset(&blank, '\0', 8);
     
     result = usb_ctrl_transfer(client, 0x40, 64, 0x03e8, 0x01f4, NULL, 0); // ?
     DEBUG_LOG("[%s] %x\n", __FUNCTION__, result.ret);
@@ -74,7 +74,7 @@ int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t pay
     io_close(client);
     client = NULL;
     sleep(5);
-    get_device_time_stage(&client, 15, DEVICE_STAGE2);
+    get_device_time_stage(&client, 15, DEVICE_STAGE2, false);
     if(!client) {
         LOG_ERROR("[%s] ERROR: Failed to connect to checkra1n DFU", __FUNCTION__);
         return -1;
