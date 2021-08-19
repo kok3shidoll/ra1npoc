@@ -73,7 +73,7 @@ static void set_global_state(io_client_t client){
     
     val += 0x40;
     val -= sent;
-    DEBUGLOG("[%s] (1/3) sent: %x, val: %x", __FUNCTION__, sent, val);
+    DEBUGLOG("[%s] (1/3) sent: %x, val: %x", __FUNCTION__, (unsigned int)sent, val);
     
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
     DEBUGLOG("[%s] (2/3) %x", __FUNCTION__, result.ret);
@@ -124,12 +124,12 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    if(result != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    //if(result != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     client = NULL;
     usleep(1000);
@@ -144,12 +144,12 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    if(result != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    //if(result != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -165,12 +165,12 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     result = io_reenumerate(client);
     DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    if(result != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to ReEnumerate to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    //if(result != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to ReEnumerate to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     client = NULL;
     usleep(10000);

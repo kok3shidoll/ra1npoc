@@ -26,7 +26,7 @@ static void cfdictionary_set_short(CFMutableDictionaryRef dict, const void *key,
 }
 
 static io_iterator_t io_get_iterator_for_pid(uint16_t pid) {
-    
+    //DEBUGLOG("[%s] io_get_iterator_for_pid", __FUNCTION__);
     IOReturn result;
     io_iterator_t iterator;
     CFMutableDictionaryRef matchingDict;
@@ -170,6 +170,7 @@ static void io_async_cb(void *refcon, IOReturn ret, void *arg_0)
 }
 
 static void io_get_serial(io_client_t client, io_service_t service){
+    //DEBUGLOG("[%s] io_get_serial", __FUNCTION__);
     CFStringRef serialstr;
     
     // Older iOS versions (such as iOS 10) can't get the serial number, so don't get it.
@@ -190,13 +191,15 @@ static void io_get_serial(io_client_t client, io_service_t service){
 }
 
 static IOReturn io_create_plugin_interface(io_client_t client, io_service_t service){
+    //DEBUGLOG("[%s] io_create_plugin_interface", __FUNCTION__);
+    
     IOReturn result;
     IOCFPlugInInterface **plugin = NULL;
     SInt32 score;
     
     result = IOCreatePlugInInterfaceForService(service, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
     if(result == kIOReturnSuccess){
-        result = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBDeviceInterfaceID650), (LPVOID *)&(client->handle));
+        result = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(IOUSBDeviceInterface), (LPVOID *)&(client->handle));
         IODestroyPlugInInterface(plugin);
         if(result == kIOReturnSuccess){
             result = (*client->handle)->USBDeviceOpen(client->handle);
@@ -219,6 +222,7 @@ static IOReturn io_create_plugin_interface(io_client_t client, io_service_t serv
 }
 
 int io_open(io_client_t *pclient, uint16_t pid, bool srnm){
+    //DEBUGLOG("[%s] io_open", __FUNCTION__);
     io_service_t service = IO_OBJECT_NULL;
     io_iterator_t iterator;
     IOReturn result;
@@ -286,10 +290,10 @@ IOReturn io_reset(io_client_t client){
     IOReturn result;
     result = io_resetdevice(client);
     DEBUGLOG("[%s] ResetDevice: %x", __FUNCTION__, result);
-    if(result == kIOReturnSuccess){
+    //if(result == kIOReturnSuccess){
         result = io_reenumerate(client);
         DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    }
+    //}
     return result;
 }
 

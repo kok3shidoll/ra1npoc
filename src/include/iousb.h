@@ -6,6 +6,12 @@
 #define kUSBHostReturnPipeStalled (IOReturn)0xe0005000
 #endif
 
+#ifndef IPHONEOS_ARM
+#define IOUSBDeviceInterface kIOUSBDeviceInterfaceID650
+#else
+#define IOUSBDeviceInterface kIOUSBDeviceInterfaceID320
+#endif
+
 #define DEVICE_DFU              (0x1227)
 #define DEVICE_STAGE2           (0x1338)
 #define DEVICE_PONGO            (0x4141)
@@ -51,7 +57,11 @@ typedef struct io_client_p io_client_p;
 typedef io_client_p* io_client_t;
 
 struct io_client_p {
+#ifndef IPHONEOS_ARM
     IOUSBDeviceInterface650 **handle;
+#else
+    IOUSBDeviceInterface320 **handle;
+#endif
     CFRunLoopSourceRef async_event_source;
     unsigned int mode;
     unsigned int vid;

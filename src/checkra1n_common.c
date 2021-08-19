@@ -10,7 +10,7 @@ int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payloa
             size = ((payload.stage2_len - len) > 0x800) ? 0x800 : (payload.stage2_len - len);
             result = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.stage2[len], size, 100);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
-                ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, result.wLenDone);
+                ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
                 return -1;
             }
             len += size;
@@ -42,7 +42,7 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
             size = ((payload.pongoOS_len - len) > 0x800) ? 0x800 : (payload.pongoOS_len - len);
             result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.pongoOS[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
-                ERROR("[%s] ERROR: Failed to send pongoOS [%x, %x]", __FUNCTION__, result.ret, result.wLenDone);
+                ERROR("[%s] ERROR: Failed to send pongoOS [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
                 return -1;
             }
             len += size;
@@ -73,12 +73,12 @@ int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t pay
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    if(result != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    //if(result != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     client = NULL;
     sleep(5);
@@ -98,12 +98,12 @@ int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t pay
     }
     
     result = io_reset(client);
-    if(result != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    //if(result != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     
     LOG_DONE("[%s] BOOTED", __FUNCTION__);

@@ -45,6 +45,7 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
 
 int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     int r;
+    IOReturn res;
     transfer_t result;
     
     memset(&blank, '\0', 2048);
@@ -55,12 +56,13 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     usleep(1000);
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
-    if(io_reset(client) != kIOReturnSuccess){
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-        io_close(client);
-        client = NULL;
-        return -1;
-    }
+    res = io_reset(client);
+    //if(res != kIOReturnSuccess){
+    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+    //    io_close(client);
+    //    client = NULL;
+    //    return -1;
+    //}
     io_close(client);
     client = NULL;
     usleep(10000);
