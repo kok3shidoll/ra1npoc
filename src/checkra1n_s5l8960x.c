@@ -3,7 +3,12 @@
 
 static unsigned char blank[2048];
 
-static void heap_spray(io_client_t client){
+unsigned char yolo[] = {
+    0x79, 0x6f, 0x6c, 0x6f
+};
+
+static void heap_spray(io_client_t client)
+{
     transfer_t result;
     
     memset(&blank, '\0', 2048);
@@ -21,7 +26,6 @@ static void heap_spray(io_client_t client){
         result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
     }
 #else
-    
     async_transfer_t transfer;
     memset(&transfer, '\0', sizeof(async_transfer_t));
     
@@ -37,8 +41,8 @@ static void heap_spray(io_client_t client){
             CFRunLoopRun();
         }
     }
-    
 #endif
+    
     DEBUGLOG("[%s] (3/4) %x", __FUNCTION__, result.ret);
     usleep(10000);
     
@@ -46,7 +50,8 @@ static void heap_spray(io_client_t client){
     DEBUGLOG("[%s] (4/4) %x", __FUNCTION__, result.ret);
 }
 
-static void set_global_state(io_client_t client){
+static void set_global_state(io_client_t client)
+{
     transfer_t result;
     unsigned int val;
     UInt32 sent;
@@ -84,12 +89,8 @@ static void set_global_state(io_client_t client){
     DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
 }
 
-
-unsigned char yolo[] = {
-    0x79, 0x6f, 0x6c, 0x6f
-};
-
-static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     transfer_t result;
     
     memset(&blank, '\0', 2048);
@@ -114,7 +115,8 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
     //r = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
 }
 
-int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     int r;
     IOReturn result;
     

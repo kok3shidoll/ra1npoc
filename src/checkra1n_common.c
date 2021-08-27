@@ -1,14 +1,16 @@
 #include <iousb.h>
 #include <checkra1n_common.h>
 
-int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     transfer_t result;
+    
     {
         size_t len = 0;
         size_t size;
         while(len < payload.stage2_len) {
             size = ((payload.stage2_len - len) > 0x800) ? 0x800 : (payload.stage2_len - len);
-            result = usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.stage2[len], size, 100);
+            result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.stage2[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
                 ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
                 return -1;
@@ -26,7 +28,8 @@ int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payloa
     return 0;
 }
 
-int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     transfer_t result;
     
     unsigned char blank[8];
@@ -48,6 +51,7 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
             len += size;
         }
     }
+    
     DEBUGLOG("[%s] (2/6) %x", __FUNCTION__, result.ret);
     usleep(10000);
     
@@ -67,7 +71,8 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
     return 0;
 }
 
-int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     int r;
     IOReturn result;
     

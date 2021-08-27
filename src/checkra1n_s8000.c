@@ -3,7 +3,8 @@
 
 static unsigned char blank[2048];
 
-static void set_global_state(io_client_t client){
+static void set_global_state(io_client_t client)
+{
     transfer_t result;
     unsigned int val;
     UInt32 sent;
@@ -31,7 +32,8 @@ static void set_global_state(io_client_t client){
     DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
 }
 
-static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     transfer_t result;
     
     memset(&blank, '\0', 2048);
@@ -43,7 +45,8 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
     DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload){
+int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+{
     int r;
     IOReturn res;
     transfer_t result;

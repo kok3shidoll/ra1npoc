@@ -1,15 +1,12 @@
+#ifndef IOUSB_H
+#define IOUSB_H
+
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 
 #ifndef kUSBHostReturnPipeStalled
 #define kUSBHostReturnPipeStalled (IOReturn)0xe0005000
-#endif
-
-#ifndef IPHONEOS_ARM
-#define IOUSBDeviceInterface kIOUSBDeviceInterfaceID650
-#else
-#define IOUSBDeviceInterface kIOUSBDeviceInterfaceID320
 #endif
 
 #define DEVICE_DFU              (0x1227)
@@ -45,30 +42,25 @@
   #define LOG_PROGRESS(x, ...)      do { printf(""x"\n", ##__VA_ARGS__); } while(0)
 #endif
 
-struct io_devinfo {
-    unsigned int sdom;
-    unsigned int cpid;
-    bool hasSRNM;
-    bool hasPWND;
-    char* srtg;
-};
-
 typedef struct io_client_p io_client_p;
 typedef io_client_p* io_client_t;
 
+struct io_devinfo {
+    unsigned int cpid;
+    bool hasSrnm;
+    bool hasPwnd;
+    char* srtg;
+};
+
 struct io_client_p {
-#ifndef IPHONEOS_ARM
-    IOUSBDeviceInterface650 **handle;
-#else
     IOUSBDeviceInterface320 **handle;
-#endif
     CFRunLoopSourceRef async_event_source;
     unsigned int mode;
     unsigned int vid;
     int usb_interface;
     int usb_alt_interface;
     struct io_devinfo devinfo;
-    bool hasSN;
+    bool hasSerialStr;
 };
 
 typedef struct {
@@ -90,15 +82,18 @@ typedef struct {
 typedef transfer_t async_transfer_t;
 
 int get_device(unsigned int mode, bool srnm);
+int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool snrm);
+void read_serial_number(io_client_t client);
+
+// iokit
 void io_close(io_client_t client);
 int io_open(io_client_t *pclient, uint16_t pid, bool srnm);
 IOReturn io_reset(io_client_t client);
 IOReturn io_reenumerate(io_client_t client);
 IOReturn io_resetdevice(io_client_t client);
-int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool snrm);
-
 IOReturn io_abort_pipe_zero(io_client_t client);
 
+// usb transfer
 transfer_t usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
 transfer_t usb_ctrl_transfer_with_time(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int time);
 transfer_t async_usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, async_transfer_t* transfer);
@@ -106,5 +101,4 @@ UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_reques
 UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
 UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
 
-
-void read_serial_number(io_client_t client);
+#endif
