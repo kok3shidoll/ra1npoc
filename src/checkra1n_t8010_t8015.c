@@ -211,6 +211,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     heap_occupation(client, cpid, payload);
     
     LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    result = io_reenumerate(client);
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -221,11 +222,13 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     }
     
     LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    usleep(10000);
     r = payload_stage2(client, cpid, payload);
     if(r != 0){
         return -1;
     }
     
+    usleep(10000);
     r = connect_to_stage2(client, cpid, payload);
     if(r != 0){
         return -1;
