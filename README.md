@@ -2,7 +2,7 @@
 checkra1n dump and poc for iOS  
 
 ## note  
-This poc uses the payload dumped from checkra1n 0.12.2 beta.  
+This poc uses the payload dumped from checkra1n *0.12.2 beta*. (too old)  
 This tool is for testing purposes. Do not use it on a normal device.  
 
 
@@ -23,12 +23,10 @@ This tool is for testing purposes. Do not use it on a normal device.
     - Works (via lightning to USB camera adapter)  
     
 - iPhone 5 (iOS 10.2.1)  
-    - Works  
-    *successful checkm8 and loaded stage2, but unable to send pongoOS (via lightning to USB camera adapter). However, this device is able to send pongoOS by switching to the lightning to USB 3 camera adapter with power supply.*  
+    - Works (via lightning to USB camera adapter *with power supply*)  
 
 - iPhone 5 (iOS 9.1)  
-    - Not Works  
-    *successful checkm8 and loaded stage2, but unable to send pongoOS (via lightning to USB camera adapter).*  
+    - Works (via lightning to USB camera adapter *with power supply*)  
 
 
 ## build  
@@ -48,9 +46,6 @@ cd src/
 `-DIPHONEOS_ARM`  
 - Allows iOS to connect to iOS devices. For lightning device, require the "lightning to usb camera adapter".  
     
-`-DIPHONEOS_LOWSPEC`  
-- Prevents some unnecessary functions from working so that they will work even when run on low spec devices (such as Apple A7).  
-
 
 ## run  
 ### A7 device  
