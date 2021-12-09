@@ -90,7 +90,7 @@ static void usage(char** argv)
 int main(int argc, char** argv)
 {
     int arg;
-    uint16_t devmode;
+    uint16_t devmode=0;
     
 #ifndef BUILTIN_PAYLOAD
     arg = 6;
