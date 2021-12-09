@@ -149,14 +149,9 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
     
     LOG_EXPLOIT_NAME("checkm8");
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(1000);
@@ -166,17 +161,12 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
         return -1;
     }
 
-    LOG_PROGRESS("[%s] running set_global_state()", __FUNCTION__);
+    LOG("[%s] running set_global_state()", __FUNCTION__);
     set_global_state(client);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -186,18 +176,13 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running heap_occupation()", __FUNCTION__);
+    LOG("[%s] running heap_occupation()", __FUNCTION__);
     heap_occupation(client, cpid, payload);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reenumerate(client);
     DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to ReEnumerate to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -207,7 +192,7 @@ int checkra1n_s5l8960x(io_client_t client, uint16_t cpid, checkra1n_payload_t pa
         return -1;
     }
     
-    LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    LOG("[%s] sending stage2 payload", __FUNCTION__);
     r = payload_stage2(client, cpid, payload);
     if(r != 0){
         return -1;

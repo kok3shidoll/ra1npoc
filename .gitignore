@@ -2,4 +2,4 @@
 .DS_Store
 src/ra1npoc_macosx
 src/ra1npoc_iphoneos
-src/ra1npoc_iphoneos_arm64
+src/payload

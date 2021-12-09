@@ -26,9 +26,7 @@
     #define DEBUGLOG(x, ...)
   #endif
   #define LOG_EXPLOIT_NAME(x, ...)  do { printf("\x1b[1m** \x1b[31mexploiting with "x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
-  #define LOG_DONE(x, ...)          do { printf("\x1b[31;1m"x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
-  #define LOG_WAIT(x, ...)          do { printf("\x1b[36m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-  #define LOG_PROGRESS(x, ...)      do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
+  #define LOG(x, ...)      do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
 #else
   #define ERROR(x, ...)             do { printf(""x"\n", ##__VA_ARGS__); } while(0)
   #ifdef HAVE_DEBUG
@@ -37,9 +35,7 @@
     #define DEBUGLOG(x, ...)
   #endif
   #define LOG_EXPLOIT_NAME(x, ...)  do { printf("** exploiting with "x"\n", ##__VA_ARGS__); } while(0)
-  #define LOG_DONE(x, ...)          do { printf(""x"\n", ##__VA_ARGS__); } while(0)
-  #define LOG_WAIT(x, ...)          do { printf(""x"\n", ##__VA_ARGS__); } while(0)
-  #define LOG_PROGRESS(x, ...)      do { printf(""x"\n", ##__VA_ARGS__); } while(0)
+  #define LOG(x, ...)      do { printf(""x"\n", ##__VA_ARGS__); } while(0)
 #endif
 
 typedef struct io_client_p io_client_p;

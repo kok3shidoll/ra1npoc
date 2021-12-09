@@ -83,14 +83,9 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
     result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
     usleep(1000);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     res = io_reset(client);
-    //if(res != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -100,10 +95,10 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running set_global_state()", __FUNCTION__);
+    LOG("[%s] running set_global_state()", __FUNCTION__);
     set_global_state(client);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -113,10 +108,10 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running heap_occupation()", __FUNCTION__);
+    LOG("[%s] running heap_occupation()", __FUNCTION__);
     heap_occupation(client, cpid, payload);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -126,7 +121,7 @@ int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t paylo
         return -1;
     }
     
-    LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    LOG("[%s] sending stage2 payload", __FUNCTION__);
     r = payload_stage2(client, cpid, payload);
     if(r != 0){
         return -1;

