@@ -47,7 +47,7 @@
 //#define S8000_PAYLOAD
 //#define S8001_CODE
 //#define S8001_PAYLOAD
-//#define S8003_CODE
+#define S8003_CODE
 //#define S8003_PAYLOAD
 
 
