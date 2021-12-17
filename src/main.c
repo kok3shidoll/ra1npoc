@@ -28,6 +28,7 @@
 #include <checkra1n_common.h>
 #include <checkra1n_t8010_t8015.h>
 #include <checkra1n_s8000.h>
+#include <checkra1n_s8003.h>
 #include <checkra1n_s5l8960x.h>
 
 #include <list.h>
@@ -72,8 +73,8 @@ static void usage(char** argv)
     printf("\t--a7   \x1b[36ms5l8960x\x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif
     
-#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
-    printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD)) || defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
+    printf("\t--a9   \x1b[36ms8000/s8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif
     
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
@@ -110,7 +111,7 @@ int main(int argc, char** argv)
         devmode = 0x8015;
     }
     if(!strcmp(argv[1], "--a9")) {
-        devmode = 0x8000;
+        devmode = 0x8000; devmode = 0x8003;
     }
     if(!strcmp(argv[1], "--a7")) {
         devmode = 0x8960;
@@ -186,6 +187,21 @@ int main(int argc, char** argv)
     }
     
 #endif /* S8000_PAYLOAD */
+
+#if defined(S8003_PAYLOAD)
+    #include "payload/s8003.h"
+    if((client->devinfo.cpid) == 0x8003) {
+        payload.over1_len = 0;
+        payload.over2_len = s8003_overwrite2_len;
+        payload.stage2_len = s8003_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = NULL;
+        payload.over2 = s8003_overwrite2;
+        payload.stage2 = s8003_stage2;
+        payload.pongoOS = pongoOS;
+    }
+    
+#endif /* S8003_PAYLOAD */
     
 #if defined(T8010_PAYLOAD)
     #include "payload/t8010.h"
@@ -233,6 +249,12 @@ int main(int argc, char** argv)
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     if((client->devinfo.cpid == 0x8000)&&(devmode == 0x8000)){
         return checkra1n_s8000(client, client->devinfo.cpid, payload);       // A9
+    }
+#endif
+    
+#if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
+    if((client->devinfo.cpid == 0x8003)&&(devmode == 0x8003)){
+        return checkra1n_s8003(client, client->devinfo.cpid, payload);       // A9
     }
 #endif
     
