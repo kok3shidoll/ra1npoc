@@ -8,11 +8,11 @@ AARCH64		= -arch arm64
 
 SOURCE		= \
                 main.c \
-                iousb.c \
-                checkra1n_common.c \
-                checkra1n_t8010_t8015.c \
-                checkra1n_s8000.c \
-                checkra1n_s5l8960x.c
+                io/iousb.c \
+                common/common.c \
+                soc/t8010_t8015.c \
+                soc/s8000.c \
+                soc/s5l8960x.c
 
 MOBJECT		= ra1npoc_macosx
 IOBJECT		= ra1npoc_iphoneos

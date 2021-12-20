@@ -1,5 +1,5 @@
 /*
- * checkra1n_common.c
+ * ra1npoc - common.c
  *
  * Copyright (c) 2021 dora2ios
  *
@@ -23,8 +23,8 @@
  *
  */
 
-#include <iousb.h>
-#include <checkra1n_common.h>
+#include <io/iousb.h>
+#include <common/common.h>
 
 int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
 {

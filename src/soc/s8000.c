@@ -1,5 +1,5 @@
 /*
- * checkra1n_s8000.c
+ * ra1npoc - s8000.c
  *
  * Copyright (c) 2021 dora2ios
  *
@@ -23,8 +23,8 @@
  *
  */
 
-#include <iousb.h>
-#include <checkra1n_common.h>
+#include <io/iousb.h>
+#include <common/common.h>
 
 static unsigned char blank[2048];
 

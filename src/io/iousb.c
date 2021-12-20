@@ -2,7 +2,7 @@
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 
-#include <iousb.h>
+#include <io/iousb.h>
 
 extern io_client_t client;
 

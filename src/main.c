@@ -1,5 +1,5 @@
 /*
- * ra1npoc
+ * ra1npoc - main.c
  *
  * Copyright (c) 2021 dora2ios
  *
@@ -23,14 +23,14 @@
  *
  */
 
-#include <iousb.h>
+#include <io/iousb.h>
 
-#include <checkra1n_common.h>
-#include <checkra1n_t8010_t8015.h>
-#include <checkra1n_s8000.h>
-#include <checkra1n_s5l8960x.h>
+#include <common/common.h>
+#include <common/list.h>
 
-#include <list.h>
+#include <soc/t8010_t8015.h>
+#include <soc/s8000.h>
+#include <soc/s5l8960x.h>
 
 #ifdef BUILTIN_PAYLOAD
 
