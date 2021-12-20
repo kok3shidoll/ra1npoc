@@ -32,6 +32,28 @@
 
 #include <list.h>
 
+#ifdef BUILTIN_PAYLOAD
+
+#include "payload/pongoOS.h"
+
+#if defined(S5L8960_PAYLOAD)
+#include "payload/s5l8960.h"
+#endif /* S5L8960_PAYLOAD */
+
+#if defined(S8000_PAYLOAD)
+#include "payload/s8000.h"
+#endif /* S8000_PAYLOAD */
+
+#if defined(T8010_PAYLOAD)
+#include "payload/t8010.h"
+#endif /* T8010_PAYLOAD */
+
+#if defined(T8015_PAYLOAD)
+#include "payload/t8015.h"
+#endif /* T8015_PAYLOAD */
+
+#endif /* BUILTIN_PAYLOAD */
+
 io_client_t client;
 checkra1n_payload_t payload;
 
@@ -89,7 +111,7 @@ static void usage(char** argv)
 
 int main(int argc, char** argv)
 {
-    int arg;
+    int arg=0;
     uint16_t devmode=0;
     
 #ifndef BUILTIN_PAYLOAD
@@ -121,9 +143,8 @@ int main(int argc, char** argv)
         return -1;
     }
     
-    LOG("* checkRAIN clone v2.0 for iOS by interception");
-    
     memset(&payload, '\0', sizeof(checkra1n_payload_t));
+    LOG("* checkRAIN clone v2.0 for iOS by interception");
     
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     while(get_device(DEVICE_DFU, true) != 0) {
@@ -155,10 +176,7 @@ int main(int argc, char** argv)
     if(open_file(pongoOS_path, &payload.pongoOS_len, &payload.pongoOS) != 0) return -1;
 #else
     
-#include "payload/pongoOS.h"
-    
 #if defined(S5L8960_PAYLOAD)
-    #include "payload/s5l8960.h"
     if((client->devinfo.cpid) == 0x8960) {
         payload.over1_len = s5l8960_overwrite1_len;
         payload.over2_len = s5l8960_overwrite2_len;
@@ -173,7 +191,6 @@ int main(int argc, char** argv)
 #endif /* S5L8960_PAYLOAD */
     
 #if defined(S8000_PAYLOAD)
-    #include "payload/s8000.h"
     if((client->devinfo.cpid) == 0x8000) {
         payload.over1_len = 0;
         payload.over2_len = s8000_overwrite2_len;
@@ -188,7 +205,6 @@ int main(int argc, char** argv)
 #endif /* S8000_PAYLOAD */
     
 #if defined(T8010_PAYLOAD)
-    #include "payload/t8010.h"
     if((client->devinfo.cpid) == 0x8010) {
         payload.over1_len = t8010_overwrite1_len;
         payload.over2_len = t8010_overwrite2_len;
@@ -203,7 +219,6 @@ int main(int argc, char** argv)
 #endif /* T8010_PAYLOAD */
     
 #if defined(T8015_PAYLOAD)
-    #include "payload/t8015.h"
     if((client->devinfo.cpid) == 0x8015){
         payload.over1_len = t8015_overwrite1_len;
         payload.over2_len = t8015_overwrite2_len;
