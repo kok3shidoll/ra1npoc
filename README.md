@@ -8,7 +8,10 @@ checkra1n dump and poc for iOS
 
 ## サポート  
 ### JailbreakしたいiOSデバイス (以下、対象デバイス): (テスト済みバージョン)  
-- iPhone 7 (t8010): iOS 14(.3)  
+- iPhone 5s (s5l8960x): iOS 12(.5.5)  
+- iPhone 6 (t7000): iOS 12(.5.5)  
+- iPhone 6s (s8000): iOS 14(.2)  
+- iPhone 7 (t8010): iOS 14(.8.1)  
 - iPhone 8 (t8015): iOS 13(.5)  
 
 
@@ -19,10 +22,10 @@ checkra1n dump and poc for iOS
 - iPhone 8 (iOS 13.5)  
     - 動作確認済 (lightning to USB camera adapter 経由)  
 
-- iPhone 5 (iOS 10.2.1)  
+- iPhone 5 (iOS 9.x, 10.x)  
     - 動作確認済 (lightning to USB camera adapter + 電源供給)  
 
-- iPhone 5s (iOS 9.1)  
+- iPhone 5s (iOS 9.1, 9.3.3)  
     - 動作確認済 (lightning to USB camera adapter + 電源供給)  
 
 
@@ -60,6 +63,11 @@ ra1npoc [--a7 | --a10 | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 p
 ### A8/A9  
 ```
 ra1npoc [--a8 | --a9] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+```
+
+### built-in
+```
+ra1npoc [--a7 |--a8 | --a9 | --a10 | --a11]  
 ```
 
 
