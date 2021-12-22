@@ -8,6 +8,11 @@ cd ../dumpfiles
 
 xxd -i pongoOS > ../src/payload/pongoOS.h
 
+# S5L8960
+xxd -i s5l8960_overwrite1 >> ../src/payload/s5l8960.h
+xxd -i s5l8960_overwrite2 >> ../src/payload/s5l8960.h
+xxd -i s5l8960_stage2 >> ../src/payload/s5l8960.h
+
 # T7000
 xxd -i t7000_overwrite2 >> ../src/payload/t7000.h
 xxd -i t7000_stage2 >> ../src/payload/t7000.h

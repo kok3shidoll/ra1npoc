@@ -15,11 +15,10 @@
 
 /*
  * S5L8960 (Apple A7)
- * S5L8960 support only exploit code.
- * Some of the necessary payloads will need to be prepared by yourself.
+ * S5L8960 is fully supported.
  */
 #define S5L8960_CODE
-//#define S5L8960_PAYLOAD
+#define S5L8960_PAYLOAD
 
 
 /*

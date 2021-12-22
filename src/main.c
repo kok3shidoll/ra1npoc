@@ -266,6 +266,8 @@ int main(int argc, char** argv)
 //#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
 //    checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
 //    bootargs = "rootdev=md0 -v";
+//    DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
+//    DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
 //#endif
     
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
