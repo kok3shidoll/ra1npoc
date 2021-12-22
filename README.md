@@ -5,8 +5,6 @@ checkra1n dump and poc for iOS
 これはcheckra1n 0.12.4 betaからダンプしたPayloadに基づいて作成された、iOS上でcheckra1nを動かすための実証コードです。  
 このツールは検証用です。通常のデバイスでは実行しないでください。  
 
-*KPFはxargsに `rootdev=md0 -v`を渡すように変更されています。*    
-
 
 ## サポート  
 ### JailbreakしたいiOSデバイス (以下、対象デバイス): (テスト済みバージョン)  
