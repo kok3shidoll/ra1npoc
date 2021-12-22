@@ -66,6 +66,7 @@ const char* bootargs = DEFAULT_BOOTARGS;
 io_client_t client;
 checkra1n_payload_t payload;
 
+#ifndef BUILTIN_PAYLOAD
 static int open_file(char *file, unsigned int *sz, void **buf)
 {
     FILE *fd = fopen(file, "r");
@@ -90,6 +91,7 @@ static int open_file(char *file, unsigned int *sz, void **buf)
     
     return 0;
 }
+#endif
 
 static void usage(char** argv)
 {

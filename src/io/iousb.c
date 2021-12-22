@@ -244,7 +244,6 @@ int io_open(io_client_t *pclient, uint16_t pid, bool srnm)
 {
     io_service_t service = IO_OBJECT_NULL;
     io_iterator_t iterator;
-    IOReturn result;
     UInt16 mode;
     UInt32 locationID;
     io_client_t _client;
