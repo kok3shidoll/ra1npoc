@@ -52,24 +52,14 @@ make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 - Payloadをbuilt-inします。
 
 ## 実行  
-### A7 device  
+### A7/A10/A11  
 ```
-ra1npoc --a7 [s5l8960x_overwrite1 s5l8960x_overwrite2 s5l8960x_stage2 t8015_pongoOS]  
-```
-
-### A9 device (s8000)  
-```
-ra1npoc --a9 [/dev/null 8000_overwrite2 s8000_stage2 t8010_pongoOS]  
+ra1npoc [--a7 | --a10 | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
-### A10 device  
+### A8/A9  
 ```
-ra1npoc --a10 [t8010_overwrite1 t8010_overwrite2 t8010_stage2 t8010_pongoOS]  
-```
-
-### A11 device  
-```
-ra1npoc --a11 [t8015_overwrite1 t8015_overwrite2 t8015_stage2 t8015_pongoOS]  
+ra1npoc [--a8 | --a9] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
 
