@@ -15,7 +15,7 @@
 
 /*
  * S5L8960 (Apple A7)
- * The S5L8960 supports only exploit code.
+ * S5L8960 support only exploit code.
  * Some of the necessary payloads will need to be prepared by yourself.
  */
 #define S5L8960_CODE
@@ -24,7 +24,7 @@
 
 /*
  * T7000 (Apple A8) // tested on iPhone7,2
- * T8015 is fully supported.
+ * T7000 is fully supported.
  */
 #define T7000_CODE
 #define T7000_PAYLOAD
@@ -39,16 +39,27 @@
 
 
 /*
- * S8000 (Apple A9)
- * The S8000 supports only exploit code.
- * Some of the necessary payloads will need to be prepared by yourself.
+ * S8000 (Apple A9) // tested on iPhone8,1
+ * S8000 is fully supported.
  */
 #define S8000_CODE
-//#define S8000_PAYLOAD
-//#define S8001_CODE
-//#define S8001_PAYLOAD
+#define S8000_PAYLOAD
+
+
+/*
+ * S8003 (Apple A9)
+ * S8003 is not supported.
+ */
 //#define S8003_CODE
 //#define S8003_PAYLOAD
+
+
+/*
+ * S8001 (Apple A9X)
+ * S8001 is not supported.
+ */
+//#define S8001_CODE
+//#define S8001_PAYLOAD
 
 
 /*
@@ -61,7 +72,7 @@
 
 /*
  * T8011 (Apple A10X Fusion)
- * T7001 is not supported.
+ * T8011 is not supported.
  */
 //#define T8011_CODE
 //#define T8011_PAYLOAD
