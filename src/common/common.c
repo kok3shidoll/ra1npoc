@@ -26,6 +26,11 @@
 #include <io/iousb.h>
 #include <common/common.h>
 
+#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
+extern int8_t kpf_flags;
+extern const char* bootargs;
+#endif
+
 int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
 {
     transfer_t result;
@@ -62,6 +67,18 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
     
     result = usb_ctrl_transfer(client, 0x40, 64, 0x03e8, 0x01f4, NULL, 0); // ?
     DEBUGLOG("[%s] (1/6) %x", __FUNCTION__, result.ret);
+    
+#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
+    const char* newArgs = bootargs; // set xnu boot-arg commandline
+    size_t newArgsLen = strlen(newArgs) + 1;
+    size_t newArgBufLen = (newArgsLen + 3) / 4 * 4;
+    char bootArgsBuf[newArgBufLen];
+    strlcpy(bootArgsBuf, newArgs, newArgBufLen);
+    memset(bootArgsBuf + newArgsLen, 0, newArgBufLen - newArgsLen);
+    memcpy(payload.pongoOS+BOOTARGS_STR_PTR, bootArgsBuf, newArgBufLen);
+    
+    *(int8_t*)(payload.pongoOS+KPF_FLAGS_PTR) = kpf_flags;
+#endif
     
     {
         size_t len = 0;

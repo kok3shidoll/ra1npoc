@@ -58,6 +58,11 @@
 
 #endif /* BUILTIN_PAYLOAD */
 
+#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
+int8_t kpf_flags = checkrain_option_none;
+const char* bootargs = DEFAULT_BOOTARGS;
+#endif
+
 io_client_t client;
 checkra1n_payload_t payload;
 
@@ -257,7 +262,12 @@ int main(int argc, char** argv)
     
 #endif /* T8015_PAYLOAD */
 #endif /* BUILTIN_PAYLOAD */
-
+    
+//#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
+//    checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
+//    bootargs = "rootdev=md0 -v";
+//#endif
+    
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
         return checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // A10 Fusion
