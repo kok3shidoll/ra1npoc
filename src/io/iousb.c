@@ -169,6 +169,8 @@ void read_serial_number(io_client_t client)
     }
     
     if(client->devinfo.srtg == NULL){
+        memset(&buf, '\0', 0x100);
+        memset(&str, '\0', 0x80);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0304, 0x040a, buf, 0x100); // 8950 or up
         if(result.ret != kIOReturnSuccess) return;
         size = *(uint8_t*)buf;
