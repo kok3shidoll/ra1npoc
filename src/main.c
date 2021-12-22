@@ -44,13 +44,29 @@
 #include "payload/t7000.h"
 #endif /* T7000_PAYLOAD */
 
+#if defined(T7001_PAYLOAD)
+#include "payload/t7001.h"
+#endif /* T7001_PAYLOAD */
+
 #if defined(S8000_PAYLOAD)
 #include "payload/s8000.h"
 #endif /* S8000_PAYLOAD */
 
+#if defined(S8003_PAYLOAD)
+#include "payload/s8003.h"
+#endif /* S8003_PAYLOAD */
+
+#if defined(S8001_PAYLOAD)
+#include "payload/s8001.h"
+#endif /* S8001_PAYLOAD */
+
 #if defined(T8010_PAYLOAD)
 #include "payload/t8010.h"
 #endif /* T8010_PAYLOAD */
+
+#if defined(T8011_PAYLOAD)
+#include "payload/t8011.h"
+#endif /* T8011_PAYLOAD */
 
 #if defined(T8015_PAYLOAD)
 #include "payload/t8015.h"
@@ -91,7 +107,7 @@ static int open_file(char *file, unsigned int *sz, void **buf)
     
     return 0;
 }
-#endif
+#endif /* BUILTIN_PAYLOAD */
 
 static void usage(char** argv)
 {
@@ -103,23 +119,39 @@ static void usage(char** argv)
     
 #if defined(S5L8960_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S5L8960_PAYLOAD))
     printf("\t--a7   \x1b[36ms5l8960x\x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif
+#endif /* S5L8960 */
     
 #if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
     printf("\t--a8   \x1b[36mt7000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif
+#endif /* T7000 */
+    
+#if defined(T7001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7001_PAYLOAD))
+    printf("\t--a8x  \x1b[36mt7001   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif /* T7001 */
     
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif
+#endif /* S8000 */
+    
+#if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
+    printf("\t--a9m  \x1b[36ms8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif /* S8003 */
+    
+#if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
+    printf("\t--a9x  \x1b[36ms8001   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif /* S8001 */
     
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
     printf("\t--a10  \x1b[36mt8010   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif
+#endif /* T8010 */
+    
+#if defined(T8011_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8011_PAYLOAD))
+    printf("\t--a10x \x1b[36mt8011   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif /* T8011 */
     
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
     printf("\t--a11  \x1b[36mt8015   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif
+#endif /* T8015 */
     
     printf("\n");
 }
@@ -140,14 +172,26 @@ int main(int argc, char** argv)
         return -1;
     }
     
-    if(!strcmp(argv[1], "--a10")) {
-        devmode = 0x8010;
-    }
     if(!strcmp(argv[1], "--a11")) {
         devmode = 0x8015;
     }
+    if(!strcmp(argv[1], "--a10x")) {
+        devmode = 0x8011;
+    }
+    if(!strcmp(argv[1], "--a10")) {
+        devmode = 0x8010;
+    }
+    if(!strcmp(argv[1], "--a9x")) {
+        devmode = 0x8001;
+    }
+    if(!strcmp(argv[1], "--a9m")) {
+        devmode = 0x8003;
+    }
     if(!strcmp(argv[1], "--a9")) {
         devmode = 0x8000;
+    }
+    if(!strcmp(argv[1], "--a8x")) {
+        devmode = 0x7001;
     }
     if(!strcmp(argv[1], "--a8")) {
         devmode = 0x7000;
@@ -205,7 +249,6 @@ int main(int argc, char** argv)
         payload.stage2 = s5l8960_stage2;
         payload.pongoOS = pongoOS;
     }
-    
 #endif /* S5L8960_PAYLOAD */
     
 #if defined(T7000_PAYLOAD)
@@ -219,8 +262,20 @@ int main(int argc, char** argv)
         payload.stage2 = t7000_stage2;
         payload.pongoOS = pongoOS;
     }
-    
 #endif /* T7000_PAYLOAD */
+    
+#if defined(T7001_PAYLOAD)
+    if((client->devinfo.cpid) == 0x7001) {
+        payload.over1_len = 0;
+        payload.over2_len = t7001_overwrite2_len;
+        payload.stage2_len = t7001_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = NULL;
+        payload.over2 = t7001_overwrite2;
+        payload.stage2 = t7001_stage2;
+        payload.pongoOS = pongoOS;
+    }
+#endif /* T7001_PAYLOAD */
     
 #if defined(S8000_PAYLOAD)
     if((client->devinfo.cpid) == 0x8000) {
@@ -233,8 +288,33 @@ int main(int argc, char** argv)
         payload.stage2 = s8000_stage2;
         payload.pongoOS = pongoOS;
     }
-    
 #endif /* S8000_PAYLOAD */
+    
+#if defined(S8003_PAYLOAD)
+    if((client->devinfo.cpid) == 0x8003) {
+        payload.over1_len = 0;
+        payload.over2_len = s8003_overwrite2_len;
+        payload.stage2_len = s8003_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = NULL;
+        payload.over2 = s8003_overwrite2;
+        payload.stage2 = s8003_stage2;
+        payload.pongoOS = pongoOS;
+    }
+#endif /* S8003_PAYLOAD */
+    
+#if defined(S8001_PAYLOAD)
+    if((client->devinfo.cpid) == 0x8001) {
+        payload.over1_len = 0;
+        payload.over2_len = s8001_overwrite2_len;
+        payload.stage2_len = s8001_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = NULL;
+        payload.over2 = s8001_overwrite2;
+        payload.stage2 = s8001_stage2;
+        payload.pongoOS = pongoOS;
+    }
+#endif /* S8001_PAYLOAD */
     
 #if defined(T8010_PAYLOAD)
     if((client->devinfo.cpid) == 0x8010) {
@@ -247,7 +327,19 @@ int main(int argc, char** argv)
         payload.stage2 = t8010_stage2;
         payload.pongoOS = pongoOS;
     }
+#endif /* T8010_PAYLOAD */
     
+#if defined(T8011_PAYLOAD)
+    if((client->devinfo.cpid) == 0x8011) {
+        payload.over1_len = t8011_overwrite1_len;
+        payload.over2_len = t8011_overwrite2_len;
+        payload.stage2_len = t8011_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = t8011_overwrite1;
+        payload.over2 = t8011_overwrite2;
+        payload.stage2 = t8011_stage2;
+        payload.pongoOS = pongoOS;
+    }
 #endif /* T8010_PAYLOAD */
     
 #if defined(T8015_PAYLOAD)
@@ -261,8 +353,8 @@ int main(int argc, char** argv)
         payload.stage2 = t8015_stage2;
         payload.pongoOS = pongoOS;
     }
-    
 #endif /* T8015_PAYLOAD */
+    
 #endif /* BUILTIN_PAYLOAD */
     
 //#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
@@ -272,15 +364,15 @@ int main(int argc, char** argv)
 //    DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
 //#endif
     
-#if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
-    if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
-        return checkra1n_t8010_t8015(client, payload); // A10 Fusion
-    }
-#endif
-    
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
     if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
         return checkra1n_t8010_t8015(client, payload); // A11 Bionic
+    }
+#endif
+    
+#if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
+    if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
+        return checkra1n_t8010_t8015(client, payload); // A10 Fusion
     }
 #endif
     
