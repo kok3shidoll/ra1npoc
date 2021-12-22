@@ -44,7 +44,6 @@ typedef io_client_p* io_client_t;
 struct io_devinfo {
     unsigned int cpid;
     bool hasSrnm;
-    bool hasPwnd;
     char* srtg;
 };
 

@@ -114,13 +114,6 @@ static void load_devinfo(io_client_t client, const char* str)
         client->devinfo.hasSrnm = FALSE;
     }
     
-    ptr = strstr(str, "PWND:[");
-    if(ptr != NULL) {
-        client->devinfo.hasPwnd = TRUE;
-    } else {
-        client->devinfo.hasPwnd = FALSE;
-    }
-    
     tmp[0] = '\0';
     ptr = strstr(str, "SRTG:[");
     if(ptr != NULL) {
