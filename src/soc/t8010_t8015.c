@@ -107,7 +107,7 @@ static void set_global_state(io_client_t client)
     DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
 }
 
-static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 {
     transfer_t result;
     
@@ -139,7 +139,7 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
     DEBUGLOG("[%s] (6/6) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+int checkra1n_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     IOReturn result;
@@ -194,7 +194,7 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     
     LOG("[%s] running heap_occupation()", __FUNCTION__);
     usleep(10000);
-    heap_occupation(client, cpid, payload);
+    heap_occupation(client, payload);
     
     LOG("[%s] reconnecting", __FUNCTION__);
     result = io_reenumerate(client);
@@ -211,13 +211,13 @@ int checkra1n_t8010_t8015(io_client_t client, uint16_t cpid, checkra1n_payload_t
     
     LOG("[%s] sending stage2 payload", __FUNCTION__);
     usleep(10000);
-    r = payload_stage2(client, cpid, payload);
+    r = payload_stage2(client, payload);
     if(r != 0){
         return -1;
     }
     
     usleep(10000);
-    r = connect_to_stage2(client, cpid, payload);
+    r = connect_to_stage2(client, payload);
     if(r != 0){
         return -1;
     }

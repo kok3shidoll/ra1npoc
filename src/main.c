@@ -272,31 +272,31 @@ int main(int argc, char** argv)
     
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
-        return checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // A10 Fusion
+        return checkra1n_t8010_t8015(client, payload); // A10 Fusion
     }
 #endif
     
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
     if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
-        return checkra1n_t8010_t8015(client, client->devinfo.cpid, payload); // A11 Bionic
+        return checkra1n_t8010_t8015(client, payload); // A11 Bionic
     }
 #endif
     
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     if((client->devinfo.cpid == 0x8000)&&(devmode == 0x8000)){
-        return checkra1n_t7000_s8000(client, client->devinfo.cpid, payload);  // A9
+        return checkra1n_t7000_s8000(client, payload);  // A9
     }
 #endif
     
 #if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
     if((client->devinfo.cpid == 0x7000)&&(devmode == 0x7000)){
-        return checkra1n_t7000_s8000(client, client->devinfo.cpid, payload);  // A8
+        return checkra1n_t7000_s8000(client, payload);  // A8
     }
 #endif
     
 #if defined(S5L8960_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S5L8960_PAYLOAD))
     if((client->devinfo.cpid == 0x8960)&&(devmode == 0x8960)){
-        return checkra1n_s5l8960x(client, client->devinfo.cpid, payload);    // A7
+        return checkra1n_s5l8960x(client, payload);    // A7
     }
 #endif
     

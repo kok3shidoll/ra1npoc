@@ -31,7 +31,7 @@ extern int8_t kpf_flags;
 extern const char* bootargs;
 #endif
 
-int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+int payload_stage2(io_client_t client, checkra1n_payload_t payload)
 {
     transfer_t result;
     
@@ -58,7 +58,7 @@ int payload_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payloa
     return 0;
 }
 
-int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+int pongo(io_client_t client, checkra1n_payload_t payload)
 {
     transfer_t result;
     
@@ -113,7 +113,7 @@ int pongo(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
     return 0;
 }
 
-int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     IOReturn result;
@@ -134,7 +134,7 @@ int connect_to_stage2(io_client_t client, uint16_t cpid, checkra1n_payload_t pay
     usleep(10000);
     
     LOG("[%s] sending pongoOS", __FUNCTION__);
-    r = pongo(client, cpid, payload);
+    r = pongo(client, payload);
     if(r != 0){
         return -1;
     }
