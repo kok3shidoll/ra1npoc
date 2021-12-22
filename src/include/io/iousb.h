@@ -20,7 +20,7 @@
 /* LOG macro */
 #ifndef IPHONEOS_ARM
   #define ERROR(x, ...)             do { printf("\x1b[31m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-  #ifdef HAVE_DEBUG
+  #ifdef DEBUG
     #define DEBUGLOG(x, ...)        do { printf("\x1b[34m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
   #else
     #define DEBUGLOG(x, ...)
@@ -29,7 +29,7 @@
   #define LOG(x, ...)      do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
 #else
   #define ERROR(x, ...)             do { printf(""x"\n", ##__VA_ARGS__); } while(0)
-  #ifdef HAVE_DEBUG
+  #ifdef DEBUG
     #define DEBUGLOG(x, ...)        do { printf(""x"\n", ##__VA_ARGS__); } while(0)
   #else
     #define DEBUGLOG(x, ...)

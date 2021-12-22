@@ -23,11 +23,11 @@
 
 
 /*
- * T7000 (Apple A8)
- * T7000 is not supported.
+ * T7000 (Apple A8) // tested on iPhone7,2
+ * T8015 is fully supported.
  */
-//#define T7000_CODE
-//#define T7000_PAYLOAD
+#define T7000_CODE
+#define T7000_PAYLOAD
 
 
 /*

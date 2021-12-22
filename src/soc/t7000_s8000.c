@@ -1,5 +1,5 @@
 /*
- * ra1npoc - s8000.c
+ * ra1npoc - t7000_s8000.c
  *
  * Copyright (c) 2021 dora2ios
  *
@@ -70,7 +70,7 @@ static void heap_occupation(io_client_t client, uint16_t cpid, checkra1n_payload
     DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
+int checkra1n_t7000_s8000(io_client_t client, uint16_t cpid, checkra1n_payload_t payload)
 {
     int r;
     IOReturn res;

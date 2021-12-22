@@ -44,7 +44,7 @@ make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 
 
 ## 定義  
-`HAVE_DEBUG`  
+`DEBUG`  
 - いくつかのデバッグ用メッセージの表示を有効にします。  
 
 `IPHONEOS_ARM`  

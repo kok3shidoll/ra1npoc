@@ -29,7 +29,7 @@
 #include <common/list.h>
 
 #include <soc/t8010_t8015.h>
-#include <soc/s8000.h>
+#include <soc/t7000_s8000.h>
 #include <soc/s5l8960x.h>
 
 #ifdef BUILTIN_PAYLOAD
@@ -39,6 +39,10 @@
 #if defined(S5L8960_PAYLOAD)
 #include "payload/s5l8960.h"
 #endif /* S5L8960_PAYLOAD */
+
+#if defined(T7000_PAYLOAD)
+#include "payload/t7000.h"
+#endif /* T7000_PAYLOAD */
 
 #if defined(S8000_PAYLOAD)
 #include "payload/s8000.h"
@@ -94,6 +98,10 @@ static void usage(char** argv)
     printf("\t--a7   \x1b[36ms5l8960x\x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif
     
+#if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
+    printf("\t--a8   \x1b[36mt7000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif
+    
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif
@@ -133,6 +141,9 @@ int main(int argc, char** argv)
     }
     if(!strcmp(argv[1], "--a9")) {
         devmode = 0x8000;
+    }
+    if(!strcmp(argv[1], "--a8")) {
+        devmode = 0x7000;
     }
     if(!strcmp(argv[1], "--a7")) {
         devmode = 0x8960;
@@ -189,6 +200,20 @@ int main(int argc, char** argv)
     }
     
 #endif /* S5L8960_PAYLOAD */
+    
+#if defined(T7000_PAYLOAD)
+    if((client->devinfo.cpid) == 0x7000) {
+        payload.over1_len = 0;
+        payload.over2_len = t7000_overwrite2_len;
+        payload.stage2_len = t7000_stage2_len;
+        payload.pongoOS_len = pongoOS_len;
+        payload.over1 = NULL;
+        payload.over2 = t7000_overwrite2;
+        payload.stage2 = t7000_stage2;
+        payload.pongoOS = pongoOS;
+    }
+    
+#endif /* T7000_PAYLOAD */
     
 #if defined(S8000_PAYLOAD)
     if((client->devinfo.cpid) == 0x8000) {
@@ -247,7 +272,13 @@ int main(int argc, char** argv)
     
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     if((client->devinfo.cpid == 0x8000)&&(devmode == 0x8000)){
-        return checkra1n_s8000(client, client->devinfo.cpid, payload);       // A9
+        return checkra1n_t7000_s8000(client, client->devinfo.cpid, payload);  // A9
+    }
+#endif
+    
+#if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
+    if((client->devinfo.cpid == 0x7000)&&(devmode == 0x7000)){
+        return checkra1n_t7000_s8000(client, client->devinfo.cpid, payload);  // A8
     }
 #endif
     
