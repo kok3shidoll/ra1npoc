@@ -1,5 +1,5 @@
 /*
- * ra1npoc - t8010_t8015.c
+ * ra1npoc - t8010_t8015.c .. exploit for t8010/t8011/t8015
  *
  * Copyright (c) 2021 dora2ios
  *
