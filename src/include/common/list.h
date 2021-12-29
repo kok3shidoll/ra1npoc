@@ -71,10 +71,10 @@
 
 /*
  * T8011 (Apple A10X Fusion)
- * T8011 is not supported.
+ * T8011 is fully supported.
  */
-//#define T8011_CODE
-//#define T8011_PAYLOAD
+#define T8011_CODE
+#define T8011_PAYLOAD
 
 
 /*
