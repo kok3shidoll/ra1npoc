@@ -11,7 +11,6 @@ checkra1n dump and poc for iOS
 | chip | name |   |
 |---------|----------|----------|
 | S5L8960 | Apple A7 | ✅ |
-| S5L8960 | Apple A7 | ✅ |
 | T7000 | Apple A8 | ✅ |
 | T7001 | Apple A8X | ❌ |
 | S8000 | Apple A9 | ✅ |
