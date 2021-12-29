@@ -7,12 +7,19 @@ checkra1n dump and poc for iOS
 
 
 ## サポート  
-### JailbreakしたいiOSデバイス (以下、対象デバイス): (テスト済みバージョン)  
-- iPhone 5s (s5l8960x): iOS 12(.5.5)  
-- iPhone 6 (t7000): iOS 12(.5.5)  
-- iPhone 6s (s8000): iOS 14(.2)  
-- iPhone 7 (t8010): iOS 14(.8.1)  
-- iPhone 8 (t8015): iOS 13(.5)  
+### JailbreakしたいiOSデバイス  
+| chip | name |   |
+|---------|----------|----------|
+| S5L8960 | Apple A7 | ✅ |
+| S5L8960 | Apple A7 | ✅ |
+| T7000 | Apple A8 | ✅ |
+| T7001 | Apple A8X | ❌ |
+| S8000 | Apple A9 | ✅ |
+| S8003 | Apple A9 | ❓ |
+| S8001 | Apple A9X | ❌ |
+| T8010 | Apple A10 | ✅ |
+| T8011 | Apple A10X | ✅ |
+| T8015 | Apple A11 | ✅ |
 
 
 ### ホスト側のデバイス (このソフトウェアを実行する側)  
