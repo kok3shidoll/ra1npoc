@@ -388,7 +388,7 @@ int main(int argc, char** argv)
     }
 #endif
     
- #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
+#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
     if((client->devinfo.cpid == 0x8003)&&(devmode == 0x8003)){
         return checkra1n_t7000_s8000(client, payload);  // A9
     }
