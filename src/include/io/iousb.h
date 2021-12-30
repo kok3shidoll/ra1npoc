@@ -96,4 +96,13 @@ UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_reques
 UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
 UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
 
+/*
+ kIOReturnSuccess           : 00000000
+ kIOUSBPipeStalled          : e000404f
+ kUSBHostReturnPipeStalled  : e0005000
+ kIOReturnTimeout           : e00002d6
+ kIOUSBTransactionTimeout   : e0004051
+ kIOReturnNotResponding     : e00002ed
+ */
+
 #endif

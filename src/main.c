@@ -372,7 +372,7 @@ int main(int argc, char** argv)
     
 #if defined(T8011_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8011_PAYLOAD))
     if((client->devinfo.cpid == 0x8011)&&(devmode == 0x8011)){
-        return checkra1n_t8010_t8015(client, payload); // A10 Fusion
+        return checkra1n_t8010_t8015(client, payload); // A10X Fusion
     }
 #endif
     

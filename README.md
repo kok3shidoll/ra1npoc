@@ -61,9 +61,11 @@ make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 - Payloadをbuilt-inします。
 
 ## 実行  
-### A7/A10/A11  
+- iOS 14環境で実行する場合、バイナリは`/usr/local/bin`以下に配置する必要があります。  
+
+### A7/A10/A10X/A11  
 ```
-ra1npoc [--a7 | --a10 | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--a7 | --a10 | --a10x | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
 ### A8/A9  
@@ -73,7 +75,7 @@ ra1npoc [--a8 | --a9] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]
 
 ### built-in
 ```
-ra1npoc [--a7 |--a8 | --a9 | --a10 | --a11]  
+ra1npoc [--a7 |--a8 | --a9 | --a10 | --a10x | --a11]  
 ```
 
 
