@@ -17,13 +17,9 @@ xxd -i s5l8960_stage2 >> ../src/payload/s5l8960.h
 xxd -i t7000_overwrite2 >> ../src/payload/t7000.h
 xxd -i t7000_stage2 >> ../src/payload/t7000.h
 
-# S8000
+# S8000/S8003
 xxd -i s8000_overwrite2 >> ../src/payload/s8000.h
 xxd -i s8000_stage2 >> ../src/payload/s8000.h
-
-# S8003
-touch ../src/payload/s8003.h
-sed -e "s/s8000/s8003/" ../src/payload/s8000.h > ../src/payload/s8003.h
 
 # T8010
 xxd -i t8010_overwrite1 >> ../src/payload/t8010.h

@@ -48,13 +48,9 @@
 #include "payload/t7001.h"
 #endif /* T7001_PAYLOAD */
 
-#if defined(S8000_PAYLOAD)
+#if (defined(S8000_PAYLOAD) || defined(S8003_PAYLOAD))
 #include "payload/s8000.h"
 #endif /* S8000_PAYLOAD */
-
-#if defined(S8003_PAYLOAD)
-#include "payload/s8003.h"
-#endif /* S8003_PAYLOAD */
 
 #if defined(S8001_PAYLOAD)
 #include "payload/s8001.h"
@@ -291,14 +287,15 @@ int main(int argc, char** argv)
 #endif /* S8000_PAYLOAD */
     
 #if defined(S8003_PAYLOAD)
+    // According to #PR3/5, S8000 and S8003 seem to use the same Payload.
     if((client->devinfo.cpid) == 0x8003) {
         payload.over1_len = 0;
-        payload.over2_len = s8003_overwrite2_len;
-        payload.stage2_len = s8003_stage2_len;
+        payload.over2_len = s8000_overwrite2_len;
+        payload.stage2_len = s8000_stage2_len;
         payload.pongoOS_len = pongoOS_len;
         payload.over1 = NULL;
-        payload.over2 = s8003_overwrite2;
-        payload.stage2 = s8003_stage2;
+        payload.over2 = s8000_overwrite2;
+        payload.stage2 = s8000_stage2;
         payload.pongoOS = pongoOS;
     }
 #endif /* S8003_PAYLOAD */
@@ -388,7 +385,7 @@ int main(int argc, char** argv)
     }
 #endif
     
-#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
+#if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
     if((client->devinfo.cpid == 0x8003)&&(devmode == 0x8003)){
         return checkra1n_t7000_s8000(client, payload);  // A9
     }
