@@ -49,8 +49,8 @@
  * S8003 (Apple A9)
  * S8003 is not supported.
  */
-//#define S8003_CODE
-//#define S8003_PAYLOAD
+#define S8003_CODE
+#define S8003_PAYLOAD
 
 
 /*

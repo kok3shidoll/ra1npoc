@@ -14,7 +14,7 @@ checkra1n dump and poc for iOS
 | T7000 | Apple A8 | ✅ |
 | T7001 | Apple A8X | ❌ |
 | S8000 | Apple A9 | ✅ |
-| S8003 | Apple A9 | ❓ |
+| S8003 | Apple A9 | ✅ |
 | S8001 | Apple A9X | ❌ |
 | T8010 | Apple A10 | ✅ |
 | T8011 | Apple A10X | ✅ |
