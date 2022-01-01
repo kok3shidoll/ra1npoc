@@ -110,7 +110,7 @@ static void usage(char** argv)
 #ifndef BUILTIN_PAYLOAD
     printf("Usage: %s [option] over1 over2 stage2 payload\n", argv[0]);
 #else
-    printf("Usage: %s [option]\n", argv[0]);
+    printf("Usage: %s [option] [-v]\n", argv[0]);
 #endif /* BUILTIN_PAYLOAD */
     
 #if defined(S5L8960_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S5L8960_PAYLOAD))
@@ -154,16 +154,15 @@ static void usage(char** argv)
 
 int main(int argc, char** argv)
 {
-    int arg=0;
     uint16_t devmode=0;
     
+    if(
 #ifndef BUILTIN_PAYLOAD
-    arg = 6;
+       argc != 6
 #else
-    arg = 2;
+       argc < 2 || argc > 3
 #endif /* BUILTIN_PAYLOAD */
-    
-    if(argc != arg) {
+       ) {
         usage(argv);
         return -1;
     }
@@ -203,7 +202,9 @@ int main(int argc, char** argv)
     
     memset(&payload, '\0', sizeof(checkra1n_payload_t));
     LOG("* checkRAIN clone v2.0 for iOS by interception");
-    
+#ifdef BUILTIN_PAYLOAD
+    LOG("[BUILTIN] v0.12.4");
+#endif
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     while(get_device(DEVICE_DFU, true) != 0) {
         sleep(1);
@@ -354,12 +355,15 @@ int main(int argc, char** argv)
     
 #endif /* BUILTIN_PAYLOAD */
     
-//#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
-//    checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
-//    bootargs = "rootdev=md0 -v";
-//    DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
-//    DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
-//#endif
+#if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
+    if(!strcmp(argv[2], "-v")) {
+        checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
+        bootargs = "rootdev=md0 -v";
+        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
+        DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
+        LOG("[%s] enable: verbose boot", __FUNCTION__);
+    }
+#endif
     
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
     if((client->devinfo.cpid == 0x8015)&&(devmode == 0x8015)){
