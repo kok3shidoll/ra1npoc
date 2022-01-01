@@ -3,3 +3,6 @@
 src/ra1npoc_macosx
 src/ra1npoc_iphoneos
 src/payload
+src/BUILD/
+src/build.sh
+src/package
