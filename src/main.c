@@ -204,6 +204,7 @@ int main(int argc, char** argv)
     LOG("* checkRAIN clone v2.0 for iOS by interception");
 #ifdef BUILTIN_PAYLOAD
     LOG("[BUILTIN] v0.12.4");
+    //LOG("[COMMIT] %s", "");
 #endif
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     while(get_device(DEVICE_DFU, true) != 0) {
@@ -356,7 +357,7 @@ int main(int argc, char** argv)
 #endif /* BUILTIN_PAYLOAD */
     
 #if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
-    if(!strcmp(argv[2], "-v")) {
+    if(argc == 3 && !strcmp(argv[2], "-v")) {
         checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
         bootargs = "rootdev=md0 -v";
         DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
