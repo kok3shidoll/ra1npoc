@@ -357,12 +357,14 @@ int main(int argc, char** argv)
 #endif /* BUILTIN_PAYLOAD */
     
 #if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
-    if(argc == 3 && !strcmp(argv[2], "-v")) {
-        checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
-        bootargs = "rootdev=md0 -v";
-        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
-        DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
-        LOG("[%s] enable: verbose boot", __FUNCTION__);
+    if(argc == 3) {
+        if(!strcmp(argv[2], "-v")) {
+            checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
+            bootargs = "rootdev=md0 -v";
+            DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
+            DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
+            LOG("[%s] enable: verbose boot", __FUNCTION__);
+        }
     }
 #endif
     
