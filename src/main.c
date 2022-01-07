@@ -125,13 +125,9 @@ static void usage(char** argv)
     printf("\t--a8x  \x1b[36mt7001   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif /* T7001 */
     
-#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
-    printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif /* S8000 */
-    
-#if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
-    printf("\t--a9m  \x1b[36ms8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
-#endif /* S8003 */
+#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD)) || defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
+    printf("\t--a9   \x1b[36ms8000/s8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#endif /* S8000/S8003 */
     
 #if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
     printf("\t--a9x  \x1b[36ms8001   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
@@ -179,11 +175,8 @@ int main(int argc, char** argv)
     if(!strcmp(argv[1], "--a9x")) {
         devmode = 0x8001;
     }
-    if(!strcmp(argv[1], "--a9m")) {
-        devmode = 0x8003;
-    }
     if(!strcmp(argv[1], "--a9")) {
-        devmode = 0x8000;
+        devmode = 0x8000; devmode = 0x8003;
     }
     if(!strcmp(argv[1], "--a8x")) {
         devmode = 0x7001;
