@@ -176,7 +176,8 @@ int main(int argc, char** argv)
         devmode = 0x8001;
     }
     if(!strcmp(argv[1], "--a9")) {
-        devmode = 0x8000; devmode = 0x8003;
+        devmode = 0x8000; 
+        devmode = 0x8003;
     }
     if(!strcmp(argv[1], "--a8x")) {
         devmode = 0x7001;
