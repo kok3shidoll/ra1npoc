@@ -125,8 +125,8 @@ static void usage(char** argv)
     printf("\t--a8x  \x1b[36mt7001   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif /* T7001 */
     
-#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD)) || defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
-    printf("\t--a9   \x1b[36ms8000/s8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
+#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD)) || defined(S8003_CODE) || defined(S8003_PAYLOAD))
+    printf("\t--a9   \x1b[36ms8000s8003   \x1b[39m - \x1b[35mcheckra1n\x1b[39m\n");
 #endif /* S8000/S8003 */
     
 #if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
