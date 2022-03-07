@@ -73,7 +73,6 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 int checkra1n_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
-    IOReturn res;
     transfer_t result;
     
     memset(&blank, '\0', 2048);
@@ -84,12 +83,7 @@ int checkra1n_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
     usleep(1000);
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    res = io_reset(client);
-    
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -99,10 +93,7 @@ int checkra1n_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
     set_global_state(client);
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -112,10 +103,7 @@ int checkra1n_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
     heap_occupation(client, payload);
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;

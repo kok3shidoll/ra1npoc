@@ -116,15 +116,9 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
 int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
-    IOReturn result;
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    result = io_reset(client);
-
-    io_close(client);
-    client = NULL;
-    sleep(5);
-    get_device_time_stage(&client, 15, DEVICE_STAGE2, false);
+    io_reconnect(&client, 15, DEVICE_STAGE2, USB_RESET|USB_REENUMERATE, false, 5000000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to connect to checkra1n DFU", __FUNCTION__);
         return -1;
@@ -139,8 +133,7 @@ int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
         return -1;
     }
     
-    result = io_reset(client);
-    
+    io_reset(client, USB_RESET|USB_REENUMERATE);
     io_close(client);
     
     LOG("[%s] BOOTED", __FUNCTION__);

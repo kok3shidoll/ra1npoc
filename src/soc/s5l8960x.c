@@ -143,19 +143,13 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 int checkra1n_s5l8960x(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
-    IOReturn result;
     
     memset(&blank, '\0', 2048);
     
     LOG_EXPLOIT_NAME("checkm8");
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    result = io_reset(client);
-    
-    io_close(client);
-    client = NULL;
-    usleep(1000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 1000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -165,12 +159,7 @@ int checkra1n_s5l8960x(io_client_t client, checkra1n_payload_t payload)
     set_global_state(client);
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    result = io_reset(client);
-    
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;
@@ -180,13 +169,7 @@ int checkra1n_s5l8960x(io_client_t client, checkra1n_payload_t payload)
     heap_occupation(client, payload);
     
     LOG("[%s] reconnecting", __FUNCTION__);
-    result = io_reenumerate(client);
-    DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    
-    io_close(client);
-    client = NULL;
-    usleep(10000);
-    get_device_time_stage(&client, 5, DEVICE_DFU, false);
+    io_reconnect(&client, 5, DEVICE_DFU, USB_REENUMERATE, false, 10000);
     if(!client) {
         ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
         return -1;

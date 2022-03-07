@@ -107,6 +107,16 @@ static void load_devinfo(io_client_t client, const char* str)
         sscanf(ptr, "CPID:%x", &client->devinfo.cpid);
     }
     
+    ptr = strstr(str, "BDID:");
+    if (ptr != NULL) {
+        sscanf(ptr, "BDID:%x", &client->devinfo.bdid);
+    }
+    
+    ptr = strstr(str, "CPFM:");
+    if (ptr != NULL) {
+        sscanf(ptr, "CPFM:%x", &client->devinfo.cpfm);
+    }
+    
     ptr = strstr(str, "SRNM:[");
     if(ptr != NULL) {
         client->devinfo.hasSrnm = TRUE;
@@ -114,7 +124,23 @@ static void load_devinfo(io_client_t client, const char* str)
         client->devinfo.hasSrnm = FALSE;
     }
     
-    tmp[0] = '\0';
+    memset(&tmp, '\0', 256);
+    ptr = strstr(str, "PWND:[");
+    if(ptr != NULL) {
+        client->devinfo.hasPwnd = TRUE;
+        
+        sscanf(ptr, "PWND:[%s]", tmp);
+        ptr = strrchr(tmp, ']');
+        if(ptr != NULL) {
+            *ptr = '\0';
+        }
+        client->devinfo.pwnstr = strdup(tmp);
+    
+    } else {
+        client->devinfo.hasPwnd = FALSE;
+    }
+    
+    memset(&tmp, '\0', 256);
     ptr = strstr(str, "SRTG:[");
     if(ptr != NULL) {
         sscanf(ptr, "SRTG:[%s]", tmp);
@@ -155,10 +181,10 @@ void read_serial_number(io_client_t client)
     
     unsigned char buf[0x100];
     unsigned char str[0x100];
-    memset(&str, '\0', 0x100);
-    memset(&buf, '\0', 0x100);
     
     if(client->devinfo.srtg == NULL){
+        memset(&buf, '\0', 0x100);
+        memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0306, 0x040a, buf, 0x100); // 8950 or up (PWND)
         if(result.ret != kIOReturnSuccess) return;
         size = *(uint8_t*)buf;
@@ -170,7 +196,7 @@ void read_serial_number(io_client_t client)
     
     if(client->devinfo.srtg == NULL){
         memset(&buf, '\0', 0x100);
-        memset(&str, '\0', 0x80);
+        memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0304, 0x040a, buf, 0x100); // 8950 or up
         if(result.ret != kIOReturnSuccess) return;
         size = *(uint8_t*)buf;
@@ -182,7 +208,7 @@ void read_serial_number(io_client_t client)
     
     if(client->devinfo.srtg == NULL){
         memset(&buf, '\0', 0x100);
-        memset(&str, '\0', 0x80);
+        memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0303, 0x040a, buf, 0x100); // 8930
         if(result.ret != kIOReturnSuccess) return;
         size = *(uint8_t*)buf;
@@ -229,15 +255,18 @@ void io_close(io_client_t client)
     client = NULL;
 }
 
-IOReturn io_reset(io_client_t client)
+void io_reset(io_client_t client, int flags)
 {
     IOReturn result;
-    result = io_resetdevice(client);
-    DEBUGLOG("[%s] ResetDevice: %x", __FUNCTION__, result);
+    if(flags & USB_RESET) {
+        result = io_resetdevice(client);
+        DEBUGLOG("[%s] ResetDevice: %x", __FUNCTION__, result);
+    }
     
-    result = io_reenumerate(client);
-    DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
-    return result;
+    if(flags & USB_REENUMERATE) {
+        result = io_reenumerate(client);
+        DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
+    }
 }
 
 int io_open(io_client_t *pclient, uint16_t pid, bool srnm)
@@ -300,10 +329,42 @@ int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stag
         if (io_open(pclient, stage, srnm) == 0) {
             return 0;
         }
+        //usleep(100000);
+        //usleep(250000);
         sleep(1);
     }
     return -1;
 }
+
+int io_reconnect(io_client_t *pclient,
+                 int retry,
+                 uint16_t stage,
+                 int flags,
+                 bool srnm,
+                 unsigned long sec)
+{
+    
+    if(*pclient) {
+        io_reset(*pclient, flags);
+        io_close(*pclient);
+        *pclient = NULL;
+    }
+    
+    usleep(sec);
+    
+    if(get_device_time_stage(pclient, retry, stage, srnm) != 0) {
+        *pclient = NULL;
+        return -1;
+    }
+    
+    if(!*pclient) {
+        *pclient = NULL;
+        return -1;
+    }
+    
+    return 0;
+}
+
 
 // no timeout
 transfer_t usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length)

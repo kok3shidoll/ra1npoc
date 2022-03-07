@@ -9,6 +9,10 @@
 #define kUSBHostReturnPipeStalled (IOReturn)0xe0005000
 #endif
 
+#define USB_NO_RESET    (0)
+#define USB_RESET       (1 << 1)
+#define USB_REENUMERATE (1 << 2)
+
 #define DEVICE_DFU              (0x1227)
 #define DEVICE_STAGE2           (0x1338)
 #define DEVICE_PONGO            (0x4141)
@@ -43,7 +47,11 @@ typedef io_client_p* io_client_t;
 
 struct io_devinfo {
     unsigned int cpid;
+    unsigned int bdid;
+    unsigned int cpfm;
     bool hasSrnm;
+    bool hasPwnd;
+    char* pwnstr;
     char* srtg;
 };
 
@@ -56,8 +64,10 @@ struct io_client_p {
     int usb_alt_interface;
     struct io_devinfo devinfo;
     bool hasSerialStr;
+    bool isDemotion;
 };
 
+// ra1npoc
 typedef struct {
     void *over1;
     unsigned int over1_len;
@@ -68,6 +78,13 @@ typedef struct {
     void *pongoOS;
     unsigned int pongoOS_len;
 } checkra1n_payload_t;
+
+// ipwnder_lite
+typedef struct {
+    unsigned char *payload;
+    unsigned int len;
+    const char *path;
+} ipwnder_payload_t;
 
 typedef struct {
     UInt32 wLenDone;
@@ -83,10 +100,16 @@ void read_serial_number(io_client_t client);
 // iokit
 void io_close(io_client_t client);
 int io_open(io_client_t *pclient, uint16_t pid, bool srnm);
-IOReturn io_reset(io_client_t client);
+void io_reset(io_client_t client, int flags);
 IOReturn io_reenumerate(io_client_t client);
 IOReturn io_resetdevice(io_client_t client);
 IOReturn io_abort_pipe_zero(io_client_t client);
+int io_reconnect(io_client_t *pclient,
+                 int retry,
+                 uint16_t stage,
+                 int flags,
+                 bool srnm,
+                 unsigned long sec);
 
 // usb transfer
 transfer_t usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
@@ -95,14 +118,5 @@ transfer_t async_usb_ctrl_transfer(io_client_t client, uint8_t bm_request_type, 
 UInt32 async_usb_ctrl_transfer_with_cancel(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
 UInt32 async_usb_ctrl_transfer_no_error(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length);
 UInt32 async_usb_ctrl_transfer_with_cancel_noloop(io_client_t client, uint8_t bm_request_type, uint8_t b_request, uint16_t w_value, uint16_t w_index, unsigned char *data, uint16_t w_length, unsigned int ns_time);
-
-/*
- kIOReturnSuccess           : 00000000
- kIOUSBPipeStalled          : e000404f
- kUSBHostReturnPipeStalled  : e0005000
- kIOReturnTimeout           : e00002d6
- kIOUSBTransactionTimeout   : e0004051
- kIOReturnNotResponding     : e00002ed
- */
 
 #endif
