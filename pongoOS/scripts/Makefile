@@ -38,12 +38,18 @@ ifeq ($(HOST_OS),Linux)
 endif
 endif
 
-.PHONY: all clean
+.PHONY: all ra1npoc clean
 
 all: pongoterm
 
+ra1npoc: pongoterm_
+
 pongoterm: pongoterm.c
 	$(CC) $(C_FLAGS) -o $@ $^ $(LD_FLAGS)
+
+pongoterm_: pongoterm.c
+	$(CC) $(C_FLAGS) -DRA1NPOC -o pongoterm $^ $(LD_FLAGS)
+
 
 clean:
 	rm -f pongoterm

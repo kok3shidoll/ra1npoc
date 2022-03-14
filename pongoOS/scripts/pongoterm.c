@@ -46,6 +46,21 @@
 #define CMD_LEN_MAX         512
 #define UPLOADSZ_MAX        (1024 * 1024 * 128)
 
+// use ra1npoc (built-in mode)
+#ifdef RA1NPOC
+#include "../../src/payload/pongoOS.h" // pongoOS used by ra1npoc (including kpf/rdsk)
+unsigned char* kpf;
+unsigned char* rdsk;
+size_t kpf_len;
+size_t rdsk_len;
+
+// Based on dumpfile. If you change us, this value must be changed.
+#define KPF_SIZE (0x18CEC)
+#define KPF_LOCATION (0x3F308)
+#define RDSK_SIZE (0x100000)
+#define RDSK_LOCATION (0x58000)
+#endif /* RA1NPOC */
+
 static uint8_t gBlockIO = 1;
 
 typedef struct stuff stuff_t;
@@ -645,6 +660,10 @@ static void* io_main(void *arg)
         size_t len = 0;
         while(1)
         {
+#ifdef RA1NPOC
+            LOG("selected: ra1npoc mode");
+            break;
+#endif
             char ch;
             ssize_t s = read(0, &ch, 1);
             if(s == 0)
@@ -678,6 +697,69 @@ static void* io_main(void *arg)
         }
         if(len == 0)
         {
+#ifdef RA1NPOC
+            // test
+            sleep(1);
+            
+            uint32_t newsz = rdsk_len;
+            ret = USBControlTransfer(stuff->handle, 0x21, 1, 0, 0, 4, &newsz, NULL);
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                ret = USBBulkUpload(stuff->handle, rdsk, rdsk_len);
+                if(ret == USB_RET_SUCCESS)
+                {
+                    LOG("Uploaded rdsk: %llu bytes", (unsigned long long)rdsk_len);
+                }
+            }
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "ramdisk\n", NULL);
+                if(ret == USB_RET_SUCCESS)
+                {
+                    LOG("Sended cmd");
+                }
+            }
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                newsz = kpf_len;
+                ret = USBControlTransfer(stuff->handle, 0x21, 1, 0, 0, 4, &newsz, NULL);
+            }
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                ret = USBBulkUpload(stuff->handle, kpf, kpf_len);
+                if(ret == USB_RET_SUCCESS)
+                {
+                    LOG("Uploaded kpf: %llu bytes", (unsigned long long)kpf_len);
+                }
+            }
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "modload\n", NULL);
+                if(ret == USB_RET_SUCCESS)
+                {
+                    LOG("Sended cmd");
+                }
+            }
+            
+            if(ret == USB_RET_SUCCESS)
+            {
+                ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "bootx\n", NULL);
+                if(ret == USB_RET_SUCCESS)
+                {
+                    LOG("Sended bootx. This device should probably boot.");
+                }
+            }
+            
+            if(ret != USB_RET_SUCCESS)
+            {
+                ERR("USB error: %s", usb_strerror(ret));
+            }
+#endif
             exit(0); // TODO: ok with libusb?
         }
         if(len > sizeof(buf))
@@ -836,5 +918,22 @@ int main(int argc, const char **argv)
             return -1;
         }
     }
+    
+#ifdef RA1NPOC
+    kpf_len  = KPF_SIZE;
+    rdsk_len = RDSK_SIZE;
+    
+    if((!kpf_len) | (kpf_len > 0x100000)) return -1;
+    if((!rdsk_len) | (rdsk_len > 0x100000)) return -1;
+    
+    // setup
+    kpf = malloc(kpf_len);
+    rdsk = malloc(rdsk_len);
+    
+    memcpy(kpf, pongoOS+KPF_LOCATION, kpf_len);
+    memcpy(rdsk, pongoOS+RDSK_LOCATION, rdsk_len);
+    
+#endif
+    
     return pongoterm_main();
 }
