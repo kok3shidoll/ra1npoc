@@ -304,11 +304,11 @@ int main(int argc, char** argv)
     
 #if defined(S8001_PAYLOAD)
     if((client->devinfo.cpid) == 0x8001) {
-        payload.over1_len = 0;
+        payload.over1_len = s8001_overwrite1_len;
         payload.over2_len = s8001_overwrite2_len;
         payload.stage2_len = s8001_stage2_len;
         payload.pongoOS_len = pongoOS_len;
-        payload.over1 = NULL;
+        payload.over1 = s8001_overwrite1;
         payload.over2 = s8001_overwrite2;
         payload.stage2 = s8001_stage2;
         payload.pongoOS = pongoOS;
@@ -383,6 +383,12 @@ int main(int argc, char** argv)
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
     if((client->devinfo.cpid == 0x8010)&&(devmode == 0x8010)){
         return checkra1n_t8010_t8015(client, payload); // A10 Fusion
+    }
+#endif
+    
+#if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
+    if(client->devinfo.cpid == 0x8001){
+        return checkra1n_t8010_t8015(client, payload); // A9X
     }
 #endif
     

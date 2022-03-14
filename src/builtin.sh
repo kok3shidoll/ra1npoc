@@ -21,6 +21,11 @@ xxd -i t7000_stage2 >> ../src/payload/t7000.h
 xxd -i s8000_overwrite2 >> ../src/payload/s8000.h
 xxd -i s8000_stage2 >> ../src/payload/s8000.h
 
+# S8001
+xxd -i s8001_overwrite1 >> ../src/payload/s8001.h
+xxd -i s8001_overwrite2 >> ../src/payload/s8001.h
+xxd -i s8001_stage2 >> ../src/payload/s8001.h
+
 # T8010
 xxd -i t8010_overwrite1 >> ../src/payload/t8010.h
 xxd -i t8010_overwrite2 >> ../src/payload/t8010.h

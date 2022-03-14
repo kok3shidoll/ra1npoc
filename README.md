@@ -15,7 +15,7 @@ checkra1n dump and poc for iOS
 | T7001 | Apple A8X | ❌ |
 | S8000 | Apple A9 | ✅ |
 | S8003 | Apple A9 | ✅ |
-| S8001 | Apple A9X | ❌ |
+| S8001 | Apple A9X | 🔼 |
 | T8010 | Apple A10 | ✅ |
 | T8011 | Apple A10X | ✅ |
 | T8015 | Apple A11 | ✅ |
@@ -63,14 +63,14 @@ make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 ## 実行  
 - iOS 14環境で実行する場合、バイナリは`/usr/local/bin`以下に配置する必要があります。  
 
-### A7/A10/A10X/A11  
+### A7/A9X-A11  
 ```
-ra1npoc [--a7 | --a10 | --a10x | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--a7 | --a9x | --a10 | --a10x | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
 ### A8/A9  
 ```
-ra1npoc [--a8 | --a9 | --a9m ] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--a8 | --a9 | --a9m] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
 ### built-in

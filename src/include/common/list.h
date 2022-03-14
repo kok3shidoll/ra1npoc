@@ -55,10 +55,10 @@
 
 /*
  * S8001 (Apple A9X)
- * S8001 is not supported.
+ * S8001 is partial supported.
  */
-//#define S8001_CODE
-//#define S8001_PAYLOAD
+#define S8001_CODE
+#define S8001_PAYLOAD
 
 
 /*
