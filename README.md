@@ -38,13 +38,17 @@ checkra1n dump and poc for iOS
 ## ビルド  
 ### 通常  
 ```
+cd src/
 make all
 ```
 
 ### Built-In ビルド  
 ```
+cd src/
 ./builtin.sh
 make all "CFLAGS+=-DBUILTIN_PAYLOAD"
+cd ../pongoOS/scripts
+make ra1npoc
 ```
 
 *iPhoneOS向けにビルドする場合、IOKitなどの一部ヘッダーはmacOSのものからコピーする必要があります。*  
@@ -65,17 +69,23 @@ make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 
 ### A7/A9X-A11  
 ```
-ra1npoc [--a7 | --a9x | --a10 | --a10x | --a11] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--{chipname}] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
 ### A8/A9  
 ```
-ra1npoc [--a8 | --a9 | --a9m] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
-### built-in
+### built-in (A9Xを除く)  
 ```
-ra1npoc [--a7 |--a8 | --a9 | --a9m | --a10 | --a10x | --a11]  
+ra1npoc [--{chipname}]  
+```
+
+### built-in (A9X)  
+```
+ra1npoc [--a9x]  
+pongoterm -r
 ```
 
 
