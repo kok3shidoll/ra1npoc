@@ -485,7 +485,7 @@ static int pongoterm_main(void)
     io_iterator_t found, lost;
     NSDictionary *dict =
     @{
-        @"IOProviderClass": @"IOUSBDevice",
+        @"IOProviderClass": @"IOUSBHostDevice", // Allows iOS to connect to iOS devices.
         @"idVendor":  @PONGO_USB_VENDOR,
         @"idProduct": @PONGO_USB_PRODUCT,
     };
