@@ -307,7 +307,7 @@ int main(int argc, char** argv)
         payload.over1_len = s8001_overwrite1_len;
         payload.over2_len = s8001_overwrite2_len;
         payload.stage2_len = s8001_stage2_len;
-        payload.pongoOS_len = pongoOS_len;
+        payload.pongoOS_len = 0x3F2F8;//pongoOS_len;
         payload.over1 = s8001_overwrite1;
         payload.over2 = s8001_overwrite2;
         payload.stage2 = s8001_stage2;

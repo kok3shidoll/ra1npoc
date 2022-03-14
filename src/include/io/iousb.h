@@ -69,13 +69,17 @@ struct io_client_p {
 
 // ra1npoc
 typedef struct {
-    void *over1;
+    // overwrite1 (used: A7/A9X-A11)
+    unsigned char *over1;
     unsigned int over1_len;
-    void *over2;
+    // overwrite2 (used: All)
+    unsigned char *over2;
     unsigned int over2_len;
-    void *stage2;
+    // stage2 (used: All)
+    unsigned char *stage2;
     unsigned int stage2_len;
-    void *pongoOS;
+    // pongoOS (used: All, but A9X does not send rdsk or kpf.)
+    unsigned char *pongoOS;
     unsigned int pongoOS_len;
 } checkra1n_payload_t;
 
