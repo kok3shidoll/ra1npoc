@@ -725,7 +725,7 @@ static void* io_main(void *arg)
                     ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "ramdisk\n", NULL);
                     if(ret == USB_RET_SUCCESS)
                     {
-                        LOG("Sended cmd");
+                        LOG("Sended cmd: ramdisk");
                     }
                 }
                 
@@ -749,7 +749,16 @@ static void* io_main(void *arg)
                     ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "modload\n", NULL);
                     if(ret == USB_RET_SUCCESS)
                     {
-                        LOG("Sended cmd");
+                        LOG("Sended cmd: modload");
+                    }
+                }
+                
+                if(ret == USB_RET_SUCCESS)
+                {
+                    ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("xargs rootdev=md0\n")), "xargs rootdev=md0\n", NULL);
+                    if(ret == USB_RET_SUCCESS)
+                    {
+                        LOG("Sended cmd: xargs");
                     }
                 }
                 
