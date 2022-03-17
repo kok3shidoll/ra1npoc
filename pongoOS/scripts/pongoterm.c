@@ -746,7 +746,7 @@ static void* io_main(void *arg)
                 
                 if(ret == USB_RET_SUCCESS)
                 {
-                    ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "modload\n", NULL);
+                    ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("modload\n")), "modload\n", NULL);
                     if(ret == USB_RET_SUCCESS)
                     {
                         LOG("Sended cmd: modload");
@@ -764,7 +764,7 @@ static void* io_main(void *arg)
                 
                 if(ret == USB_RET_SUCCESS)
                 {
-                    ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("ramdisk\n")), "bootx\n", NULL);
+                    ret = USBControlTransfer(stuff->handle, 0x21, 3, 0, 0, (uint32_t)(strlen("bootx\n")), "bootx\n", NULL);
                     if(ret == USB_RET_SUCCESS)
                     {
                         LOG("Sended bootx. This device should probably boot.");

@@ -67,10 +67,24 @@ make ra1npoc
 ## 実行  
 - iOS 14環境で実行する場合、バイナリは`/usr/local/bin`以下に配置する必要があります。  
 
-### A7/A9X-A11  
+### A7/A10-A11  
 ```
 ra1npoc [--{chipname}] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
+
+### A9X 
+```
+ra1npoc [--a9x] [s8001_overwrite1 s8001_overwrite2 s8001_stage2 pongoOS.bin]
+
+pongoterm
+> /send /path/to/ramdisk
+> ramdisk
+> /send /path/to/kpf
+> modload
+> xargs rootdev=md0
+> bootx
+```
+
 
 ### A8/A9  
 ```

@@ -388,7 +388,9 @@ int main(int argc, char** argv)
     
 #if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
     if(client->devinfo.cpid == 0x8001){
-        return checkra1n_t8010_t8015(client, payload); // A9X
+        int ret = checkra1n_t8010_t8015(client, payload); // A9X
+        if(ret == 0) LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
+        return ret;
     }
 #endif
     
