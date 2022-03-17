@@ -79,7 +79,7 @@ io_client_t client;
 checkra1n_payload_t payload;
 
 #ifndef BUILTIN_PAYLOAD
-static int open_file(char *file, unsigned int *sz, void **buf)
+static int open_file(char *file, unsigned int *sz, unsigned char **buf)
 {
     FILE *fd = fopen(file, "r");
     if (!fd) {
