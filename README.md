@@ -93,12 +93,12 @@ ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]
 
 ### built-in (A9Xを除く)  
 ```
-ra1npoc [--{chipname}]  
+ra1npoc [-v]  
 ```
 
 ### built-in (A9X)  
 ```
-ra1npoc [--a9x]  
+ra1npoc  
 pongoterm -r
 ```
 
