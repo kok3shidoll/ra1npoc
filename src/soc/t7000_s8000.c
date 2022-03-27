@@ -1,5 +1,5 @@
 /*
- * ra1npoc - t7000_s8000.c
+ * ra1npoc - t7000_s8000.c .. exploit for t7000/t7001/s8000/s8003
  *
  * Copyright (c) 2021 dora2ios
  *

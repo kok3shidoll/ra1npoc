@@ -1,5 +1,5 @@
 /*
- * ra1npoc - s5l8960x.c
+ * ra1npoc - s5l8960x.c .. exploit for s5l8960x
  *
  * Copyright (c) 2021 dora2ios
  *
