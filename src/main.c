@@ -33,6 +33,7 @@
 #include <soc/s5l8960x.h>
 
 #ifdef BUILTIN_PAYLOAD
+#include <getopt.h>
 
 #include "payload/pongoOS.h"
 
@@ -72,7 +73,7 @@
 
 #if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
 int8_t kpf_flags = checkrain_option_none;
-const char* bootargs = DEFAULT_BOOTARGS;
+const char* bootargs = NULL;
 #endif
 
 io_client_t client;
@@ -200,20 +201,18 @@ int main(int argc, char** argv)
     
 #ifndef BUILTIN_PAYLOAD
     uint16_t devmode=0;
-#endif /* !BUILTIN_PAYLOAD */
-    
-    if(
-#ifndef BUILTIN_PAYLOAD
-       argc != 6
 #else
-       argc < 1 || argc > 2
-#endif /* BUILTIN_PAYLOAD */
-       ) {
+    bool verboseBoot = false;
+    char* extraBootArgs = NULL;
+    
+#endif /* !BUILTIN_PAYLOAD */
+ 
+#ifndef BUILTIN_PAYLOAD
+    if(argc != 6) {
         usage(argv);
         return -1;
     }
     
-#ifndef BUILTIN_PAYLOAD
     if(!strcmp(argv[1], "--a11")) {
         devmode = 0x8015;
     }
@@ -246,20 +245,42 @@ int main(int argc, char** argv)
         return -1;
     }
 #else /* !BUILTIN_PAYLOAD */
-    if(argc == 2) {
-        if(!strcmp(argv[1], "-v")) {
-            // ok
-        } else if(!strcmp(argv[1], "-h")) {
-            usage(argv);
-            return 0;
-        } else if(!strcmp(argv[1], "-l")) {
-            list();
-            return 0;
-        } else {
-            usage(argv);
-            return -1;
+    int opt = 0;
+    static struct option longopts[] = {
+        { "help",           no_argument,       NULL, 'h' },
+        { "list",           no_argument,       NULL, 'l' },
+        { "verbose",        no_argument,       NULL, 'v' },
+        { "extra-bootargs", required_argument, NULL, 'e' },
+        { NULL, 0, NULL, 0 }
+    };
+    
+    while ((opt = getopt_long(argc, argv, "hlve:", longopts, NULL)) > 0) {
+        switch (opt) {
+            case 'h':
+                usage(argv);
+                return 0;
+                
+            case 'l':
+                list();
+                return 0;
+                
+            case 'v':
+                verboseBoot = true;
+                break;
+                
+            case 'e':
+                if (optarg) {
+                    extraBootArgs = strdup(optarg);
+                    LOG("[%s] extraBootArgs: [%s]", __FUNCTION__, extraBootArgs);
+                }
+                break;
+                
+            default:
+                usage(argv);
+                return -1;
         }
     }
+     
 #endif /* BUILTIN_PAYLOAD */
     
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
@@ -451,15 +472,38 @@ int main(int argc, char** argv)
     }
     
 #if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
-    if(argc == 2) {
-        if(!strcmp(argv[1], "-v")) {
-            checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
-            bootargs = "rootdev=md0 -v";
-            DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
-            DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
-            LOG("[%s] enable: verbose boot", __FUNCTION__);
-        }
+    if(verboseBoot == true) {
+        checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
+        //bootargs = "rootdev=md0 -v";
+        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
+        //DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
+        LOG("[%s] enable: verbose boot", __FUNCTION__);
     }
+    char str[MAX_BOOTARGS_LEN];
+    memset(&str, 0x0, MAX_BOOTARGS_LEN);
+    
+    if(strlen(DEFAULT_BOOTARGS) > MAX_BOOTARGS_LEN) {
+        ERROR("[%s] DEFAULT_BOOTARGS is too large!", __FUNCTION__);
+        return -1;
+    }
+    sprintf(str, "%s", DEFAULT_BOOTARGS);
+    
+    if(verboseBoot == true) {
+        if((strlen(str) + strlen(" -v")) > MAX_BOOTARGS_LEN) {
+            ERROR("[%s] bootArgs is too large!", __FUNCTION__);
+            return -1;
+        }
+        sprintf(str, "%s -v", str);
+    }
+    if(extraBootArgs != NULL) {
+        if((strlen(str) + strlen(extraBootArgs)) > MAX_BOOTARGS_LEN) {
+            ERROR("[%s] bootArgs is too large!", __FUNCTION__);
+            return -1;
+        }
+        sprintf(str, "%s %s", str, extraBootArgs);
+    }
+    bootargs = str;
+    LOG("[%s] bootArgs: %s", __FUNCTION__, bootargs);
 #endif
     
     if(checkm8_flag & CHECKM8_A7) {
