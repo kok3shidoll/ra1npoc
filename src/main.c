@@ -179,9 +179,10 @@ static void usage(char** argv)
 #endif /* T8015 */
     
 #else
-    printf("\t-v\t\x1b[36menable verbose boot\x1b[39m\n");
-    printf("\t-l\t\x1b[36mshow device list\x1b[39m\n");
-    printf("\t-h\t\x1b[36mshow help\x1b[39m\n");
+    printf("  -h, --help\t\t\t\x1b[36mshow usage\x1b[39m\n");
+    printf("  -l, --list\t\t\t\x1b[36mshow list of supported devices\x1b[39m\n");
+    printf("  -v, --verbose\t\t\t\x1b[36menable verbose boot\x1b[39m\n");
+    printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
     
     printf("\n");
