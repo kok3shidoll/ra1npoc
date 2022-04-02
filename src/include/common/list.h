@@ -82,6 +82,12 @@
 #define T8011_CODE
 #define T8011_PAYLOAD
 
+/*
+ * T8012 (Apple T2)
+ * T8012
+ */
+#define T8012_CODE
+#define T8012_PAYLOAD
 
 /*
  * T8015 (Apple A11 Bionic)

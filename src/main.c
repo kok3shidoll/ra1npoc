@@ -65,6 +65,10 @@
 #include "payload/t8011.h"
 #endif /* T8011_PAYLOAD */
 
+#if defined(T8012_PAYLOAD)
+#include "payload/t8012.h"
+#endif /* T8012_PAYLOAD */
+
 #if defined(T8015_PAYLOAD)
 #include "payload/t8015.h"
 #endif /* T8015_PAYLOAD */
@@ -134,6 +138,9 @@ static void list(void)
 #if defined(T8011_CODE) && defined(T8011_PAYLOAD)
     printf("\t\x1b[36mt8011   \x1b[39m - \x1b[35mApple A10X Fusion\x1b[39m\n");
 #endif /* T8011 */
+#if defined(T8012_CODE) && defined(T8012_PAYLOAD)
+    printf("\t\x1b[36mt8012   \x1b[39m - \x1b[35mApple T2\x1b[39m\n");
+#endif /* T8012 */
 #if defined(T8015_CODE) && defined(T8015_PAYLOAD)
     printf("\t\x1b[36mt8015   \x1b[39m - \x1b[35mApple A11 Bionic\x1b[39m\n");
 #endif /* T8015 */
@@ -174,6 +181,9 @@ static void usage(char** argv)
 #if defined(T8011_CODE)
     printf("\t--a10x \x1b[36mt8011   \x1b[39m - \x1b[35mApple A10X Fusion\x1b[39m\n");
 #endif /* T8011 */
+#if defined(T8012_CODE)
+    printf("\t--t2   \x1b[36mt8011   \x1b[39m - \x1b[35mApple T2\x1b[39m\n");
+#endif /* T8012 */
 #if defined(T8015_CODE)
     printf("\t--a11  \x1b[36mt8015   \x1b[39m - \x1b[35mApple A11 Bionic\x1b[39m\n");
 #endif /* T8015 */
@@ -216,6 +226,9 @@ int main(int argc, char** argv)
     
     if(!strcmp(argv[1], "--a11")) {
         devmode = 0x8015;
+    }
+    if(!strcmp(argv[1], "--t2")) {
+        devmode = 0x8012;
     }
     if(!strcmp(argv[1], "--a10x")) {
         devmode = 0x8011;
@@ -450,6 +463,22 @@ int main(int argc, char** argv)
             checkm8_flag |= CHECKM8_A9X_A11;
             break;
 #endif /* T8011 */
+            
+#if defined(T8012_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8012_PAYLOAD))
+        case 0x8012:
+#ifdef BUILTIN_PAYLOAD
+            payload.over1_len = t8012_overwrite1_len;
+            payload.over2_len = t8012_overwrite2_len;
+            payload.stage2_len = t8012_stage2_len;
+            payload.pongoOS_len = pongoOS_len;
+            payload.over1 = t8012_overwrite1;
+            payload.over2 = t8012_overwrite2;
+            payload.stage2 = t8012_stage2;
+            payload.pongoOS = pongoOS;
+#endif /* BUILTIN_PAYLOAD */
+            checkm8_flag |= CHECKM8_A9X_A11;
+            break;
+#endif /* T8012 */
             
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
         case 0x8015:
