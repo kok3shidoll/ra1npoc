@@ -36,6 +36,11 @@ xxd -i t8011_overwrite1 >> ../src/payload/t8011.h
 xxd -i t8011_overwrite2 >> ../src/payload/t8011.h
 xxd -i t8011_stage2 >> ../src/payload/t8011.h
 
+# T8012
+xxd -i t8012_overwrite1 >> ../src/payload/t8012.h
+xxd -i t8012_overwrite2 >> ../src/payload/t8012.h
+xxd -i t8012_stage2 >> ../src/payload/t8012.h
+
 # T8015
 xxd -i t8015_overwrite1 >> ../src/payload/t8015.h
 xxd -i t8015_overwrite2 >> ../src/payload/t8015.h
