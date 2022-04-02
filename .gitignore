@@ -1,7 +1,6 @@
 
 .DS_Store
-src/ra1npoc_macosx
-src/ra1npoc_iphoneos
+src/ra1npoc*
 src/payload
 src/BUILD/
 src/build.sh
