@@ -93,6 +93,7 @@ typedef transfer_t async_transfer_t;
 
 int get_device(unsigned int mode, bool srnm);
 int get_device_time_stage(io_client_t *pclient, unsigned int time, uint16_t stage, bool snrm);
+void send_reboot_via_recovery(io_client_t client);
 void read_serial_number(io_client_t client);
 
 // iokit

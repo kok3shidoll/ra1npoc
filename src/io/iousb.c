@@ -173,6 +173,16 @@ static void io_get_serial(io_client_t client, io_service_t service)
     
 }
 
+void send_reboot_via_recovery(io_client_t client)
+{
+    const char* io_setenv_cmd = "setenv auto-boot true\x00";
+    const char* io_saveenv_cmd = "saveenv\x00";
+    const char* io_reboot_cmd = "reboot\x00";
+    usb_ctrl_transfer(client, 0x40, 0, 0x0000, 0x0000, (unsigned char*)io_setenv_cmd, strlen(io_setenv_cmd)+1);
+    usb_ctrl_transfer(client, 0x40, 0, 0x0000, 0x0000, (unsigned char*)io_saveenv_cmd, strlen(io_saveenv_cmd)+1);
+    usb_ctrl_transfer(client, 0x40, 0, 0x0000, 0x0000, (unsigned char*)io_reboot_cmd, strlen(io_reboot_cmd)+1);
+    
+}
 // iOS 10 and below, it is not possible to get the serial by IORegistryEntryCreateCFProperty, so send a usb request to get the serial.
 // If it successful, set hasSerialStr in the structure io_devinfo in the io_client_t structure to true.
 void read_serial_number(io_client_t client)
