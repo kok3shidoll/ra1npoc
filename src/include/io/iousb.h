@@ -21,23 +21,17 @@
 #define DEVICE_RECOVERY_MODE_3  (0x1282)
 #define DEVICE_RECOVERY_MODE_4  (0x1283)
 
+bool debug_enabled;
+
 /* LOG macro */
 #ifndef IPHONEOS_ARM
   #define ERROR(x, ...)             do { printf("\x1b[31m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-  #ifdef DEBUG
-    #define DEBUGLOG(x, ...)        do { printf("\x1b[34m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
-  #else
-    #define DEBUGLOG(x, ...)
-  #endif
+  #define DEBUGLOG(x, ...)          do { if(debug_enabled) printf("\x1b[34m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
   #define LOG_EXPLOIT_NAME(x, ...)  do { printf("\x1b[1m** \x1b[31mexploiting with "x"\x1b[39;0m\n", ##__VA_ARGS__); } while(0)
   #define LOG(x, ...)      do { printf("\x1b[32m"x"\x1b[39m\n", ##__VA_ARGS__); } while(0)
 #else
   #define ERROR(x, ...)             do { printf(""x"\n", ##__VA_ARGS__); } while(0)
-  #ifdef DEBUG
-    #define DEBUGLOG(x, ...)        do { printf(""x"\n", ##__VA_ARGS__); } while(0)
-  #else
-    #define DEBUGLOG(x, ...)
-  #endif
+  #define DEBUGLOG(x, ...)          do { if(debug_enabled) printf(""x"\n", ##__VA_ARGS__); } while(0)
   #define LOG_EXPLOIT_NAME(x, ...)  do { printf("** exploiting with "x"\n", ##__VA_ARGS__); } while(0)
   #define LOG(x, ...)      do { printf(""x"\n", ##__VA_ARGS__); } while(0)
 #endif

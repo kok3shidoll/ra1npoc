@@ -82,6 +82,7 @@ const char* bootargs = NULL;
 
 io_client_t client;
 checkra1n_payload_t payload;
+extern bool debug_enabled;
 
 #ifndef BUILTIN_PAYLOAD
 static int open_file(char *file, unsigned int *sz, unsigned char **buf)
@@ -192,6 +193,7 @@ static void usage(char** argv)
     printf("  -h, --help\t\t\t\x1b[36mshow usage\x1b[39m\n");
     printf("  -l, --list\t\t\t\x1b[36mshow list of supported devices\x1b[39m\n");
     printf("  -v, --verbose\t\t\t\x1b[36menable verbose boot\x1b[39m\n");
+    printf("  -d, --debug\t\t\t\x1b[36menable debug log\x1b[39m\n");
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
     
@@ -200,7 +202,6 @@ static void usage(char** argv)
 
 int main(int argc, char** argv)
 {
-    
     memset(&payload, '\0', sizeof(checkra1n_payload_t));
     LOG("* checkRAIN clone v2.1 for iOS by interception");
 #ifdef BUILTIN_PAYLOAD
@@ -258,17 +259,23 @@ int main(int argc, char** argv)
         usage(argv);
         return -1;
     }
+    
+#ifdef DEBUG
+    debug_enabled = true;
+#endif /* DEBUG */
+    
 #else /* !BUILTIN_PAYLOAD */
     int opt = 0;
     static struct option longopts[] = {
         { "help",           no_argument,       NULL, 'h' },
         { "list",           no_argument,       NULL, 'l' },
         { "verbose",        no_argument,       NULL, 'v' },
+        { "debug",          no_argument,       NULL, 'd' },
         { "extra-bootargs", required_argument, NULL, 'e' },
         { NULL, 0, NULL, 0 }
     };
     
-    while ((opt = getopt_long(argc, argv, "hlve:", longopts, NULL)) > 0) {
+    while ((opt = getopt_long(argc, argv, "hlvde:", longopts, NULL)) > 0) {
         switch (opt) {
             case 'h':
                 usage(argv);
@@ -280,6 +287,11 @@ int main(int argc, char** argv)
                 
             case 'v':
                 verboseBoot = true;
+                break;
+                
+            case 'd':
+                debug_enabled = true;
+                DEBUGLOG("[%s] enabled: debug log", __FUNCTION__);
                 break;
                 
             case 'e':
