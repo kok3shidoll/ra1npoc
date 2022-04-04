@@ -193,6 +193,7 @@ static void usage(char** argv)
     printf("  -h, --help\t\t\t\x1b[36mshow usage\x1b[39m\n");
     printf("  -l, --list\t\t\t\x1b[36mshow list of supported devices\x1b[39m\n");
     printf("  -v, --verbose\t\t\t\x1b[36menable verbose boot\x1b[39m\n");
+    printf("  -c, --cleandfu\t\t\t\x1b[36muse cleandfu [BETA]\x1b[39m\n");
     printf("  -d, --debug\t\t\t\x1b[36menable debug log\x1b[39m\n");
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
@@ -214,6 +215,7 @@ int main(int argc, char** argv)
 #ifndef BUILTIN_PAYLOAD
     uint16_t devmode=0;
 #else
+    bool useRecovery = false;
     bool verboseBoot = false;
     char* extraBootArgs = NULL;
     
@@ -270,12 +272,13 @@ int main(int argc, char** argv)
         { "help",           no_argument,       NULL, 'h' },
         { "list",           no_argument,       NULL, 'l' },
         { "verbose",        no_argument,       NULL, 'v' },
+        { "cleandfu",       no_argument,       NULL, 'c' },
         { "debug",          no_argument,       NULL, 'd' },
         { "extra-bootargs", required_argument, NULL, 'e' },
         { NULL, 0, NULL, 0 }
     };
     
-    while ((opt = getopt_long(argc, argv, "hlvde:", longopts, NULL)) > 0) {
+    while ((opt = getopt_long(argc, argv, "hlvdce:", longopts, NULL)) > 0) {
         switch (opt) {
             case 'h':
                 usage(argv);
@@ -294,6 +297,10 @@ int main(int argc, char** argv)
                 DEBUGLOG("[%s] enabled: debug log", __FUNCTION__);
                 break;
                 
+            case 'c':
+                useRecovery = true;
+                break;
+                
             case 'e':
                 if (optarg) {
                     extraBootArgs = strdup(optarg);
@@ -308,6 +315,12 @@ int main(int argc, char** argv)
     }
      
 #endif /* BUILTIN_PAYLOAD */
+    
+    if(useRecovery) {
+        if(enter_dfu_via_recovery(client) != 0) {
+            return -1;
+        }
+    }
     
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     while(get_device(DEVICE_DFU, true) != 0) {
