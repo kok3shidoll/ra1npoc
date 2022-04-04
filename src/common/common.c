@@ -144,7 +144,7 @@ int enter_dfu_via_recovery(io_client_t client)
         printf("\033[2K");
         putchar('[');
         for (j=0;j<i+1;j++)
-            putchar('#');
+            putchar('=');
         for (;j<step2_sec;j++)
             putchar(' ');
         putchar(']');
@@ -162,7 +162,7 @@ int enter_dfu_via_recovery(io_client_t client)
         printf("\033[2K");
         putchar('[');
         for (j=0;j<i+1;j++)
-            putchar('#');
+            putchar('=');
         for (;j<step3_sec;j++)
             putchar(' ');
         putchar(']');
