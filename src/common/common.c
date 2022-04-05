@@ -187,7 +187,7 @@ int enter_dfu_via_recovery(io_client_t client)
     getchar();
     
     printf("\n");
-    LOG("[STEP2] Press and hold the Side and %s together (%dsec)", btn, step2_sec);
+    LOG("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
     int j=0;
     for(int i=0; i<step2_sec; i++) {
         if(i==1)
