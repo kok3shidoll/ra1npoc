@@ -50,7 +50,7 @@ static struct checkra1n_device_list devlists[] = {
     { 0x8010, 0x0c, DFU_IPHONE7 }, // iPhone 7
     { 0x8010, 0x0a, DFU_IPHONE7 }, // iPhone 7 Plus
     { 0x8010, 0x0e, DFU_IPHONE7 }, // iPhone 7 Plus
-    { 0x8010, 0x16, DFU_LEGACY  }, // iPod touch 7
+    { 0x8010, 0x16, DFU_IPHONE7 }, // iPod touch 7
     { 0x8010, 0x18, DFU_LEGACY  }, // iPad 6
     { 0x8010, 0x1a, DFU_LEGACY  }, // iPad 6
     { 0x8010, 0x1c, DFU_LEGACY  }, // iPad 7
