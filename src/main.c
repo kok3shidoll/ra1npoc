@@ -193,7 +193,7 @@ static void usage(char** argv)
     printf("  -h, --help\t\t\t\x1b[36mshow usage\x1b[39m\n");
     printf("  -l, --list\t\t\t\x1b[36mshow list of supported devices\x1b[39m\n");
     printf("  -v, --verbose\t\t\t\x1b[36menable verbose boot\x1b[39m\n");
-    printf("  -c, --cleandfu\t\t\t\x1b[36muse cleandfu [BETA]\x1b[39m\n");
+    printf("  -c, --cleandfu\t\t\x1b[36muse cleandfu [BETA]\x1b[39m\n");
     printf("  -d, --debug\t\t\t\x1b[36menable debug log\x1b[39m\n");
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
