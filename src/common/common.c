@@ -25,6 +25,7 @@
 
 #include <io/iousb.h>
 #include <common/common.h>
+#include <time.h>
 
 struct checkra1n_device_list {
     uint16_t        cpid;
@@ -70,11 +71,51 @@ extern int8_t kpf_flags;
 extern const char* bootargs;
 #endif
 
+long cpuTime;
+
+static void interval(double sec)
+{
+    long now;
+    double n_sec;
+    double b_sec = (double)cpuTime / CLOCKS_PER_SEC;
+    while(1) {
+        now = clock();
+        n_sec = (double)now / CLOCKS_PER_SEC;
+        if ((n_sec-b_sec) > sec)
+            break;
+    }
+    cpuTime = now;
+}
+
+static void prog(int sec)
+{
+    int i=0;
+    int j=0;
+    
+    for(i=0; i<sec; i++) {
+        printf("[");
+        for (j=0;j<i+1;j++)
+            printf("=");
+        for (;j<sec;j++)
+            printf(" ");
+        printf("] (%d/%d sec)\r", i+1, sec);
+        fflush(stdout);
+        interval(1);
+    }
+    printf("\n");
+}
 
 int enter_dfu_via_recovery(io_client_t client)
 {
     LOG("[%s] Waiting for device in Recovery mode...", __FUNCTION__);
-    io_reconnect(&client, 10, DEVICE_RECOVERY_MODE_2, USB_NO_RESET, true, 10000);
+    while(1) {
+        if(client) {
+            io_close(client);
+            client = NULL;
+        }
+        io_open(&client, DEVICE_RECOVERY_MODE_2, true);
+        if(client) break;
+    }
     if(!client) {
         ERROR("[%s] ERROR: Failed to find the device in Recovery mode", __FUNCTION__);
         return -1;
@@ -126,13 +167,23 @@ int enter_dfu_via_recovery(io_client_t client)
         return -1;
     } /* DFU_UNKOWN_TYPE */
     
-    LOG("[%s] Time to put the device into DFU mode", __FUNCTION__);
-    LOG("[%s] Please follow the instructions below to operate the device.", __FUNCTION__);
     printf("\n");
-    LOG("[STEP1] press <enter> key.");
-    LOG("[STEP2] Press and hold the Side and %s together (%dsec)", btn, step2_sec);
-    LOG("[STEP3] Release the Side button But keep holding the %s (%dsec)", btn, step3_sec);
-    printf(">> ");
+    
+    printf("================\n");
+    printf("::\n");
+    printf(":: %s\n", __FUNCTION__);
+    printf(":: CPID: 0x%02x BDID: 0x%02x TYPE: 0x%02x\n", client->devinfo.cpid, client->devinfo.bdid, enterdfuType);
+    printf("::\n");
+    printf(":: \x1b[34mTime to put the device into DFU mode\x1b[39m\n");
+    printf(":: \x1b[34mPlease follow the instructions below to operate the device.\x1b[39m\n");
+    printf("::\n");
+    printf(":: \x1b[32mSTEP1: Press \x1b[31m<enter>\x1b[32m key.\x1b[39m\n");
+    printf(":: \x1b[32mSTEP2: Press and hold the Side and %ss together \x1b[31m(%dsec)\x1b[39m\n", btn, step2_sec);
+    printf(":: \x1b[32mSTEP3: Release the Side button But keep holding the %s \x1b[31m(%dsec)\x1b[39m\n", btn, step3_sec);
+    printf("================\n");
+    printf("\n");
+    printf("\x1b[34mready?\x1b[39m\n");
+    printf("\x1b[32m[STEP1] Press <enter> key\x1b[39m >> ");
     getchar();
     
     printf("\n");
@@ -141,39 +192,19 @@ int enter_dfu_via_recovery(io_client_t client)
     for(int i=0; i<step2_sec; i++) {
         if(i==1)
             send_reboot_via_recovery(client);
-        printf("\033[2K");
-        putchar('[');
+        printf("[");
         for (j=0;j<i+1;j++)
-            putchar('=');
+            printf("=");
         for (;j<step2_sec;j++)
-            putchar(' ');
-        putchar(']');
-        puts("");
-        
-        printf("\033[2K\033[G (%d/%d sec)\n", i+1, step2_sec);
-        printf("\033[2F");
+            printf(" ");
+        printf("] (%d/%d sec)\r", i+1, step2_sec);
         fflush(stdout);
-        sleep(1);
+        interval(1);
     }
-    puts("");
+    printf("\n");
     
     LOG("[STEP3] Release the Side button But keep holding the %s (%dsec)", btn, step3_sec);
-    for(int i=0; i<step3_sec; i++) {
-        printf("\033[2K");
-        putchar('[');
-        for (j=0;j<i+1;j++)
-            putchar('=');
-        for (;j<step3_sec;j++)
-            putchar(' ');
-        putchar(']');
-        puts("");
-        
-        printf("\033[2K\033[G (%d/%d  sec)\n", i+1, step3_sec);
-        printf("\033[2F");
-        fflush(stdout);
-        sleep(1);
-    }
-    puts("");
+    prog(step3_sec);
     
     LOG("[%s] reconnecting", __FUNCTION__);
     io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
