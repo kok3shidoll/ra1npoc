@@ -55,9 +55,6 @@ make ra1npoc
 
 
 ## 定義  
-`DEBUG`  
-- いくつかのデバッグ用メッセージの表示を有効にします。  
-
 `IPHONEOS_ARM`  
 - iOSデバイスからiOSデバイスに接続できるようにします。lightningデバイスの場合、接続にはlightning to USB camera adapterが必要となります。  
 
@@ -91,21 +88,28 @@ pongoterm
 ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
 ```
 
-### built-in (A9Xを除く)  
+### built-in  
 ```
-ra1npoc [-v]  
+ra1npoc [option]  
+  -h, --help                    show usage
+  -l, --list                    show list of supported devices
+  -v, --verbose                 enable verbose boot
+  -c, --cleandfu                use cleandfu [BETA]
+  -d, --debug                   enable debug log
+  -e, --extra-bootargs <args>   set extra bootargs
 ```
 
 ### built-in (A9X)  
+A9Xの場合、ra1npocを実行したあとpongoOSで停止する仕様となっています。  
+iPadOSを起動したい場合、続けてpongotermを使用してブートファイルを送信する必要があります。  
 ```
-ra1npoc  
 pongoterm -r
 ```
 
 
-## iOSで利用する際の注意点   
-- 対象デバイスをlightning to USB camera adapter経由で脱獄するデバイス (このソフトウェアを実行する側) に接続する際、電源供給が足りず、対象デバイスをDFU Modeに出来ない可能性があります。  
-    - 解決策1: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU Modeにした上でiOSデバイスに接続し直す。  
+## iOS/iPadOSで利用する際の注意点   
+- 対象デバイスをlightning to USB camera adapter経由で脱獄するデバイス (このソフトウェアを実行する側) に接続する際、電源供給が足りず、対象デバイスをDFU/Recovery Modeに出来ない可能性があります。  
+    - 解決策1: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU/Recovery Modeにした上でiOSデバイスに接続し直す。  
     - 解決策2: USBハブに電源供給を行い、バスパワーではなくセルフパワーで接続する。  
 
 - stage2からpongoOSを送信する際に電源供給が足りず、再接続が出来ない可能性があります。  
