@@ -186,6 +186,9 @@ int enter_dfu_via_recovery(io_client_t client)
     printf("\x1b[32m[STEP1] Press <enter> key\x1b[39m >> ");
     getchar();
     
+    // initialization for interval()
+    cpuTime = clock();
+    
     printf("\n");
     LOG("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
     int j=0;
