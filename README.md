@@ -22,36 +22,29 @@ checkra1n dump and poc for iOS
 
 
 ### ホスト側のデバイス (このソフトウェアを実行する側)  
-- iPhone 5s (iOS 12.5.1)  
+- iOS 12+  
     - 動作確認済 (lightning to USB camera adapter 経由)  
 
-- iPhone 8 (iOS 13.5)  
-    - 動作確認済 (lightning to USB camera adapter 経由)  
-
-- iPhone 5 (iOS 9.x, 10.x)  
-    - 動作確認済 (lightning to USB camera adapter + 電源供給)  
-
-- iPhone 5s (iOS 9.1, 9.3.3)  
+- iOS 9+  
     - 動作確認済 (lightning to USB camera adapter + 電源供給)  
 
 
 ## ビルド  
-### 通常  
+### Built-Inモード  
 ```
 cd src/
 make all
-```
-
-### Built-In ビルド  
-```
-cd src/
-./builtin.sh
-make all "CFLAGS+=-DBUILTIN_PAYLOAD"
 cd ../pongoOS/scripts
 make ra1npoc
 ```
 
-*iPhoneOS向けにビルドする場合、IOKitなどの一部ヘッダーはmacOSのものからコピーする必要があります。*  
+### 旧モード  
+```
+cd src/
+make old
+```
+
+*iPhoneOS向けにビルドするために、IOKitなどの一部ヘッダーをmacOSからiPhoneOSのSDKにコピーする必要があります。*  
 
 
 ## 定義  
@@ -61,32 +54,9 @@ make ra1npoc
 `BUILTIN_PAYLOAD`   
 - Payloadをbuilt-inします。
 
+
 ## 実行  
 - iOS 14環境で実行する場合、バイナリは`/usr/local/bin`以下に配置する必要があります。  
-
-### A7/A10-A11  
-```
-ra1npoc [--{chipname}] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
-```
-
-### A9X 
-```
-ra1npoc [--a9x] [s8001_overwrite1 s8001_overwrite2 s8001_stage2 pongoOS.bin]
-
-pongoterm
-> /send /path/to/ramdisk
-> ramdisk
-> /send /path/to/kpf
-> modload
-> xargs rootdev=md0
-> bootx
-```
-
-
-### A8/A9  
-```
-ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
-```
 
 ### built-in  
 ```
@@ -107,6 +77,31 @@ pongoterm -r
 ```
 
 
+### 旧モードの場合  
+### A7/A10-A11  
+```
+ra1npoc [--{chipname}] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+```
+
+### A9X 
+```
+ra1npoc [--a9x] [s8001_overwrite1 s8001_overwrite2 s8001_stage2 pongoOS.bin]
+
+pongoterm
+> /send /path/to/ramdisk
+> ramdisk
+> /send /path/to/kpf
+> modload
+> xargs rootdev=md0
+> bootx
+```
+
+### A8/A9  
+```
+ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+```
+
+
 ## iOS/iPadOSで利用する際の注意点   
 - 対象デバイスをlightning to USB camera adapter経由で脱獄するデバイス (このソフトウェアを実行する側) に接続する際、電源供給が足りず、対象デバイスをDFU/Recovery Modeに出来ない可能性があります。  
     - 解決策1: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU/Recovery Modeにした上でiOSデバイスに接続し直す。  
@@ -115,6 +110,7 @@ pongoterm -r
 - stage2からpongoOSを送信する際に電源供給が足りず、再接続が出来ない可能性があります。  
     - 影響のあるデバイス (このソフトウェアを実行する側): `iOS 10以下のiOSデバイス`  
     - 解決策: USBハブに電源供給を行い、バスパワーではなくセルフパワーで接続する。  
+
 
 ## Credit  
 checkra1n team: checkra1n  

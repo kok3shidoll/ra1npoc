@@ -1,9 +1,23 @@
-IGCC		= xcrun -sdk iphoneos gcc
-MGCC		= xcrun -sdk macosx gcc
-MGCC_FLAGS	= -I./include -framework IOKit -framework CoreFoundation -Os -Wall $(CFLAGS)
-IGCC_FLAGS	= $(MGCC_FLAGS) -DIPHONEOS_ARM
-AARCH32		= -arch armv7
-AARCH64		= -arch arm64
+
+IPHONEOS_CC	= xcrun -sdk iphoneos gcc
+MACOSX_CC	= xcrun -sdk macosx gcc
+
+CFLAGS		= -I./include -Wall
+CFLAGS		+= -Os
+IPHONEOS_FLAGS	= -DIPHONEOS_ARM
+BUILTIN_FLAGS	= -DBUILTIN_PAYLOAD
+
+LDFLAGS		= -framework IOKit -framework CoreFoundation
+
+IPHONEOS_ARCH	= -arch armv7 -arch arm64
+
+MACOSX_OBJECT	= ra1npoc_macosx
+IPHONEOS_OBJECT	= ra1npoc_iphoneos
+
+CODESIGN	= ldid -S
+STRIP		= strip
+
+PD_GENERATOR	= builtin.sh
 
 SOURCE		= \
                 main.c \
@@ -13,24 +27,23 @@ SOURCE		= \
                 soc/t7000_s8000.c \
                 soc/s5l8960x.c
 
-MOBJECT		= ra1npoc_macosx
-IOBJECT		= ra1npoc_iphoneos
-IOBJECT32	= ra1npoc_iphoneos32
-IOBJECT64	= ra1npoc_iphoneos64
-ICODESIGN	= ldid -S
 
-PayloadDir	= payload/
+.PHONY: all builtin old clean
 
-.PHONY: all macosx iphoneos clean
+all: builtin
 
-all: macosx iphoneos
+builtin:
+	./$(PD_GENERATOR)
+	$(MACOSX_CC) $(CFLAGS) $(BUILTIN_FLAGS) $(LDFLAGS) $(SOURCE) -o $(MACOSX_OBJECT)
+	$(IPHONEOS_CC) $(CFLAGS) $(IPHONEOS_FLAGS) $(BUILTIN_FLAGS) $(LDFLAGS) $(SOURCE) $(IPHONEOS_ARCH) -o $(IPHONEOS_OBJECT)
+	$(STRIP) $(IPHONEOS_OBJECT)
+	$(CODESIGN) $(IPHONEOS_OBJECT)
 
-macosx:
-	$(MGCC) $(MGCC_FLAGS) $(SOURCE) -o $(MOBJECT)
-
-iphoneos:
-	$(IGCC) $(IGCC_FLAGS) $(SOURCE) $(AARCH32) $(AARCH64) -o $(IOBJECT)
-	$(ICODESIGN) $(IOBJECT)
+old:
+	$(MACOSX_CC) $(CFLAGS) $(LDFLAGS) $(SOURCE) -o $(MACOSX_OBJECT)
+	$(IPHONEOS_CC) $(CFLAGS) $(IPHONEOS_FLAGS) $(LDFLAGS) $(SOURCE) $(IPHONEOS_ARCH) -o $(IPHONEOS_OBJECT)
+	$(STRIP) $(IPHONEOS_OBJECT)
+	$(CODESIGN) $(IPHONEOS_OBJECT)
 
 clean:
-	-$(RM) $(MOBJECT) $(IOBJECT32) $(IOBJECT64) $(IOBJECT)
+	-$(RM) $(MACOSX_OBJECT) $(IPHONEOS_OBJECT)

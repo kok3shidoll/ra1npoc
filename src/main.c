@@ -313,14 +313,14 @@ int main(int argc, char** argv)
                 return -1;
         }
     }
-     
-#endif /* BUILTIN_PAYLOAD */
     
     if(useRecovery) {
         if(enter_dfu_via_recovery(client) != 0) {
             return -1;
         }
     }
+    
+#endif /* BUILTIN_PAYLOAD */
     
     LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
     while(get_device(DEVICE_DFU, true) != 0) {

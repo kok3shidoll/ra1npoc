@@ -92,6 +92,8 @@ static void prog(int sec)
     int i=0;
     int j=0;
     
+    cpuTime = clock();
+    
     for(i=0; i<sec; i++) {
         printf("[");
         for (j=0;j<i+1;j++)
