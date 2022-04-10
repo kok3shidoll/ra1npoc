@@ -102,14 +102,8 @@ ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]
 ```
 
 
-## iOS/iPadOSで利用する際の注意点   
-- 対象デバイスをlightning to USB camera adapter経由で脱獄するデバイス (このソフトウェアを実行する側) に接続する際、電源供給が足りず、対象デバイスをDFU/Recovery Modeに出来ない可能性があります。  
-    - 解決策1: パソコンやモバイルバッテリーなどの十分な電源供給か可能な機器を使用してDFU/Recovery Modeにした上でiOSデバイスに接続し直す。  
-    - 解決策2: USBハブに電源供給を行い、バスパワーではなくセルフパワーで接続する。  
-
-- stage2からpongoOSを送信する際に電源供給が足りず、再接続が出来ない可能性があります。  
-    - 影響のあるデバイス (このソフトウェアを実行する側): `iOS 10以下のiOSデバイス`  
-    - 解決策: USBハブに電源供給を行い、バスパワーではなくセルフパワーで接続する。  
+## 使い方   
+[ra1npoc - How to use](https://dora2ios.github.io/info/ra1npoc/usage.html)  
 
 
 ## Credit  
