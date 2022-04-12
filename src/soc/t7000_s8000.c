@@ -43,7 +43,7 @@ static void set_global_state(io_client_t client)
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
-        result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 64);
+        result = send_data(client, blank, 64);
         DEBUGLOG("[%s] (*) %x", __FUNCTION__, result.ret);
         usleep(10000);
     }
@@ -53,7 +53,7 @@ static void set_global_state(io_client_t client)
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
     DEBUGLOG("[%s] (2/3) %x", __FUNCTION__, result.ret);
     
-    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    result = send_abort(client);
     DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
 }
 
@@ -66,7 +66,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     // over1 = dummy
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
     DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
-    result = usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
+    result = send_abort(client);
     DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
 }
 
