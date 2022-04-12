@@ -36,14 +36,14 @@ static void set_global_state(io_client_t client)
     
     memset(&blank, '\x41', 2048);
     
-    val = 704; // s8000
+    val = 704; // A8/A8X/A9
     
     int i=0;
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) != 0x40){
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
-        result = send_data(client, blank, 64);
+        result = send_data(client, blank, 64); // send blank data and redo the request.
         DEBUGLOG("[%s] (*) %x", __FUNCTION__, result.ret);
         usleep(10000);
     }

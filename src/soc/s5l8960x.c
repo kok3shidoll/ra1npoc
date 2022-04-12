@@ -74,12 +74,12 @@ static void set_global_state(io_client_t client)
     
     memset(&blank, '\x41', 2048);
     
-    val = 1408; // t8010 & t8015 & s5l8960x
+    val = 1408; // A7/A9X/A10/A10X/A11
     
     /* val haxx
-     * If async_transfer() sent = 0x40, then val = 1408. And, it is possible to try again a few times and wait until sent = 0x40
-     * However, even if sent != 0x40, it succeeds by subtracting the value from val.
-     * To reduce the number of attempts, It decided to use subtraction unless sent is greater than val.
+     * If async_transfer sent size = 64 byte, then pushval size = 1408 byte. And, it is possible to try again a few times and wait until sent = 64
+     * However, even if sent != 64, it succeeds by subtracting the value from pushval.
+     * add 64 byte from pushval, then subtract sent from it.
      */
     
     int i=0;
@@ -87,7 +87,7 @@ static void set_global_state(io_client_t client)
         i++;
         DEBUGLOG("[%s] (*) retry: %x\n", __FUNCTION__, i);
         usleep(10000);
-        result = send_data(client, blank, 64);
+        result = send_data(client, blank, 64); // send blank data and redo the request.
         DEBUGLOG("[%s] (*) %x\n", __FUNCTION__, result.ret);
         usleep(10000);
     }
