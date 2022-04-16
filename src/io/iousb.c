@@ -151,6 +151,43 @@ static void load_devinfo(io_client_t client, const char* str)
         }
         client->devinfo.srtg = strdup(tmp);
     }
+    
+    client->devinfo.checkm8_flag = NO_CHECKM8;
+    switch(client->devinfo.cpid) {
+        case 0x8960:
+            client->devinfo.checkm8_flag |= CHECKM8_A7;
+            break;
+        case 0x7000:
+            client->devinfo.checkm8_flag |= CHECKM8_A8_A9;
+            break;
+        case 0x7001:
+            client->devinfo.checkm8_flag |= CHECKM8_A8_A9;
+            break;
+        case 0x8000:
+            client->devinfo.checkm8_flag |= CHECKM8_A8_A9;
+            break;
+        case 0x8003:
+            client->devinfo.checkm8_flag |= CHECKM8_A8_A9;
+            break;
+        case 0x8001:
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= NO_AUTOBOOT;
+            break;
+        case 0x8010:
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            break;
+        case 0x8011:
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            break;
+        case 0x8012:
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            break;
+        case 0x8015:
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            break;
+        default:
+            break;
+    }
 }
 
 static void io_get_serial(io_client_t client, io_service_t service)

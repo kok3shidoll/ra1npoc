@@ -13,6 +13,12 @@
 #define USB_RESET       (1 << 1)
 #define USB_REENUMERATE (1 << 2)
 
+#define NO_CHECKM8      (0)
+#define CHECKM8_A7      (1 << 1)
+#define CHECKM8_A8_A9   (1 << 2)
+#define CHECKM8_A9X_A11 (1 << 3)
+#define NO_AUTOBOOT     (1 << 4)
+
 #define DEVICE_DFU              (0x1227)
 #define DEVICE_STAGE2           (0x1338)
 #define DEVICE_PONGO            (0x4141)
@@ -47,6 +53,7 @@ struct io_devinfo {
     bool hasPwnd;
     char* pwnstr;
     char* srtg;
+    int checkm8_flag;
 };
 
 struct io_client_p {

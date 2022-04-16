@@ -210,8 +210,6 @@ int main(int argc, char** argv)
     //LOG("[COMMIT] %s", "");
 #endif
     
-    int checkm8_flag = NO_CHECKM8;
-    
 #ifndef BUILTIN_PAYLOAD
     uint16_t devmode=0;
 #else
@@ -372,7 +370,6 @@ int main(int argc, char** argv)
             payload.stage2 = s5l8960_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A7;
             break;
 #endif /* S5L8960 */
             
@@ -388,7 +385,6 @@ int main(int argc, char** argv)
             payload.stage2 = t7000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A8_A9;
             break;
 #endif /* T7000 */
  
@@ -404,7 +400,6 @@ int main(int argc, char** argv)
             payload.stage2 = t7001_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A8_A9;
             break;
 #endif /* T7001 */
             
@@ -420,7 +415,6 @@ int main(int argc, char** argv)
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A8_A9;
             break;
 #endif /* S8000 */
             
@@ -436,7 +430,6 @@ int main(int argc, char** argv)
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A8_A9;
             break;
 #endif /* S8003 */
             
@@ -452,8 +445,6 @@ int main(int argc, char** argv)
             payload.stage2 = s8001_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A9X_A11;
-            checkm8_flag |= NO_AUTOBOOT;
             break;
 #endif /* S8001 */
             
@@ -469,7 +460,6 @@ int main(int argc, char** argv)
             payload.stage2 = t8010_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A9X_A11;
             break;
 #endif /* T8010 */
             
@@ -485,7 +475,6 @@ int main(int argc, char** argv)
             payload.stage2 = t8011_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A9X_A11;
             break;
 #endif /* T8011 */
             
@@ -501,7 +490,6 @@ int main(int argc, char** argv)
             payload.stage2 = t8012_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A9X_A11;
             break;
 #endif /* T8012 */
             
@@ -517,7 +505,6 @@ int main(int argc, char** argv)
             payload.stage2 = t8015_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
-            checkm8_flag |= CHECKM8_A9X_A11;
             break;
 #endif /* T8015 */
             
@@ -561,20 +548,21 @@ int main(int argc, char** argv)
     LOG("[%s] bootArgs: %s", __FUNCTION__, bootargs);
 #endif
     
-    if(checkm8_flag & CHECKM8_A7) {
+    if(client->devinfo.checkm8_flag & CHECKM8_A7) {
         // A7
         return checkra1n_s5l8960x(client, payload);
     }
     
-    if(checkm8_flag & CHECKM8_A8_A9) {
+    if(client->devinfo.checkm8_flag & CHECKM8_A8_A9) {
         // A8, A8X, A9
         return checkra1n_t7000_s8000(client, payload);
     }
     
-    if(checkm8_flag & CHECKM8_A9X_A11) {
+    if(client->devinfo.checkm8_flag & CHECKM8_A9X_A11) {
         // A9X, A10, A10X, A11
+        int flags = client->devinfo.checkm8_flag; // because it will be lost
         int ret = checkra1n_t8010_t8015(client, payload);
-        if((ret == 0) && (checkm8_flag & NO_AUTOBOOT))
+        if((ret == 0) && (flags & NO_AUTOBOOT))
             LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
         return ret;
     }

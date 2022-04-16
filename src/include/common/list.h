@@ -13,12 +13,6 @@
 #ifndef LIST_H
 #define LIST_H
 
-#define NO_CHECKM8      (0)
-#define CHECKM8_A7      (1 << 1)
-#define CHECKM8_A8_A9   (1 << 2)
-#define CHECKM8_A9X_A11 (1 << 3)
-#define NO_AUTOBOOT     (1 << 4)
-
 /*
  * S5L8960 (Apple A7)
  * S5L8960 is fully supported.
