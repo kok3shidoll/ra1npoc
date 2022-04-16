@@ -550,18 +550,18 @@ int main(int argc, char** argv)
     
     if(client->devinfo.checkm8_flag & CHECKM8_A7) {
         // A7
-        return checkra1n_s5l8960x(client, payload);
+        return checkm8_s5l8960x(client, payload);
     }
     
     if(client->devinfo.checkm8_flag & CHECKM8_A8_A9) {
         // A8, A8X, A9
-        return checkra1n_t7000_s8000(client, payload);
+        return checkm8_t7000_s8000(client, payload);
     }
     
     if(client->devinfo.checkm8_flag & CHECKM8_A9X_A11) {
         // A9X, A10, A10X, A11
         int flags = client->devinfo.checkm8_flag; // because it will be lost
-        int ret = checkra1n_t8010_t8015(client, payload);
+        int ret = checkm8_t8010_t8015(client, payload);
         if((ret == 0) && (flags & NO_AUTOBOOT))
             LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
         return ret;

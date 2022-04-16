@@ -137,7 +137,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (6/6) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
+int checkm8_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     

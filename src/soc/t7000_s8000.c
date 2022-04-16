@@ -70,7 +70,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
+int checkm8_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     transfer_t result;

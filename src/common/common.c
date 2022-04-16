@@ -27,13 +27,13 @@
 #include <common/common.h>
 #include <time.h>
 
-struct checkra1n_device_list {
+struct checkm8_device_list {
     uint16_t        cpid;
     uint8_t         bdid;
     int     enterdfuType;
 };
 
-static struct checkra1n_device_list devlists[] = {
+static struct checkm8_device_list devlists[] = {
     // Apple A7
     { 0x8960, 0xff, DFU_LEGACY }, // all have legacy type
     // Apple A8

@@ -129,7 +129,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (7/7) %x", __FUNCTION__, result.ret);
 }
 
-int checkra1n_s5l8960x(io_client_t client, checkra1n_payload_t payload)
+int checkm8_s5l8960x(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     
