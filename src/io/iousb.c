@@ -154,6 +154,12 @@ static void load_devinfo(io_client_t client, const char* str)
     
     client->devinfo.checkm8_flag = NO_CHECKM8;
     switch(client->devinfo.cpid) {
+        case 0x8950:
+            client->devinfo.checkm8_flag |= CHECKM8_A6;
+            break;
+        case 0x8955:
+            client->devinfo.checkm8_flag |= CHECKM8_A6;
+            break;
         case 0x8960:
             client->devinfo.checkm8_flag |= CHECKM8_A7;
             break;
