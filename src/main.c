@@ -203,6 +203,8 @@ static void usage(char** argv)
 
 int main(int argc, char** argv)
 {
+    int ret = 0;
+    
     memset(&payload, '\0', sizeof(checkra1n_payload_t));
     LOG("* checkRAIN clone v2.1.1 for iOS by interception");
 #ifdef BUILTIN_PAYLOAD
@@ -548,25 +550,26 @@ int main(int argc, char** argv)
     LOG("[%s] bootArgs: %s", __FUNCTION__, bootargs);
 #endif
     
-    if(client->devinfo.checkm8_flag & CHECKM8_A7) {
+    int flags = client->devinfo.checkm8_flag; // because it will be lost
+    
+    if(flags & CHECKM8_A7) {
         // A7
-        return checkm8_s5l8960x(client, payload);
+        ret = checkm8_s5l8960x(client, payload);
     }
     
-    if(client->devinfo.checkm8_flag & CHECKM8_A8_A9) {
+    if(flags & CHECKM8_A8_A9) {
         // A8, A8X, A9
-        return checkm8_t7000_s8000(client, payload);
+        ret = checkm8_t7000_s8000(client, payload);
     }
     
-    if(client->devinfo.checkm8_flag & CHECKM8_A9X_A11) {
+    if(flags & CHECKM8_A9X_A11) {
         // A9X, A10, A10X, A11
-        int flags = client->devinfo.checkm8_flag; // because it will be lost
-        int ret = checkm8_t8010_t8015(client, payload);
-        if((ret == 0) && (flags & NO_AUTOBOOT))
-            LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
-        return ret;
+        ret = checkm8_t8010_t8015(client, payload);
     }
     
-    return -1;
+    if((ret == 0) && (flags & NO_AUTOBOOT))
+        LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
+    
+    return ret;
 }
 

@@ -139,7 +139,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 
 int checkm8_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
 {
-    int r;
+    int ret = 0;
     
     memset(&blank, '\0', 2048);
     
@@ -184,17 +184,25 @@ int checkm8_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
         return -1;
     }
     
-    LOG("[%s] sending stage2 payload", __FUNCTION__);
-    usleep(10000);
-    r = payload_stage2(client, payload);
-    if(r != 0){
-        return -1;
+    LOG("[%s] checkmate!", __FUNCTION__);
+    
+    if(payload.stage2_len != 0) {
+        LOG("[%s] sending stage2 payload", __FUNCTION__);
+        usleep(10000);
+        ret = payload_stage2(client, payload);
+        if(ret != 0){
+            ERROR("[%s] ERROR: Failed to send stage2", __FUNCTION__);
+            return -1;
+        }
     }
     
-    usleep(10000);
-    r = connect_to_stage2(client, payload);
-    if(r != 0){
-        return -1;
+    if(payload.pongoOS_len != 0) {
+        usleep(10000);
+        LOG("[%s] connecting to stage2", __FUNCTION__);
+        ret = connect_to_stage2(client, payload);
+        if(ret != 0){
+            return -1; // err
+        }
     }
     
     return 0;

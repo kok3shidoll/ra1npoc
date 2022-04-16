@@ -389,7 +389,7 @@ int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
     io_reset(client, USB_RESET|USB_REENUMERATE);
     io_close(client);
     
-    LOG("[%s] BOOTED", __FUNCTION__);
+    LOG("[%s] BOOTED?", __FUNCTION__);
     
     return 0;
 }
