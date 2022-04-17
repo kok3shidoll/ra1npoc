@@ -55,7 +55,7 @@
 
 /*
  * S8001 (Apple A9X)
- * S8001 is partial supported.
+ * S8001 is fully supported.
  */
 #define S8001_CODE
 #define S8001_PAYLOAD
@@ -78,7 +78,7 @@
 
 /*
  * T8012 (Apple T2)
- * T8012
+ * T8012 is fully supported.
  */
 #define T8012_CODE
 #define T8012_PAYLOAD
