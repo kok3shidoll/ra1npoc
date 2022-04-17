@@ -58,10 +58,10 @@ size_t kpf_len;
 size_t rdsk_len;
 
 // Based on dumpfile. If you change us, this value must be changed.
-#define KPF_SIZE (0x18CEC)
-#define KPF_LOCATION (0x3F308)
-#define RDSK_SIZE (0x100000)
-#define RDSK_LOCATION (0x58000)
+#define KPF_SIZE        (0x15648)
+#define KPF_LOCATION    (0x3F308)
+#define RDSK_SIZE       (0x100000)
+#define RDSK_LOCATION   (0x58000)
 #endif /* RA1NPOC */
 
 static uint8_t gBlockIO = 1;

@@ -70,6 +70,7 @@ static struct checkm8_device_list devlists[] = {
 #if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
 extern int8_t kpf_flags;
 extern const char* bootargs;
+extern bool special_pongo;
 #endif
 
 long cpuTime;
@@ -323,15 +324,24 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
     DEBUGLOG("[%s] (1/6) %x", __FUNCTION__, result.ret);
     
 #if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
+    
+    uint32_t bootargs_offset = BOOTARGS_STR_PTR;
+    uint32_t kpf_flags_offset = KPF_FLAGS_PTR;
+    
+    if(special_pongo == true) {
+        bootargs_offset -= SPECIAL_HAXX;
+        kpf_flags_offset -= SPECIAL_HAXX;
+    }
+    
     const char* newArgs = bootargs; // set xnu boot-arg commandline
     size_t newArgsLen = strlen(newArgs) + 1;
     size_t newArgBufLen = (newArgsLen + 3) / 4 * 4;
     char bootArgsBuf[newArgBufLen];
     strlcpy(bootArgsBuf, newArgs, newArgBufLen);
     memset(bootArgsBuf + newArgsLen, 0, newArgBufLen - newArgsLen);
-    memcpy(payload.pongoOS+BOOTARGS_STR_PTR, bootArgsBuf, newArgBufLen);
+    memcpy(payload.pongoOS+bootargs_offset, bootArgsBuf, newArgBufLen);
     
-    *(int8_t*)(payload.pongoOS+KPF_FLAGS_PTR) = kpf_flags;
+    *(int8_t*)(payload.pongoOS+kpf_flags_offset) = kpf_flags;
 #endif
     
     {

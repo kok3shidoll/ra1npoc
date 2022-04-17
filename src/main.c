@@ -83,6 +83,8 @@ const char* bootargs = NULL;
 
 io_client_t client;
 checkra1n_payload_t payload;
+bool special_pongo = false;
+
 extern bool debug_enabled;
 
 #ifndef BUILTIN_PAYLOAD
@@ -197,6 +199,7 @@ static void usage(char** argv)
     printf("  -c, --cleandfu\t\t\x1b[36muse cleandfu [BETA]\x1b[39m\n");
     printf("  -d, --debug\t\t\t\x1b[36menable debug log\x1b[39m\n");
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
+    printf("  -s, --special\t\t\t\x1b[36muse special pongo_2.5.0-0cb6126f\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
     
     printf("\n");
@@ -218,6 +221,7 @@ int main(int argc, char** argv)
 #else
     bool useRecovery = false;
     bool verboseBoot = false;
+    unsigned char special_pongoOS[MAX_HAXX_SIZE];
     char* extraBootArgs = NULL;
     
 #endif /* !BUILTIN_PAYLOAD */
@@ -276,10 +280,11 @@ int main(int argc, char** argv)
         { "cleandfu",       no_argument,       NULL, 'c' },
         { "debug",          no_argument,       NULL, 'd' },
         { "extra-bootargs", required_argument, NULL, 'e' },
+        { "special",        no_argument,       NULL, 's' },
         { NULL, 0, NULL, 0 }
     };
     
-    while ((opt = getopt_long(argc, argv, "hlvdce:", longopts, NULL)) > 0) {
+    while ((opt = getopt_long(argc, argv, "hlvdce:s", longopts, NULL)) > 0) {
         switch (opt) {
             case 'h':
                 usage(argv);
@@ -307,6 +312,10 @@ int main(int argc, char** argv)
                     extraBootArgs = strdup(optarg);
                     LOG("[%s] extraBootArgs: [%s]", __FUNCTION__, extraBootArgs);
                 }
+                break;
+                
+            case 's':
+                special_pongo = true;
                 break;
                 
             default:
@@ -442,11 +451,88 @@ int main(int argc, char** argv)
             payload.over1_len = s8001_overwrite1_len;
             payload.over2_len = s8001_overwrite2_len;
             payload.stage2_len = s8001_stage2_len;
-            payload.pongoOS_len = 0x3F2F8; // pongoOS_len
             payload.over1 = s8001_overwrite1;
             payload.over2 = s8001_overwrite2;
             payload.stage2 = s8001_stage2;
-            payload.pongoOS = pongoOS;
+            if(special_pongo == true) {
+                size_t pongo_size = 0;
+                
+                memset(&special_pongoOS, '\0', MAX_HAXX_SIZE);
+                
+                // 1, copy pongo
+                if(pongo_2_5_0_0cb6126f_bin_len > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS, pongo_2_5_0_0cb6126f_bin, pongo_2_5_0_0cb6126f_bin_len);
+                pongo_size += pongo_2_5_0_0cb6126f_bin_len;
+                
+                // 2, add auto-boot mark
+                unsigned char auto_boot_mark[] =
+                {
+                    0x61, 0x75, 0x74, 0x6f,
+                    0x62, 0x6f, 0x6f, 0x74,
+                    0x00, 0x00, 0x20, 0x00,
+                    0x00, 0x00, 0x00, 0x00
+                };
+                size_t auto_boot_mark_size = 0x16;
+                
+                if(pongo_size + auto_boot_mark_size > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS+pongo_size, auto_boot_mark, 16);
+                pongo_size += 16;
+                
+                // 3, copy kpf
+                if(pongo_size + KPF_SIZE > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS+pongo_size, pongoOS+KPF_LOCATION, KPF_SIZE);
+                pongo_size += KPF_SIZE;
+                
+                // 4, add RDSK mark
+                unsigned char RDSK_mark[] =
+                {
+                    0x52, 0x44, 0x53, 0x4B,
+                    0x52, 0x44, 0x53, 0x4B,
+                    0x00, 0x00, 0x10, 0x00
+                };
+                size_t RDSK_mark_size = 0xc;
+                
+                pongo_size = RDSK_LOCATION - SPECIAL_HAXX - RDSK_mark_size;
+                if(pongo_size + RDSK_mark_size > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS+pongo_size, RDSK_mark, RDSK_mark_size);
+                pongo_size += RDSK_mark_size;
+                
+                // 5, copy rdsk
+                if(pongo_size + RDSK_SIZE > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS+pongo_size, pongoOS+RDSK_LOCATION, RDSK_SIZE);
+                pongo_size += RDSK_SIZE;
+                
+                // 6, set flags etc...?
+                if(pongo_size + BLANK_SIZE > MAX_HAXX_SIZE) {
+                    ERROR("[%s] overflow", __FUNCTION__);
+                    return -1;
+                }
+                memcpy(special_pongoOS+pongo_size, pongoOS+RDSK_LOCATION+RDSK_SIZE, BLANK_SIZE);
+                pongo_size += BLANK_SIZE;
+                
+                DEBUGLOG("[%s] use: special pongoOS", __FUNCTION__);
+                payload.pongoOS = special_pongoOS;
+                payload.pongoOS_len = pongo_size;
+                
+            } else {
+                payload.pongoOS = pongoOS;
+                payload.pongoOS_len = 0x3F2F8; // pongoOS_len
+            }
 #endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* S8001 */
@@ -568,7 +654,7 @@ int main(int argc, char** argv)
         ret = checkm8_t8010_t8015(client, payload);
     }
     
-    if((ret == 0) && (flags & NO_AUTOBOOT))
+    if(((ret == 0) && (flags & NO_AUTOBOOT)) && (special_pongo == false))
         LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
     
     return ret;

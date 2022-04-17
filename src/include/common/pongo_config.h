@@ -9,6 +9,14 @@
 #ifdef BUILTIN_PAYLOAD
 #define BOOTARGS_STR_PTR    (0x15801E)
 #define KPF_FLAGS_PTR       (0x158018)
+#define KPF_LOCATION        (0x3F308)
+#define KPF_SIZE            (0x15648)
+#define RDSK_SIZE           (0x100000)
+#define RDSK_LOCATION       (0x58000)
+#define BLANK_SIZE          (0x154C) // after ramdisk, buffer storing bootargs and flags..?
+// no idea :/
+#define SPECIAL_HAXX        (0x3000)
+#define MAX_HAXX_SIZE       (0x200000)
 #endif // BUILTIN_PAYLOAD
 
 /*

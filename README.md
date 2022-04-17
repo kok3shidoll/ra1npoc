@@ -15,7 +15,7 @@ checkra1n dump and poc for iOS
 | T7001 | Apple A8X | ❌ |
 | S8000 | Apple A9 | ✅ |
 | S8003 | Apple A9 | ✅ |
-| S8001 | Apple A9X | 🔼 |
+| S8001 | Apple A9X | ✅ |
 | T8010 | Apple A10 | ✅ |
 | T8011 | Apple A10X | ✅ |
 | T8015 | Apple A11 | ✅ |
@@ -67,11 +67,17 @@ ra1npoc [option]
   -c, --cleandfu                use cleandfu [BETA]
   -d, --debug                   enable debug log
   -e, --extra-bootargs <args>   set extra bootargs
+  -s, --special                 use special pongo_2.5.0-0cb6126f
 ```
 
 ### built-in (A9X)  
-A9Xの場合、ra1npocを実行したあとpongoOSで停止する仕様となっています。  
-iPadOSを起動したい場合、続けてpongotermを使用してブートファイルを送信する必要があります。  
+A9Xの場合、`-s`フラグを渡すことで、正常に起動できるようになります。[checkra1n_issues#2074](https://github.com/checkra1n/BugTracker/issues/2074)  
+```
+ra1npoc -s
+```
+
+~~A9Xの場合、ra1npocを実行したあとpongoOSで停止する仕様となっています。  ~~
+~~iPadOSを起動したい場合、続けてpongotermを使用してブートファイルを送信する必要があります。  ~~
 ```
 pongoterm -r
 ```

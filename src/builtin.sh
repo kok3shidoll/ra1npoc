@@ -6,7 +6,8 @@ mkdir payload/
 
 cd ../dumpfiles
 
-xxd -i pongoOS > ../src/payload/pongoOS.h
+xxd -i pongoOS >> ../src/payload/pongoOS.h
+xxd -i pongo_2.5.0-0cb6126f.bin  >> ../src/payload/pongoOS.h
 
 # S5L8960
 xxd -i s5l8960_overwrite1 >> ../src/payload/s5l8960.h
