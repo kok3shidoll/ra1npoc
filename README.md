@@ -71,7 +71,7 @@ ra1npoc [option]
 ```
 
 ### built-in (A9X)  
-A9Xの場合、`-s`フラグを渡すことで、正常に起動できるようになります。[checkra1n_issues#2074](https://github.com/checkra1n/BugTracker/issues/2074)  
+A9Xの場合、`-s`フラグを渡すことで、iPadOSが正常に起動するようになります。[checkra1n_issues#2074](https://github.com/checkra1n/BugTracker/issues/2074)  
 ```
 ra1npoc -s
 ```
