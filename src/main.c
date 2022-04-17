@@ -26,6 +26,7 @@
 #include <io/iousb.h>
 
 #include <common/common.h>
+#include <common/pongo_config.h>
 #include <common/list.h>
 
 #include <soc/t8010_t8015.h>
