@@ -4,7 +4,7 @@ MACOSX_CC	= xcrun -sdk macosx gcc
 
 CFLAGS		= -I./include -Wall
 CFLAGS		+= -Os
-IPHONEOS_FLAGS	= -DIPHONEOS_ARM -miphoneos-version-min=9.2
+IPHONEOS_FLAGS	= -DIPHONEOS_ARM -miphoneos-version-min=9.0
 BUILTIN_FLAGS	= -DBUILTIN_PAYLOAD
 
 LDFLAGS		= -framework IOKit -framework CoreFoundation
