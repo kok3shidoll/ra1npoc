@@ -56,6 +56,7 @@
 
 #if defined(S8001_PAYLOAD)
 #include "payload/s8001.h"
+unsigned char special_pongoOS[MAX_HAXX_SIZE];
 #endif /* S8001_PAYLOAD */
 
 #if defined(T8010_PAYLOAD)
@@ -221,7 +222,6 @@ int main(int argc, char** argv)
 #else
     bool useRecovery = false;
     bool verboseBoot = false;
-    unsigned char special_pongoOS[MAX_HAXX_SIZE];
     char* extraBootArgs = NULL;
     
 #endif /* !BUILTIN_PAYLOAD */
