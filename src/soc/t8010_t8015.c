@@ -73,7 +73,7 @@ static void set_global_state(io_client_t client)
 {
     transfer_t result;
     unsigned int val;
-    UInt32 sent;
+    UInt32 sent = 0;
     
     memset(&blank, '\x41', 2048);
     
@@ -86,7 +86,7 @@ static void set_global_state(io_client_t client)
      */
     
     int i=0;
-    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) >= val){
+    while(((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) >= val) || (sent == 0)){
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
@@ -98,8 +98,8 @@ static void set_global_state(io_client_t client)
     val += 0x40;
     val -= sent;
     DEBUGLOG("[%s] (1/3) sent: %x, val: %x", __FUNCTION__, (unsigned int)sent, val);
-    
-    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
+
+    result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100); // <- PipeStalled
     DEBUGLOG("[%s] (2/3) %x", __FUNCTION__, result.ret);
     
     result = send_abort(client);
