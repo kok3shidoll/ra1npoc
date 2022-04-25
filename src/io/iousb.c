@@ -177,7 +177,6 @@ static void load_devinfo(io_client_t client, const char* str)
             break;
         case 0x8001:
             client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
-            client->devinfo.checkm8_flag |= NO_AUTOBOOT;
             break;
         case 0x8010:
             client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
@@ -240,7 +239,8 @@ void read_serial_number(io_client_t client)
         memset(&buf, '\0', 0x100);
         memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0306, 0x040a, buf, 0x100); // 8950 or up (PWND)
-        if(result.ret != kIOReturnSuccess) return;
+        if(result.ret != kIOReturnSuccess)
+            return;
         size = *(uint8_t*)buf;
         for(int i=0;i<(size/2);i++){
             str[i] = *(uint8_t*)(buf+2+(i*2));
@@ -252,7 +252,8 @@ void read_serial_number(io_client_t client)
         memset(&buf, '\0', 0x100);
         memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0304, 0x040a, buf, 0x100); // 8950 or up
-        if(result.ret != kIOReturnSuccess) return;
+        if(result.ret != kIOReturnSuccess)
+            return;
         size = *(uint8_t*)buf;
         for(int i=0;i<(size/2);i++){
             str[i] = *(uint8_t*)(buf+2+(i*2));
@@ -264,7 +265,8 @@ void read_serial_number(io_client_t client)
         memset(&buf, '\0', 0x100);
         memset(&str, '\0', 0x100);
         result = usb_ctrl_transfer(client, 0x80, 6, 0x0303, 0x040a, buf, 0x100); // 8930
-        if(result.ret != kIOReturnSuccess) return;
+        if(result.ret != kIOReturnSuccess)
+            return;
         size = *(uint8_t*)buf;
         for(int i=0;i<(size/2);i++){
             str[i] = *(uint8_t*)(buf+2+(i*2));

@@ -532,6 +532,7 @@ int main(int argc, char** argv)
             } else {
                 payload.pongoOS = pongoOS;
                 payload.pongoOS_len = 0x3F2F8; // pongoOS_len
+                client->devinfo.checkm8_flag |= NO_AUTOBOOT;
             }
 #endif /* BUILTIN_PAYLOAD */
             break;
