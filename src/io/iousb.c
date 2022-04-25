@@ -45,7 +45,7 @@ static io_iterator_t io_get_iterator_for_pid(uint16_t pid)
     CFMutableDictionaryRef matchingDict;
     
 #ifdef IPHONEOS_ARM
-    // Allows iOS to connect to iOS devices.
+    // Allows iOS to connect to iOS devices. // iOS 9.0 or high
     darwin_device_class = "IOUSBHostDevice";
 #endif
     
