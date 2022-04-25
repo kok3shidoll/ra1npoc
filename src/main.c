@@ -604,13 +604,6 @@ int main(int argc, char** argv)
     }
     
 #if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
-    if(verboseBoot == true) {
-        checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
-        //bootargs = "rootdev=md0 -v";
-        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
-        //DEBUGLOG("[%s] boot-args: %s", __FUNCTION__, bootargs);
-        LOG("[%s] enable: verbose boot", __FUNCTION__);
-    }
     char str[MAX_BOOTARGS_LEN];
     memset(&str, 0x0, MAX_BOOTARGS_LEN);
     
@@ -626,6 +619,10 @@ int main(int argc, char** argv)
             return -1;
         }
         sprintf(str, "%s -v", str);
+        
+        checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
+        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
+        LOG("[%s] enable: verbose boot", __FUNCTION__);
     }
     if(extraBootArgs != NULL) {
         if((strlen(str) + strlen(extraBootArgs)) > MAX_BOOTARGS_LEN) {
@@ -655,7 +652,7 @@ int main(int argc, char** argv)
         ret = checkm8_t8010_t8015(client, payload);
     }
     
-    if(((ret == 0) && (flags & NO_AUTOBOOT)) && (special_pongo == false))
+    if((ret == 0) && (flags & NO_AUTOBOOT))
         LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
     
     return ret;
