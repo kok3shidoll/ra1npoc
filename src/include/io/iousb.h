@@ -28,6 +28,12 @@
 #define DEVICE_RECOVERY_MODE_3  (0x1282)
 #define DEVICE_RECOVERY_MODE_4  (0x1283)
 
+#define DFU_DNLOAD              (1)
+#define DFU_GET_STATUS          (3)
+#define DFU_CLR_STATUS          (4)
+#define DFU_MAX_TRANSFER_SZ     (0x800)
+#define EP0_MAX_PACKET_SZ       (0x40)
+
 bool debug_enabled;
 
 /* LOG macro */

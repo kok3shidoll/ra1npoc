@@ -294,7 +294,7 @@ int payload_stage2(io_client_t client, checkra1n_payload_t payload)
         size_t len = 0;
         size_t size;
         while(len < payload.stage2_len) {
-            size = ((payload.stage2_len - len) > 0x800) ? 0x800 : (payload.stage2_len - len);
+            size = ((payload.stage2_len - len) > DFU_MAX_TRANSFER_SZ) ? DFU_MAX_TRANSFER_SZ : (payload.stage2_len - len);
             result = send_data(client, (unsigned char*)&payload.stage2[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
                 ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
@@ -348,7 +348,7 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
         size_t len = 0;
         size_t size;
         while(len < payload.pongoOS_len) {
-            size = ((payload.pongoOS_len - len) > 0x800) ? 0x800 : (payload.pongoOS_len - len);
+            size = ((payload.pongoOS_len - len) > DFU_MAX_TRANSFER_SZ) ? DFU_MAX_TRANSFER_SZ : (payload.pongoOS_len - len);
             result = send_data(client, (unsigned char*)&payload.pongoOS[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
                 ERROR("[%s] ERROR: Failed to send pongoOS [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
