@@ -1,5 +1,6 @@
 # ra1npoc  
 checkra1n dump and poc for iOS  
+A tool for re-Jailbreak devices jailbroken by checkra1n/odysseyra1n on iOS/iPadOS/macOS platforms.  
 
 ## 注意  
 これはcheckra1n 0.12.4 betaからダンプしたPayloadに基づいて作成された、iOS上でcheckra1nを動かすための実証コードです。  
