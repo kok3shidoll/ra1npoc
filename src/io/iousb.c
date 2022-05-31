@@ -210,7 +210,7 @@ static void io_get_serial(io_client_t client, io_service_t service)
         CFRelease(serialstr);
         load_devinfo(client, serial_str);
         client->hasSerialStr = true;
-        DEBUGLOG("[%s] Found serial number!", __FUNCTION__);
+        DEBUGLOG("Found serial number!");
     }
     
 }
@@ -276,7 +276,7 @@ void read_serial_number(io_client_t client)
     
     if(client->devinfo.srtg != NULL){
         client->hasSerialStr = true;
-        DEBUGLOG("[%s] Found serial number!", __FUNCTION__);
+        DEBUGLOG("Found serial number!");
     }
 }
 
@@ -316,12 +316,12 @@ void io_reset(io_client_t client, int flags)
     IOReturn result;
     if(flags & USB_RESET) {
         result = io_resetdevice(client);
-        DEBUGLOG("[%s] ResetDevice: %x", __FUNCTION__, result);
+        DEBUGLOG("ResetDevice: %x", result);
     }
     
     if(flags & USB_REENUMERATE) {
         result = io_reenumerate(client);
-        DEBUGLOG("[%s] USBDeviceReEnumerate: %x", __FUNCTION__, result);
+        DEBUGLOG("USBDeviceReEnumerate: %x", result);
     }
 }
 

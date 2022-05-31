@@ -171,7 +171,7 @@ transfer_t usb_req_leak_with_async(io_client_t client,
 
 int enter_dfu_via_recovery(io_client_t client)
 {
-    LOG("[%s] Waiting for device in Recovery mode...", __FUNCTION__);
+    LOG("Waiting for device in Recovery mode...");
     while(1) {
         if(client) {
             io_close(client);
@@ -181,17 +181,17 @@ int enter_dfu_via_recovery(io_client_t client)
         if(client) break;
     }
     if(!client) {
-        ERROR("[%s] ERROR: Failed to find the device in Recovery mode", __FUNCTION__);
+        ERROR("Failed to find the device in Recovery mode");
         return -1;
     }
     
-    LOG("[%s] CONNECTED", __FUNCTION__);
+    LOG("CONNECTED");
     
     if(client->hasSerialStr == false){
         read_serial_number(client);
     }
     
-    DEBUGLOG("[%s] CPID: 0x%02x, BDID: 0x%01x", __FUNCTION__, client->devinfo.cpid, client->devinfo.bdid);
+    DEBUGLOG("CPID: 0x%02x, BDID: 0x%01x", client->devinfo.cpid, client->devinfo.bdid);
     
     int enterdfuType = DFU_UNKOWN_TYPE;
     for (int i=0; devlists[i].cpid != 0xffff; i++) {
@@ -210,7 +210,7 @@ int enter_dfu_via_recovery(io_client_t client)
             }
         }
     }
-    DEBUGLOG("[%s] enterdfuType: %x", __FUNCTION__, enterdfuType);
+    DEBUGLOG("enterdfuType: %x", enterdfuType);
     
     const char* btn = NULL;
     int step2_sec = 4;
@@ -227,7 +227,7 @@ int enter_dfu_via_recovery(io_client_t client)
     }
     else
     { /* DFU_UNKOWN_TYPE */
-        ERROR("[%s] This mode is not yet supported for this device.", __FUNCTION__);
+        ERROR("This mode is not yet supported for this device.");
         return -1;
     } /* DFU_UNKOWN_TYPE */
     
@@ -254,7 +254,7 @@ int enter_dfu_via_recovery(io_client_t client)
     cpuTime = clock();
     
     printf("\n");
-    LOG("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
+    LOG_NOFUNC("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
     int j=0;
     for(int i=0; i<step2_sec; i++) {
         if(i==1)
@@ -270,17 +270,17 @@ int enter_dfu_via_recovery(io_client_t client)
     }
     printf("\n");
     
-    LOG("[STEP3] Release the Side button But keep holding the %s (%dsec)", btn, step3_sec);
+    LOG_NOFUNC("[STEP3] Release the Side button But keep holding the %s (%dsec)", btn, step3_sec);
     prog(step3_sec);
     
-    LOG("[%s] reconnecting", __FUNCTION__);
+    LOG("reconnecting");
     io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
     if(!client) {
-        ERROR("[%s] ERROR: Failed to put the device into DFU mode", __FUNCTION__);
+        ERROR("Failed to put the device into DFU mode");
         return -1;
     }
     
-    LOG("[%s] DONE!", __FUNCTION__);
+    LOG("DONE!");
     io_close(client);
     client = NULL;
     return 0;
@@ -297,17 +297,17 @@ int payload_stage2(io_client_t client, checkra1n_payload_t payload)
             size = ((payload.stage2_len - len) > DFU_MAX_TRANSFER_SZ) ? DFU_MAX_TRANSFER_SZ : (payload.stage2_len - len);
             result = send_data(client, (unsigned char*)&payload.stage2[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
-                ERROR("[%s] ERROR: Failed to send stage2 [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
+                ERROR("Failed to send stage2 [%x, %x]", result.ret, (unsigned int)result.wLenDone);
                 return -1;
             }
             len += size;
         }
     }
-    DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(1/2) %x", result.ret);
     usleep(1000);
     
     result = send_abort(client);
-    DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(2/2) %x", result.ret);
     usleep(1000);
     
     return 0;
@@ -321,7 +321,7 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
     memset(&blank, '\0', 8);
     
     result = usb_ctrl_transfer(client, 0x40, 64, 0x03e8, 0x01f4, NULL, 0); // ?
-    DEBUGLOG("[%s] (1/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(1/6) %x", result.ret);
     
 #if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
     
@@ -351,27 +351,27 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
             size = ((payload.pongoOS_len - len) > DFU_MAX_TRANSFER_SZ) ? DFU_MAX_TRANSFER_SZ : (payload.pongoOS_len - len);
             result = send_data(client, (unsigned char*)&payload.pongoOS[len], size);
             if(result.wLenDone != size || result.ret != kIOReturnSuccess){
-                ERROR("[%s] ERROR: Failed to send pongoOS [%x, %x]", __FUNCTION__, result.ret, (unsigned int)result.wLenDone);
+                ERROR("Failed to send pongoOS [%x, %x]", result.ret, (unsigned int)result.wLenDone);
                 return -1;
             }
             len += size;
         }
     }
     
-    DEBUGLOG("[%s] (2/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(2/6) %x", result.ret);
     usleep(10000);
     
     result = send_data(client, NULL, 0);
-    DEBUGLOG("[%s] (3/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(3/6) %x", result.ret);
     
     result = get_status(client, blank, 8);
-    DEBUGLOG("[%s] (4/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(4/6) %x", result.ret);
 
     result = get_status(client, blank, 8);
-    DEBUGLOG("[%s] (5/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(5/6) %x", result.ret);
 
     result = get_status(client, blank, 8);
-    DEBUGLOG("[%s] (6/6) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(6/6) %x", result.ret);
     usleep(10000);
     
     return 0;
@@ -381,17 +381,17 @@ int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
 {
     int r;
     
-    LOG("[%s] reconnecting", __FUNCTION__);
+    LOG("reconnecting");
     io_reconnect(&client, 15, DEVICE_STAGE2, USB_RESET|USB_REENUMERATE, false, 5000000);
     if(!client) {
-        ERROR("[%s] ERROR: Failed to connect to checkra1n DFU", __FUNCTION__);
+        ERROR("ERROR: Failed to connect to checkra1n DFU");
         return -1;
     }
     
-    LOG("[%s] connected to Stage2", __FUNCTION__);
+    LOG("connected to Stage2");
     usleep(10000);
     
-    LOG("[%s] sending pongoOS", __FUNCTION__);
+    LOG("sending pongoOS");
     r = pongo(client, payload);
     if(r != 0){
         return -1;
@@ -400,7 +400,7 @@ int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
     io_reset(client, USB_RESET|USB_REENUMERATE);
     io_close(client);
     
-    LOG("[%s] BOOTED?", __FUNCTION__);
+    LOG("BOOTED?");
     
     return 0;
 }

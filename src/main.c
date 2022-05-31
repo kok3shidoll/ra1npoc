@@ -93,7 +93,7 @@ static int open_file(char *file, unsigned int *sz, unsigned char **buf)
 {
     FILE *fd = fopen(file, "r");
     if (!fd) {
-        ERROR("[%s] error opening %s", __FUNCTION__, file);
+        ERROR("opening %s", file);
         return -1;
     }
     
@@ -103,7 +103,7 @@ static int open_file(char *file, unsigned int *sz, unsigned char **buf)
     
     *buf = malloc(*sz);
     if (!*buf) {
-        ERROR("[%s] error allocating file buffer", __FUNCTION__);
+        ERROR("allocating file buffer");
         fclose(fd);
         return -1;
     }
@@ -211,10 +211,10 @@ int main(int argc, char** argv)
     int ret = 0;
     
     memset(&payload, '\0', sizeof(checkra1n_payload_t));
-    LOG("* checkRAIN clone v2.1.4 for iOS by interception");
+    LOG_NOFUNC("* checkRAIN clone v2.1.4 for iOS by interception");
 #ifdef BUILTIN_PAYLOAD
-    LOG("[BUILTIN] v0.12.4");
-    //LOG("[COMMIT] %s", "");
+    LOG_NOFUNC("[BUILTIN] v0.12.4");
+    //LOG_NOFUNC("[COMMIT] %s", "");
 #endif
     
 #ifndef BUILTIN_PAYLOAD
@@ -300,7 +300,7 @@ int main(int argc, char** argv)
                 
             case 'd':
                 debug_enabled = true;
-                DEBUGLOG("[%s] enabled: debug log", __FUNCTION__);
+                DEBUGLOG("enabled: debug log");
                 break;
                 
             case 'c':
@@ -310,7 +310,7 @@ int main(int argc, char** argv)
             case 'e':
                 if (optarg) {
                     extraBootArgs = strdup(optarg);
-                    LOG("[%s] extraBootArgs: [%s]", __FUNCTION__, extraBootArgs);
+                    LOG("extraBootArgs: [%s]", extraBootArgs);
                 }
                 break;
                 
@@ -332,27 +332,27 @@ int main(int argc, char** argv)
     
 #endif /* BUILTIN_PAYLOAD */
     
-    LOG("[%s] Waiting for device in DFU mode...", __FUNCTION__);
+    LOG("Waiting for device in DFU mode...");
     while(get_device(DEVICE_DFU, true) != 0) {
         sleep(1);
     }
     
-    LOG("[%s] CONNECTED", __FUNCTION__);
+    LOG("CONNECTED");
     
     if(client->hasSerialStr == false){
         read_serial_number(client); // For iOS 10 and lower
     }
     
-    DEBUGLOG("[%s] CPID: 0x%02x, STRG: [%s]", __FUNCTION__, client->devinfo.cpid, client->devinfo.srtg);
+    DEBUGLOG("CPID: 0x%02x, STRG: [%s]", client->devinfo.cpid, client->devinfo.srtg);
     
     if(client->hasSerialStr != true){
-        ERROR("[%s] Serial number was not found!", __FUNCTION__);
+        ERROR("serial number was not found!");
         return -1;
     }
     
 #ifndef BUILTIN_PAYLOAD
     if(client->devinfo.cpid != devmode) {
-        ERROR("[%s] option does not match the connected device!", __FUNCTION__);
+        ERROR("option does not match the connected device!");
         return -1;
     }
     
@@ -461,7 +461,7 @@ int main(int argc, char** argv)
                 
                 // 1, copy pongo
                 if(pongo_2_5_0_0cb6126f_bin_len > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "pongo.bin");
                     return -1;
                 }
                 memcpy(special_pongoOS, pongo_2_5_0_0cb6126f_bin, pongo_2_5_0_0cb6126f_bin_len);
@@ -478,7 +478,7 @@ int main(int argc, char** argv)
                 size_t auto_boot_mark_size = 0x16;
                 
                 if(pongo_size + auto_boot_mark_size > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "auto_boot_mark");
                     return -1;
                 }
                 memcpy(special_pongoOS+pongo_size, auto_boot_mark, 16);
@@ -486,7 +486,7 @@ int main(int argc, char** argv)
                 
                 // 3, copy kpf
                 if(pongo_size + KPF_SIZE > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "kpf");
                     return -1;
                 }
                 memcpy(special_pongoOS+pongo_size, pongoOS+KPF_LOCATION, KPF_SIZE);
@@ -503,7 +503,7 @@ int main(int argc, char** argv)
                 
                 pongo_size = RDSK_LOCATION - SPECIAL_HAXX - RDSK_mark_size;
                 if(pongo_size + RDSK_mark_size > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "rdsk_mark");
                     return -1;
                 }
                 memcpy(special_pongoOS+pongo_size, RDSK_mark, RDSK_mark_size);
@@ -511,7 +511,7 @@ int main(int argc, char** argv)
                 
                 // 5, copy rdsk
                 if(pongo_size + RDSK_SIZE > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "rdsk");
                     return -1;
                 }
                 memcpy(special_pongoOS+pongo_size, pongoOS+RDSK_LOCATION, RDSK_SIZE);
@@ -519,13 +519,13 @@ int main(int argc, char** argv)
                 
                 // 6, set flags etc...?
                 if(pongo_size + BLANK_SIZE > MAX_HAXX_SIZE) {
-                    ERROR("[%s] overflow", __FUNCTION__);
+                    ERROR("overflow: %s", "BLANK_SIZE");
                     return -1;
                 }
                 memcpy(special_pongoOS+pongo_size, pongoOS+RDSK_LOCATION+RDSK_SIZE, BLANK_SIZE);
                 pongo_size += BLANK_SIZE;
                 
-                DEBUGLOG("[%s] use: special pongoOS", __FUNCTION__);
+                DEBUGLOG("use: special pongoOS");
                 payload.pongoOS = special_pongoOS;
                 payload.pongoOS_len = pongo_size;
                 
@@ -599,7 +599,7 @@ int main(int argc, char** argv)
 #endif /* T8015 */
             
         default:
-            ERROR("[%s] This device is not supported!", __FUNCTION__);
+            ERROR("This device is not supported!");
             return -1;
     }
     
@@ -608,31 +608,31 @@ int main(int argc, char** argv)
     memset(&str, 0x0, MAX_BOOTARGS_LEN);
     
     if(strlen(DEFAULT_BOOTARGS) > MAX_BOOTARGS_LEN) {
-        ERROR("[%s] DEFAULT_BOOTARGS is too large!", __FUNCTION__);
+        ERROR("DEFAULT_BOOTARGS is too large!");
         return -1;
     }
     sprintf(str, "%s", DEFAULT_BOOTARGS);
     
     if(verboseBoot == true) {
         if((strlen(str) + strlen(" -v")) > MAX_BOOTARGS_LEN) {
-            ERROR("[%s] bootArgs is too large!", __FUNCTION__);
+            ERROR("bootArgs is too large!");
             return -1;
         }
         sprintf(str, "%s -v", str);
         
         checkrain_set_option(kpf_flags, checkrain_option_verbose_boot, 1);
-        DEBUGLOG("[%s] kpf_flags: %x", __FUNCTION__, kpf_flags);
-        LOG("[%s] enable: verbose boot", __FUNCTION__);
+        DEBUGLOG("kpf_flags: %x", kpf_flags);
+        LOG("enable: verbose boot");
     }
     if(extraBootArgs != NULL) {
         if((strlen(str) + strlen(extraBootArgs)) > MAX_BOOTARGS_LEN) {
-            ERROR("[%s] bootArgs is too large!", __FUNCTION__);
+            ERROR("bootArgs is too large!");
             return -1;
         }
         sprintf(str, "%s %s", str, extraBootArgs);
     }
     bootargs = str;
-    LOG("[%s] bootArgs: %s", __FUNCTION__, bootargs);
+    LOG("bootArgs: %s", bootargs);
 #endif
     
     int flags = client->devinfo.checkm8_flag; // because it will be lost
@@ -653,7 +653,7 @@ int main(int argc, char** argv)
     }
     
     if((ret == 0) && (flags & NO_AUTOBOOT))
-        LOG("[%s] note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.", __FUNCTION__);
+        LOG("note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.");
     
     return ret;
 }

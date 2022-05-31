@@ -41,20 +41,20 @@ static void set_global_state(io_client_t client)
     int i=0;
     while((sent = async_usb_ctrl_transfer_with_cancel(client, 0x21, 1, 0x0000, 0x0000, blank, DFU_MAX_TRANSFER_SZ, 0)) != 0x40){
         i++;
-        DEBUGLOG("[%s] (*) retry: %x", __FUNCTION__, i);
+        DEBUGLOG("(*) retry: %x", i);
         usleep(10000);
         result = send_data(client, blank, 64); // send blank data and redo the request.
-        DEBUGLOG("[%s] (*) %x", __FUNCTION__, result.ret);
+        DEBUGLOG("(*) %x", result.ret);
         usleep(10000);
     }
     
-    DEBUGLOG("[%s] (1/3) val: %x", __FUNCTION__, val);
+    DEBUGLOG("(1/3) val: %x", val);
     
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, blank, val, 100);
-    DEBUGLOG("[%s] (2/3) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(2/3) %x", result.ret);
     
     result = send_abort(client);
-    DEBUGLOG("[%s] (3/3) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(3/3) %x", result.ret);
 }
 
 static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
@@ -62,9 +62,9 @@ static void heap_occupation(io_client_t client, checkra1n_payload_t payload)
     transfer_t result;
     
     result = usb_ctrl_transfer_with_time(client, 0, 0, 0x0000, 0x0000, payload.over2, payload.over2_len, 100);
-    DEBUGLOG("[%s] (1/2) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(1/2) %x", result.ret);
     result = send_abort(client);
-    DEBUGLOG("[%s] (2/2) %x", __FUNCTION__, result.ret);
+    DEBUGLOG("(2/2) %x", result.ret);
 }
 
 int checkm8_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
@@ -80,48 +80,48 @@ int checkm8_t7000_s8000(io_client_t client, checkra1n_payload_t payload)
     result = usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, blank, DFU_MAX_TRANSFER_SZ);
     usleep(1000);
     
-    LOG("[%s] reconnecting", __FUNCTION__);
+    LOG("reconnecting");
     io_reconnect(&client, 5, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
     if(!client) {
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("Failed to reconnect to device");
         return -1;
     }
     
-    LOG("[%s] running set_global_state()", __FUNCTION__);
+    LOG("running set_global_state()");
     set_global_state(client);
     
-    LOG("[%s] reconnecting", __FUNCTION__);
+    LOG("reconnecting");
     io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
     if(!client) {
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("Failed to reconnect to device");
         return -1;
     }
     
-    LOG("[%s] running heap_occupation()", __FUNCTION__);
+    LOG("running heap_occupation()");
     heap_occupation(client, payload);
     
-    LOG("[%s] reconnecting", __FUNCTION__);
+    LOG("reconnecting");
     io_reconnect(&client, 5, DEVICE_DFU, USB_NO_RESET, false, 10000);
     if(!client) {
-        ERROR("[%s] ERROR: Failed to reconnect to device", __FUNCTION__);
+        ERROR("Failed to reconnect to device");
         return -1;
     }
     
-    LOG("[%s] checkmate!", __FUNCTION__);
+    LOG("checkmate!");
     
     if(payload.stage2_len != 0) {
-        LOG("[%s] sending stage2 payload", __FUNCTION__);
+        LOG("sending stage2 payload");
         usleep(10000);
         ret = payload_stage2(client, payload);
         if(ret != 0){
-            ERROR("[%s] ERROR: Failed to send stage2", __FUNCTION__);
+            ERROR("Failed to send stage2");
             return -1;
         }
     }
     
     if(payload.pongoOS_len != 0) {
         usleep(10000);
-        LOG("[%s] connecting to stage2", __FUNCTION__);
+        LOG("connecting to stage2");
         ret = connect_to_stage2(client, payload);
         if(ret != 0){
             return -1; // err
