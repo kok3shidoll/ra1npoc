@@ -18,6 +18,7 @@ checkra1n dump and poc for iOS
 | S8001 | Apple A9X | ✅ |
 | T8010 | Apple A10 | ✅ |
 | T8011 | Apple A10X | ✅ |
+| T8012 | Apple T2 | ✅ |
 | T8015 | Apple A11 | ✅ |
 
 
