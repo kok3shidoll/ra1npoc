@@ -23,10 +23,7 @@ SOURCE		= \
                 main.c \
                 io/iousb.c \
                 common/common.c \
-                soc/t8010_t8015.c \
-                soc/t7000_s8000.c \
-                soc/s5l8960x.c
-
+                exploit/checkm8_arm64.c
 
 .PHONY: all builtin old clean
 

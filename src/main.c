@@ -29,9 +29,7 @@
 #include <common/pongo_config.h>
 #include <common/list.h>
 
-#include <soc/t8010_t8015.h>
-#include <soc/t7000_s8000.h>
-#include <soc/s5l8960x.h>
+#include <exploit/checkm8_arm64.h>
 
 #ifdef BUILTIN_PAYLOAD
 #include <getopt.h>
@@ -637,20 +635,7 @@ int main(int argc, char** argv)
     
     int flags = client->devinfo.checkm8_flag; // because it will be lost
     
-    if(flags & CHECKM8_A7) {
-        // A7
-        ret = checkm8_s5l8960x(client, payload);
-    }
-    
-    if(flags & CHECKM8_A8_A9) {
-        // A8, A8X, A9
-        ret = checkm8_t7000_s8000(client, payload);
-    }
-    
-    if(flags & CHECKM8_A9X_A11) {
-        // A9X, A10, A10X, A11
-        ret = checkm8_t8010_t8015(client, payload);
-    }
+    ret = checkm8_arm64(client, payload, flags);
     
     if((ret == 0) && (flags & NO_AUTOBOOT))
         LOG("note: probably pongoOS booted, but there is still work to be done.\nYou have to sending rdsk and kpf via pongoterm.");
