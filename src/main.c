@@ -323,7 +323,7 @@ int main(int argc, char** argv)
     }
     
     if(useRecovery) {
-        if(enter_dfu_via_recovery(client) != 0) {
+        if(enter_dfu_via_recovery(client)) {
             return -1;
         }
     }
@@ -331,11 +331,12 @@ int main(int argc, char** argv)
 #endif /* BUILTIN_PAYLOAD */
     
     LOG("Waiting for device in DFU mode...");
-    while(get_device(DEVICE_DFU, true) != 0) {
+    while(get_device(DEVICE_DFU, true)) {
         sleep(1);
     }
     
-    LOG("CONNECTED");
+    LOG("CONNECTED: DFU mode");
+    sleep(2);
     
     if(client->hasSerialStr == false){
         read_serial_number(client); // For iOS 10 and lower
@@ -633,7 +634,7 @@ int main(int argc, char** argv)
     LOG("bootArgs: %s", bootargs);
 #endif
     
-    int flags = client->devinfo.checkm8_flag; // because it will be lost
+    int flags = client->devinfo.checkm8_flag; // because checkm8_flag(s) will be lost
     
     ret = checkm8_arm64(client, payload, flags);
     

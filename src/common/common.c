@@ -121,31 +121,6 @@ static void prog(int sec)
     printf("\n");
 }
 
-transfer_t usb_req_stall(io_client_t client)
-{
-    return usb_ctrl_transfer_with_time(client, 2, 3, 0x0000, 128, NULL, 0, 10);
-}
-
-transfer_t usb_req_leak(io_client_t client, unsigned char* blank)
-{
-    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 64, 1);
-}
-
-transfer_t usb_req_no_leak(io_client_t client, unsigned char* blank)
-{
-    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 65, 1);
-}
-
-transfer_t leak(io_client_t client, unsigned char* blank)
-{
-    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 192, 1);
-}
-
-transfer_t no_leak(io_client_t client, unsigned char* blank)
-{
-    return usb_ctrl_transfer_with_time(client, 0x80, 6, 0x0304, 0x040a, blank, 193, 1);
-}
-
 transfer_t send_data(io_client_t client, unsigned char* buf, size_t size)
 {
     return usb_ctrl_transfer(client, 0x21, 1, 0x0000, 0x0000, buf, size);
@@ -166,20 +141,6 @@ transfer_t send_abort(io_client_t client)
     return usb_ctrl_transfer_with_time(client, 0x21, 4, 0x0000, 0x0000, NULL, 0, 0);
 }
 
-transfer_t usb_req_leak_with_async(io_client_t client,
-                                   unsigned char* blank,
-                                   int usleep_time,
-                                   async_transfer_t transfer)
-{
-    transfer_t result = async_usb_ctrl_transfer(client, 0x80, 6, 0x304, 0x40a, blank, 64, &transfer);
-    usleep(usleep_time);
-    io_abort_pipe_zero(client);
-    usleep(usleep_time);
-    while(transfer.ret != kIOReturnAborted){
-        CFRunLoopRun();
-    }
-    return result;
-}
 
 int enter_dfu_via_recovery(io_client_t client)
 {
@@ -197,7 +158,7 @@ int enter_dfu_via_recovery(io_client_t client)
         return -1;
     }
     
-    LOG("CONNECTED");
+    LOG("CONNECTED: Recovery mode");
     
     if(client->hasSerialStr == false){
         read_serial_number(client);
@@ -396,21 +357,18 @@ int pongo(io_client_t client, checkra1n_payload_t payload)
 
 int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
 {
-    int r;
-    
     LOG("reconnecting");
     io_reconnect(&client, 15, DEVICE_STAGE2, USB_RESET|USB_REENUMERATE, false, 5000000);
     if(!client) {
         ERROR("ERROR: Failed to connect to checkra1n DFU");
         return -1;
     }
-    
     LOG("connected to Stage2");
+    
     usleep(10000);
     
     LOG("sending pongoOS");
-    r = pongo(client, payload);
-    if(r != 0){
+    if(pongo(client, payload)){
         return -1;
     }
     
