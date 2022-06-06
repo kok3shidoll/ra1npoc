@@ -35,6 +35,18 @@ struct checkm8_device_list {
 };
 
 static struct checkm8_device_list devlists[] = {
+    // Apple A4
+    { 0x8930, 0xff, DFU_LEGACY }, // legacy
+    // Apple A5
+    { 0x8940, 0xff, DFU_LEGACY }, // legacy
+    // Apple A5r
+    { 0x8942, 0xff, DFU_LEGACY }, // legacy
+    // Apple A5X
+    { 0x8945, 0xff, DFU_LEGACY }, // legacy
+    // Apple A6
+    { 0x8950, 0xff, DFU_LEGACY }, // legacy
+    // Apple A6X
+    { 0x8955, 0xff, DFU_LEGACY }, // legacy
     // Apple A7
     { 0x8960, 0xff, DFU_LEGACY }, // all have legacy type
     // Apple A8
@@ -241,19 +253,24 @@ int enter_dfu_via_recovery(io_client_t client)
     printf(":: \x1b[34mTime to put the device into DFU mode\x1b[39m\n");
     printf(":: \x1b[34mPlease follow the instructions below to operate the device.\x1b[39m\n");
     printf("::\n");
-    printf(":: \x1b[32mSTEP1: Press \x1b[31m<enter>\x1b[32m key.\x1b[39m\n");
-    printf(":: \x1b[32mSTEP2: Press and hold the Side and %ss together \x1b[31m(%dsec)\x1b[39m\n", btn, step2_sec);
-    printf(":: \x1b[32mSTEP3: Release the Side button But keep holding the %s \x1b[31m(%dsec)\x1b[39m\n", btn, step3_sec);
+    printf(":: \x1b[32mSTEP1 Press \x1b[31m<enter>\x1b[32m key.\x1b[39m\n");
+    printf(":: \x1b[32mSTEP2 Press and hold the Side and %ss together \x1b[31m(%dsec)\x1b[39m\n", btn, step2_sec);
+    printf(":: \x1b[32mSTEP3 Release the Side button But keep holding the %s \x1b[31m(%dsec)\x1b[39m\n", btn, step3_sec);
     printf("================\n");
     printf("\n");
-    printf("\x1b[34mready?\x1b[39m\n");
+    printf("\x1b[34mready? it starts 3 seconds after press <enter> key.\x1b[39m\n");
     printf("\x1b[32m[STEP1] Press <enter> key\x1b[39m >> ");
     getchar();
-    
+    printf("\n");
     // initialization for interval()
     cpuTime = clock();
     
-    printf("\n");
+    for(int i=0; i<3; i++) {
+        printf("preparing... (STEP2 will start after %d seconds)\r", 3-i);
+        fflush(stdout);
+        interval(1);
+    }
+    
     LOG_NOFUNC("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
     int j=0;
     for(int i=0; i<step2_sec; i++) {
