@@ -1,7 +1,7 @@
 /*
  * list.h
  *
- * Copyright (c) 2021 dora2ios
+ * Copyright (c) 2021 - 2022 dora2ios
  *
  * List of supported devices.
  * Currently, source code of payload used with checkra1n is not publicly available.

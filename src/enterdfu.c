@@ -1,7 +1,7 @@
 /*
- * ra1npoc - main.c
+ * ra1npoc - enterdfu.c
  *
- * Copyright (c) 2021 dora2ios
+ * Copyright (c) 2022 dora2ios
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
