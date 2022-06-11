@@ -27,7 +27,7 @@
 #include <common/common.h>
 #include <getopt.h>
 
-io_client_t client;
+io_client_t client = NULL;
 extern bool debug_enabled;
 
 static void usage(char** argv)
@@ -71,6 +71,12 @@ int main(int argc, char** argv)
                 usage(argv);
                 return -1;
         }
+    }
+    
+    io_reconnect(&client, 1, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
+    if(client) {
+        LOG("already DFU mode");
+        return 0;
     }
     
     if(useRecovery) {

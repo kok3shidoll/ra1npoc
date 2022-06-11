@@ -35,6 +35,10 @@ struct checkm8_device_list {
 };
 
 static struct checkm8_device_list devlists[] = {
+    // 3GS
+    { 0x8920, 0xff, DFU_LEGACY }, // legacy
+    // iPT3
+    { 0x8920, 0xff, DFU_LEGACY }, // legacy
     // Apple A4
     { 0x8930, 0xff, DFU_LEGACY }, // legacy
     // Apple A5
@@ -215,8 +219,8 @@ int enter_dfu_via_recovery(io_client_t client)
     printf(":: \x1b[34mPlease follow the instructions below to operate the device.\x1b[39m\n");
     printf("::\n");
     printf(":: \x1b[32mSTEP1 Press \x1b[31m<enter>\x1b[32m key.\x1b[39m\n");
-    printf(":: \x1b[32mSTEP2 Press and hold the Side and %ss together \x1b[31m(%dsec)\x1b[39m\n", btn, step2_sec);
-    printf(":: \x1b[32mSTEP3 Release the Side button But keep holding the %s \x1b[31m(%dsec)\x1b[39m\n", btn, step3_sec);
+    printf(":: \x1b[32mSTEP2 Press and hold Side(or Top) and %ss together \x1b[31m(%dsec)\x1b[39m\n", btn, step2_sec);
+    printf(":: \x1b[32mSTEP3 Release Side(or Top) button But keep holding %s \x1b[31m(%dsec)\x1b[39m\n", btn, step3_sec);
     printf("================\n");
     printf("\n");
     printf("\x1b[34mready? it starts 3 seconds after press <enter> key.\x1b[39m\n");
@@ -232,7 +236,7 @@ int enter_dfu_via_recovery(io_client_t client)
         interval(1);
     }
     
-    LOG_NOFUNC("[STEP2] Press and hold the Side and %ss together (%dsec)", btn, step2_sec);
+    LOG_NOFUNC("[STEP2] Press and hold Side(or Top) and %ss together (%dsec)", btn, step2_sec);
     int j=0;
     for(int i=0; i<step2_sec; i++) {
         if(i==1)
@@ -248,7 +252,7 @@ int enter_dfu_via_recovery(io_client_t client)
     }
     printf("\n");
     
-    LOG_NOFUNC("[STEP3] Release the Side button But keep holding the %s (%dsec)", btn, step3_sec);
+    LOG_NOFUNC("[STEP3] Release Side(or Top) button But keep holding %s (%dsec)", btn, step3_sec);
     prog(step3_sec);
     
     LOG("reconnecting");
