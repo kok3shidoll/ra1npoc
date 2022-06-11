@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     
     if(useRecovery) {
         if(enter_dfu_via_recovery(client)) {
-            ERROR("ERROR: Failed to connect to DFU mode");
+            ERROR("Failed to connect to DFU mode");
             return -1;
         }
     } else {
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
     LOG("reconnecting");
     io_reconnect(&client, 10, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
     if(!client) {
-        ERROR("ERROR: Failed to connect to DFU mode");
+        ERROR("Failed to connect to DFU mode");
         return -1;
     }
     LOG("SUCCESS: CONNECTED DFU mode");

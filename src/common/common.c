@@ -364,7 +364,7 @@ int connect_to_stage2(io_client_t client, checkra1n_payload_t payload)
     LOG("reconnecting");
     io_reconnect(&client, 15, DEVICE_STAGE2, USB_RESET|USB_REENUMERATE, false, 5000000);
     if(!client) {
-        ERROR("ERROR: Failed to connect to checkra1n DFU");
+        ERROR("Failed to connect to checkra1n DFU");
         return -1;
     }
     LOG("connected to Stage2");
