@@ -77,13 +77,6 @@ typedef struct {
     unsigned int pongoOS_len;
 } checkra1n_payload_t;
 
-// ipwnder_lite
-typedef struct {
-    unsigned char *payload;
-    unsigned int len;
-    const char *path;
-} ipwnder_payload_t;
-
 typedef struct {
     UInt32 wLenDone;
     IOReturn ret;
