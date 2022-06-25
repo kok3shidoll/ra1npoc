@@ -25,10 +25,12 @@
 
 #include <io/iousb.h>
 #include <common/common.h>
+#include <common/log.h>
+
 #include <getopt.h>
 
 io_client_t client = NULL;
-extern bool debug_enabled;
+bool debug_enabled = false;
 
 static void usage(char** argv)
 {

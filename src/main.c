@@ -28,6 +28,7 @@
 #include <common/common.h>
 #include <common/pongo_config.h>
 #include <common/list.h>
+#include <common/log.h>
 
 #include <exploit/checkm8_arm64.h>
 
@@ -84,7 +85,7 @@ io_client_t client;
 checkra1n_payload_t payload;
 bool special_pongo = false;
 
-extern bool debug_enabled;
+bool debug_enabled = false;
 
 #ifndef BUILTIN_PAYLOAD
 static int open_file(char *file, unsigned int *sz, unsigned char **buf)

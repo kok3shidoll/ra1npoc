@@ -26,6 +26,8 @@
 #include <io/iousb.h>
 #include <common/common.h>
 #include <common/pongo_config.h>
+#include <common/log.h>
+
 #include <time.h>
 
 struct checkm8_device_list {

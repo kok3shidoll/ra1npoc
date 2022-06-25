@@ -3,8 +3,8 @@
 #include <IOKit/IOCFPlugIn.h>
 
 #include <io/iousb.h>
+#include <common/log.h>
 
-bool debug_enabled = false;
 extern io_client_t client;
 
 static const char *darwin_device_class = kIOUSBDeviceClassName;
