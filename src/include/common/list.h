@@ -31,10 +31,10 @@
 
 /*
  * T7001 (Apple A8X)
- * T7001 is not supported.
+ * T7001 is fully supported.
  */
-//#define T7001_CODE
-//#define T7001_PAYLOAD
+#define T7001_CODE
+#define T7001_PAYLOAD
 
 
 /*

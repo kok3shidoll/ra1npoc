@@ -54,6 +54,12 @@ int main(int argc, char** argv)
         { NULL, 0, NULL, 0 }
     };
     
+    if(argc < 2) {
+        usage(argv);
+        return 0;
+    }
+        
+    
     while ((opt = getopt_long(argc, argv, "hdc", longopts, NULL)) > 0) {
         switch (opt) {
             case 'h':
@@ -75,7 +81,7 @@ int main(int argc, char** argv)
         }
     }
     
-    io_reconnect(&client, 1, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 10000);
+    io_reconnect(&client, 1, DEVICE_DFU, USB_RESET|USB_REENUMERATE, false, 0);
     if(client) {
         LOG("already DFU mode");
         return 0;

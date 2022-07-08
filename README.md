@@ -9,18 +9,18 @@ A tool for re-jailbreak devices jailbroken by checkra1n/odysseyra1n on iOS/iPadO
 
 ## サポート  
 ### JailbreakしたいiOSデバイス  
-| chip | name |   |
-|---------|----------|----------|
-| S5L8960 | Apple A7 | ✅ |
-| T7000 | Apple A8 | ✅ |
-| T7001 | Apple A8X | ❌ |
-| S8000 | Apple A9 | ✅ |
-| S8003 | Apple A9 | ✅ |
-| S8001 | Apple A9X | ✅ |
-| T8010 | Apple A10 | ✅ |
-| T8011 | Apple A10X | ✅ |
-| T8012 | Apple T2 | ✅ |
-| T8015 | Apple A11 | ✅ |
+| chip | name |
+|---------|----------|
+| S5L8960 | Apple A7 |
+| T7000 | Apple A8 |
+| T7001 | Apple A8X |
+| S8000 | Apple A9 |
+| S8003 | Apple A9 |
+| S8001 | Apple A9X |
+| T8010 | Apple A10 |
+| T8011 | Apple A10X |
+| T8012 | Apple T2 |
+| T8015 | Apple A11 |
 
 
 ### ホスト側のデバイス (このソフトウェアを実行する側)  

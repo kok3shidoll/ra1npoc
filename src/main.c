@@ -154,7 +154,7 @@ static void list(void)
 static void usage(char** argv)
 {
 #ifndef BUILTIN_PAYLOAD
-    printf("Usage: %s [option] overwrite1 overwrite2 stage2 payload.bin\n", argv[0]);
+    printf("Usage: %s [option] overwrite stage1 stage2 payload.bin\n", argv[0]);
 #else
     printf("Usage: %s [option]\n", argv[0]);
 #endif /* BUILTIN_PAYLOAD */
@@ -357,15 +357,15 @@ int main(int argc, char** argv)
     }
     
     // load payload
-    char *over1_path    = argv[2];
-    char *over2_path    = argv[3];
-    char *stage2_path   = argv[4];
-    char *pongoOS_path  = argv[5];
+    char *overwrite_path = argv[2];
+    char *stage1_path    = argv[3];
+    char *stage2_path    = argv[4];
+    char *pongoOS_path   = argv[5];
     
-    if(open_file(over1_path,   &payload.over1_len,   &payload.over1)   != 0) return -1;
-    if(open_file(over2_path,   &payload.over2_len,   &payload.over2)   != 0) return -1;
-    if(open_file(stage2_path,  &payload.stage2_len,  &payload.stage2)  != 0) return -1;
-    if(open_file(pongoOS_path, &payload.pongoOS_len, &payload.pongoOS) != 0) return -1;
+    if(open_file(overwrite_path,    &payload.overwrite_len, &payload.overwrite)   != 0) return -1;
+    if(open_file(stage1_path,       &payload.stage1_len,    &payload.stage1)   != 0) return -1;
+    if(open_file(stage2_path,       &payload.stage2_len,    &payload.stage2)  != 0) return -1;
+    if(open_file(pongoOS_path,      &payload.pongoOS_len,   &payload.pongoOS) != 0) return -1;
 #endif /* !BUILTIN_PAYLOAD */
     
     switch(client->devinfo.cpid) {
@@ -373,12 +373,12 @@ int main(int argc, char** argv)
 #if defined(S5L8960_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S5L8960_PAYLOAD))
         case 0x8960:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = s5l8960_overwrite1_len;
-            payload.over2_len = s5l8960_overwrite2_len;
+            payload.overwrite_len = s5l8960_overwrite_len;
+            payload.stage1_len = s5l8960_stage1_len;
             payload.stage2_len = s5l8960_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = s5l8960_overwrite1;
-            payload.over2 = s5l8960_overwrite2;
+            payload.overwrite = s5l8960_overwrite;
+            payload.stage1 = s5l8960_stage1;
             payload.stage2 = s5l8960_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -388,12 +388,12 @@ int main(int argc, char** argv)
 #if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
         case 0x7000:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = 0;
-            payload.over2_len = t7000_overwrite2_len;
+            payload.overwrite_len = 0;
+            payload.stage1_len = t7000_stage1_len;
             payload.stage2_len = t7000_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = NULL;
-            payload.over2 = t7000_overwrite2;
+            payload.overwrite = NULL;
+            payload.stage1 = t7000_stage1;
             payload.stage2 = t7000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -403,12 +403,12 @@ int main(int argc, char** argv)
 #if defined(T7001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7001_PAYLOAD))
         case 0x7001:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = 0;
-            payload.over2_len = t7001_overwrite2_len;
+            payload.overwrite_len = 0;
+            payload.stage1_len = t7001_stage1_len;
             payload.stage2_len = t7001_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = NULL;
-            payload.over2 = t7001_overwrite2;
+            payload.overwrite = NULL;
+            payload.stage1 = t7001_stage1;
             payload.stage2 = t7001_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -418,12 +418,12 @@ int main(int argc, char** argv)
 #if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
         case 0x8000:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = 0;
-            payload.over2_len = s8000_overwrite2_len;
+            payload.overwrite_len = 0;
+            payload.stage1_len = s8000_stage1_len;
             payload.stage2_len = s8000_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = NULL;
-            payload.over2 = s8000_overwrite2;
+            payload.overwrite = NULL;
+            payload.stage1 = s8000_stage1;
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -433,12 +433,12 @@ int main(int argc, char** argv)
 #if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
         case 0x8003:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = 0;
-            payload.over2_len = s8000_overwrite2_len;
+            payload.overwrite_len = 0;
+            payload.stage1_len = s8000_stage1_len;
             payload.stage2_len = s8000_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = NULL;
-            payload.over2 = s8000_overwrite2;
+            payload.overwrite = NULL;
+            payload.stage1 = s8000_stage1;
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -448,11 +448,11 @@ int main(int argc, char** argv)
 #if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
         case 0x8001:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = s8001_overwrite1_len;
-            payload.over2_len = s8001_overwrite2_len;
+            payload.overwrite_len = s8001_overwrite_len;
+            payload.stage1_len = s8001_stage1_len;
             payload.stage2_len = s8001_stage2_len;
-            payload.over1 = s8001_overwrite1;
-            payload.over2 = s8001_overwrite2;
+            payload.overwrite = s8001_overwrite;
+            payload.stage1 = s8001_stage1;
             payload.stage2 = s8001_stage2;
             if(special_pongo == true) {
                 size_t pongo_size = 0;
@@ -541,12 +541,12 @@ int main(int argc, char** argv)
 #if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
         case 0x8010:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = t8010_overwrite1_len;
-            payload.over2_len = t8010_overwrite2_len;
+            payload.overwrite_len = t8010_overwrite_len;
+            payload.stage1_len = t8010_stage1_len;
             payload.stage2_len = t8010_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = t8010_overwrite1;
-            payload.over2 = t8010_overwrite2;
+            payload.overwrite = t8010_overwrite;
+            payload.stage1 = t8010_stage1;
             payload.stage2 = t8010_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -556,12 +556,12 @@ int main(int argc, char** argv)
 #if defined(T8011_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8011_PAYLOAD))
         case 0x8011:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = t8011_overwrite1_len;
-            payload.over2_len = t8011_overwrite2_len;
+            payload.overwrite_len = t8011_overwrite_len;
+            payload.stage1_len = t8011_stage1_len;
             payload.stage2_len = t8011_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = t8011_overwrite1;
-            payload.over2 = t8011_overwrite2;
+            payload.overwrite = t8011_overwrite;
+            payload.stage1 = t8011_stage1;
             payload.stage2 = t8011_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -571,12 +571,12 @@ int main(int argc, char** argv)
 #if defined(T8012_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8012_PAYLOAD))
         case 0x8012:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = t8012_overwrite1_len;
-            payload.over2_len = t8012_overwrite2_len;
+            payload.overwrite_len = t8012_overwrite_len;
+            payload.stage1_len = t8012_stage1_len;
             payload.stage2_len = t8012_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = t8012_overwrite1;
-            payload.over2 = t8012_overwrite2;
+            payload.overwrite = t8012_overwrite;
+            payload.stage1 = t8012_stage1;
             payload.stage2 = t8012_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
@@ -586,12 +586,12 @@ int main(int argc, char** argv)
 #if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
         case 0x8015:
 #ifdef BUILTIN_PAYLOAD
-            payload.over1_len = t8015_overwrite1_len;
-            payload.over2_len = t8015_overwrite2_len;
+            payload.overwrite_len = t8015_overwrite_len;
+            payload.stage1_len = t8015_stage1_len;
             payload.stage2_len = t8015_stage2_len;
             payload.pongoOS_len = pongoOS_len;
-            payload.over1 = t8015_overwrite1;
-            payload.over2 = t8015_overwrite2;
+            payload.overwrite = t8015_overwrite;
+            payload.stage1 = t8015_stage1;
             payload.stage2 = t8015_stage2;
             payload.pongoOS = pongoOS;
 #endif /* BUILTIN_PAYLOAD */
