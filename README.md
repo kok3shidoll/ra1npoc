@@ -88,12 +88,12 @@ pongoterm -r
 ### 旧モードの場合  
 ### A7/A10-A11  
 ```
-ra1npoc [--{chipname}] [{Soc}_overwrite1 {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--{chipname}] [{Soc}_overwrite {Soc}_stage1 {Soc}_stage2 pongoOS]  
 ```
 
 ### A9X 
 ```
-ra1npoc [--a9x] [s8001_overwrite1 s8001_overwrite2 s8001_stage2 pongoOS.bin]
+ra1npoc [--a9x] [s8001_overwrite s8001_stage1 s8001_stage2 pongoOS.bin]
 
 pongoterm
 > /send /path/to/ramdisk
@@ -106,7 +106,7 @@ pongoterm
 
 ### A8/A9  
 ```
-ra1npoc [--{chipname}] [/dev/null {Soc}_overwrite2 {Soc}_stage2 pongoOS]  
+ra1npoc [--{chipname}] [/dev/null {Soc}_stage1 {Soc}_stage2 pongoOS]  
 ```
 
 
