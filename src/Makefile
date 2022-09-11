@@ -15,7 +15,7 @@ IOS_ARCH		= -arch armv7 -arch arm64
 RA1NPOC_MACOSX_OBJ	= ra1npoc_macosx
 RA1NPOC_IOS_OBJ		= ra1npoc_ios
 
-CODESIGN	= codesign -f -s -
+CODESIGN	= codesign -f -s - --entitlements ent.xml
 STRIP		= strip
 
 GEN_PAYLOAD	= builtin.sh
