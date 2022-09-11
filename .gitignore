@@ -1,4 +1,3 @@
-
 .DS_Store
 src/ra1npoc*
 src/enterdfu_*
@@ -6,5 +5,4 @@ src/payload
 src/BUILD/
 src/build.sh
 src/package
-dumpfiles/ios15
-dumpfiles/dis
+src/ios_headers
