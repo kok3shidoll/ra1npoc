@@ -58,8 +58,6 @@ make old
 
 
 ## 実行  
-- iOS 14環境で実行する場合、バイナリは`/usr/local/bin`以下に配置する必要があります。  
-
 ### built-in  
 ```
 ra1npoc [option]  
@@ -76,12 +74,6 @@ ra1npoc [option]
 A9Xの場合、`-s`フラグを渡すことで、iPadOSが正常に起動するようになります。[checkra1n_issues#2074](https://github.com/checkra1n/BugTracker/issues/2074)  
 ```
 ra1npoc -s
-```
-
-~~A9Xの場合、ra1npocを実行したあとpongoOSで停止する仕様となっています。~~  
-~~iPadOSを起動したい場合、続けてpongotermを使用してブートファイルを送信する必要があります。~~  
-```
-pongoterm -r
 ```
 
 
