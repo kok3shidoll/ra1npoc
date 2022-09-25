@@ -32,18 +32,11 @@ A tool for re-jailbreak devices jailbroken by checkra1n/odysseyra1n on iOS/iPadO
 
 
 ## ビルド  
-### Built-Inモード  
 ```
 cd src/
 make all
 cd ../pongoOS/scripts
 make ra1npoc
-```
-
-### 旧モード  
-```
-cd src/
-make old
 ```
 
 

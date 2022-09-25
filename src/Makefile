@@ -6,7 +6,6 @@ IOS_HEADERS_PATH	= ios_headers
 CFLAGS			= -I./include -Wall
 CFLAGS			+= -Os
 IOS_FLAGS		= -I./$(IOS_HEADERS_PATH) -DIPHONEOS_ARM -miphoneos-version-min=9.0
-BUILTIN_FLAGS	= -DBUILTIN_PAYLOAD
 
 LDFLAGS			= -framework IOKit -framework CoreFoundation
 
@@ -35,7 +34,7 @@ ENTERDFU_SOURCE	= \
                 io/iousb.c \
                 common/common.c
 
-.PHONY: all builtin enterdfu old clean
+.PHONY: all builtin enterdfu clean
 
 all: builtin enterdfu
 
@@ -48,14 +47,8 @@ get_ios_header:
 builtin: get_ios_header
 	./$(GEN_PAYLOAD)
 	# macosx
-	$(MACOSX_CC) $(CFLAGS) $(BUILTIN_FLAGS) $(LDFLAGS) $(SOURCE) -o $(RA1NPOC_MACOSX_OBJ)
-	# ios
-	$(IOS_CC) $(CFLAGS) $(IOS_FLAGS) $(BUILTIN_FLAGS) $(LDFLAGS) $(SOURCE) $(IOS_ARCH) -o $(RA1NPOC_IOS_OBJ)
-	$(STRIP) $(RA1NPOC_IOS_OBJ)
-	$(CODESIGN) $(RA1NPOC_IOS_OBJ)
-
-old: get_ios_header
 	$(MACOSX_CC) $(CFLAGS) $(LDFLAGS) $(SOURCE) -o $(RA1NPOC_MACOSX_OBJ)
+	# ios
 	$(IOS_CC) $(CFLAGS) $(IOS_FLAGS) $(LDFLAGS) $(SOURCE) $(IOS_ARCH) -o $(RA1NPOC_IOS_OBJ)
 	$(STRIP) $(RA1NPOC_IOS_OBJ)
 	$(CODESIGN) $(RA1NPOC_IOS_OBJ)

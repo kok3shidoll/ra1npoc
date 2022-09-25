@@ -6,7 +6,6 @@
  *
  */
 
-#ifdef BUILTIN_PAYLOAD
 #define BOOTARGS_STR_PTR    (0x15801E)
 #define KPF_FLAGS_PTR       (0x158018)
 #define KPF_LOCATION        (0x3F308)
@@ -17,7 +16,6 @@
 // no idea :/
 #define SPECIAL_HAXX        (0x3000)
 #define MAX_HAXX_SIZE       (0x200000)
-#endif // BUILTIN_PAYLOAD
 
 /*
  * Copyright (C) 2019-2021 checkra1n team

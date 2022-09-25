@@ -32,7 +32,6 @@
 
 #include <exploit/checkm8_arm64.h>
 
-#ifdef BUILTIN_PAYLOAD
 #include <getopt.h>
 
 #include "payload/pongoOS.h"
@@ -74,8 +73,6 @@ unsigned char special_pongoOS[MAX_HAXX_SIZE];
 #include "payload/t8015.h"
 #endif /* T8015_PAYLOAD */
 
-#endif /* BUILTIN_PAYLOAD */
-
 #if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
 int8_t kpf_flags = checkrain_option_none;
 const char* bootargs = NULL;
@@ -84,37 +81,9 @@ const char* bootargs = NULL;
 io_client_t client;
 checkra1n_payload_t payload;
 bool special_pongo = false;
-
 bool debug_enabled = false;
 
-#ifndef BUILTIN_PAYLOAD
-static int open_file(char *file, unsigned int *sz, unsigned char **buf)
-{
-    FILE *fd = fopen(file, "r");
-    if (!fd) {
-        ERROR("opening %s", file);
-        return -1;
-    }
-    
-    fseek(fd, 0, SEEK_END);
-    *sz = ftell(fd);
-    fseek(fd, 0, SEEK_SET);
-    
-    *buf = malloc(*sz);
-    if (!*buf) {
-        ERROR("allocating file buffer");
-        fclose(fd);
-        return -1;
-    }
-    
-    fread(*buf, *sz, 1, fd);
-    fclose(fd);
-    
-    return 0;
-}
-#endif /* BUILTIN_PAYLOAD */
 
-#ifdef BUILTIN_PAYLOAD
 static void list(void)
 {
     printf("Devices list:\n");
@@ -149,50 +118,11 @@ static void list(void)
     printf("\t\x1b[36mt8015   \x1b[39m - \x1b[35mApple A11 Bionic\x1b[39m\n");
 #endif /* T8015 */
 }
-#endif
 
 static void usage(char** argv)
 {
-#ifndef BUILTIN_PAYLOAD
-    printf("Usage: %s [option] overwrite stage1 stage2 payload.bin\n", argv[0]);
-#else
     printf("Usage: %s [option]\n", argv[0]);
-#endif /* BUILTIN_PAYLOAD */
     
-#ifndef BUILTIN_PAYLOAD
-    
-#if defined(S5L8960_CODE)
-    printf("\t--a7   \x1b[36ms5l8960x\x1b[39m - \x1b[35mApple A7\x1b[39m\n");
-#endif /* S5L8960 */
-#if defined(T7000_CODE)
-    printf("\t--a8   \x1b[36mt7000   \x1b[39m - \x1b[35mApple A8\x1b[39m\n");
-#endif /* T7000 */
-#if defined(T7001_CODE)
-    printf("\t--a8x  \x1b[36mt7001   \x1b[39m - \x1b[35mApple A8X\x1b[39m\n");
-#endif /* T7001 */
-#if defined(S8000_CODE)
-    printf("\t--a9   \x1b[36ms8000   \x1b[39m - \x1b[35mApple A9 (Samsung)\x1b[39m\n");
-#endif /* S8000 */
-#if defined(S8003_CODE)
-    printf("\t--a9m  \x1b[36ms8003   \x1b[39m - \x1b[35mApple A9 (TSMC)\x1b[39m\n");
-#endif /* S8003 */
-#if defined(S8001_CODE)
-    printf("\t--a9x  \x1b[36ms8001   \x1b[39m - \x1b[35mApple A9X\x1b[39m\n");
-#endif /* S8001 */
-#if defined(T8010_CODE)
-    printf("\t--a10  \x1b[36mt8010   \x1b[39m - \x1b[35mApple A10 Fusion\x1b[39m\n");
-#endif /* T8010 */
-#if defined(T8011_CODE)
-    printf("\t--a10x \x1b[36mt8011   \x1b[39m - \x1b[35mApple A10X Fusion\x1b[39m\n");
-#endif /* T8011 */
-#if defined(T8012_CODE)
-    printf("\t--t2   \x1b[36mt8011   \x1b[39m - \x1b[35mApple T2\x1b[39m\n");
-#endif /* T8012 */
-#if defined(T8015_CODE)
-    printf("\t--a11  \x1b[36mt8015   \x1b[39m - \x1b[35mApple A11 Bionic\x1b[39m\n");
-#endif /* T8015 */
-    
-#else
     printf("  -h, --help\t\t\t\x1b[36mshow usage\x1b[39m\n");
     printf("  -l, --list\t\t\t\x1b[36mshow list of supported devices\x1b[39m\n");
     printf("  -v, --verbose\t\t\t\x1b[36menable verbose boot\x1b[39m\n");
@@ -201,7 +131,6 @@ static void usage(char** argv)
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
     printf("  -s, --special\t\t\t\x1b[36muse special pongo_2.5.0-0cb6126f\x1b[39m\n");
     printf("  -m, --m1usbc\t\t\t\x1b[36muse usb-c on apple silicon macs\x1b[39m\n");
-#endif /* BUILTIN_PAYLOAD */
     
     printf("\n");
 }
@@ -210,69 +139,16 @@ int main(int argc, char** argv)
 {
     int ret = 0;
     
-    memset(&payload, '\0', sizeof(checkra1n_payload_t));
-    LOG_NOFUNC("* checkRAIN clone v2.1.4 for iOS by interception");
-#ifdef BUILTIN_PAYLOAD
-    LOG_NOFUNC("[BUILTIN] v0.12.4");
-    //LOG_NOFUNC("[COMMIT] %s", "");
-#endif
-    
-#ifndef BUILTIN_PAYLOAD
-    uint16_t devmode=0;
-#else
     bool useRecovery = false;
     bool verboseBoot = false;
     bool useAppleSilicon = false;
     char* extraBootArgs = NULL;
     
-#endif /* !BUILTIN_PAYLOAD */
- 
-#ifndef BUILTIN_PAYLOAD
-    if(argc != 6) {
-        usage(argv);
-        return -1;
-    }
+    memset(&payload, '\0', sizeof(checkra1n_payload_t));
+    LOG_NOFUNC("* checkRAIN clone v2.1.4 for iOS by interception");
+    LOG_NOFUNC("[BUILTIN] v0.12.4");
+    //LOG_NOFUNC("[COMMIT] %s", "");
     
-    if(!strcmp(argv[1], "--a11")) {
-        devmode = 0x8015;
-    }
-    if(!strcmp(argv[1], "--t2")) {
-        devmode = 0x8012;
-    }
-    if(!strcmp(argv[1], "--a10x")) {
-        devmode = 0x8011;
-    }
-    if(!strcmp(argv[1], "--a10")) {
-        devmode = 0x8010;
-    }
-    if(!strcmp(argv[1], "--a9x")) {
-        devmode = 0x8001;
-    }
-    if(!strcmp(argv[1], "--a9m")) {
-        devmode = 0x8003;
-    }
-    if(!strcmp(argv[1], "--a9")) {
-        devmode = 0x8000;
-    }
-    if(!strcmp(argv[1], "--a8x")) {
-        devmode = 0x7001;
-    }
-    if(!strcmp(argv[1], "--a8")) {
-        devmode = 0x7000;
-    }
-    if(!strcmp(argv[1], "--a7")) {
-        devmode = 0x8960;
-    }
-    if(!devmode) {
-        usage(argv);
-        return -1;
-    }
-    
-#ifdef DEBUG
-    debug_enabled = true;
-#endif /* DEBUG */
-    
-#else /* !BUILTIN_PAYLOAD */
     int opt = 0;
     static struct option longopts[] = {
         { "help",           no_argument,       NULL, 'h' },
@@ -336,8 +212,6 @@ int main(int argc, char** argv)
         }
     }
     
-#endif /* BUILTIN_PAYLOAD */
-    
     LOG("Waiting for device in DFU mode...");
     while(get_device(DEVICE_DFU, true)) {
         sleep(1);
@@ -357,29 +231,10 @@ int main(int argc, char** argv)
         return -1;
     }
     
-#ifndef BUILTIN_PAYLOAD
-    if(client->devinfo.cpid != devmode) {
-        ERROR("option does not match the connected device!");
-        return -1;
-    }
-    
-    // load payload
-    char *overwrite_path = argv[2];
-    char *stage1_path    = argv[3];
-    char *stage2_path    = argv[4];
-    char *pongoOS_path   = argv[5];
-    
-    if(open_file(overwrite_path,    &payload.overwrite_len, &payload.overwrite)   != 0) return -1;
-    if(open_file(stage1_path,       &payload.stage1_len,    &payload.stage1)   != 0) return -1;
-    if(open_file(stage2_path,       &payload.stage2_len,    &payload.stage2)  != 0) return -1;
-    if(open_file(pongoOS_path,      &payload.pongoOS_len,   &payload.pongoOS) != 0) return -1;
-#endif /* !BUILTIN_PAYLOAD */
-    
     switch(client->devinfo.cpid) {
             
-#if defined(S5L8960_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S5L8960_PAYLOAD))
+#if defined(S5L8960_CODE) && defined(S5L8960_PAYLOAD)
         case 0x8960:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = s5l8960_overwrite_len;
             payload.stage1_len = s5l8960_stage1_len;
             payload.stage2_len = s5l8960_stage2_len;
@@ -388,13 +243,11 @@ int main(int argc, char** argv)
             payload.stage1 = s5l8960_stage1;
             payload.stage2 = s5l8960_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* S5L8960 */
             
-#if defined(T7000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7000_PAYLOAD))
+#if defined(T7000_CODE) && defined(T7000_PAYLOAD)
         case 0x7000:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = 0;
             payload.stage1_len = t7000_stage1_len;
             payload.stage2_len = t7000_stage2_len;
@@ -403,13 +256,11 @@ int main(int argc, char** argv)
             payload.stage1 = t7000_stage1;
             payload.stage2 = t7000_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T7000 */
  
-#if defined(T7001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T7001_PAYLOAD))
+#if defined(T7001_CODE) && defined(T7001_PAYLOAD)
         case 0x7001:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = 0;
             payload.stage1_len = t7001_stage1_len;
             payload.stage2_len = t7001_stage2_len;
@@ -418,13 +269,11 @@ int main(int argc, char** argv)
             payload.stage1 = t7001_stage1;
             payload.stage2 = t7001_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T7001 */
             
-#if defined(S8000_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8000_PAYLOAD))
+#if defined(S8000_CODE) && defined(S8000_PAYLOAD)
         case 0x8000:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = 0;
             payload.stage1_len = s8000_stage1_len;
             payload.stage2_len = s8000_stage2_len;
@@ -433,13 +282,11 @@ int main(int argc, char** argv)
             payload.stage1 = s8000_stage1;
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* S8000 */
             
-#if defined(S8003_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8003_PAYLOAD))
+#if defined(S8003_CODE) && defined(S8003_PAYLOAD)
         case 0x8003:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = 0;
             payload.stage1_len = s8000_stage1_len;
             payload.stage2_len = s8000_stage2_len;
@@ -448,13 +295,11 @@ int main(int argc, char** argv)
             payload.stage1 = s8000_stage1;
             payload.stage2 = s8000_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* S8003 */
             
-#if defined(S8001_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(S8001_PAYLOAD))
+#if defined(S8001_CODE) && defined(S8001_PAYLOAD)
         case 0x8001:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = s8001_overwrite_len;
             payload.stage1_len = s8001_stage1_len;
             payload.stage2_len = s8001_stage2_len;
@@ -541,13 +386,11 @@ int main(int argc, char** argv)
                 payload.pongoOS_len = 0x3F2F8; // pongoOS_len
                 client->devinfo.checkm8_flag |= NO_AUTOBOOT;
             }
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* S8001 */
             
-#if defined(T8010_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8010_PAYLOAD))
+#if defined(T8010_CODE) && defined(T8010_PAYLOAD)
         case 0x8010:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = t8010_overwrite_len;
             payload.stage1_len = t8010_stage1_len;
             payload.stage2_len = t8010_stage2_len;
@@ -556,13 +399,11 @@ int main(int argc, char** argv)
             payload.stage1 = t8010_stage1;
             payload.stage2 = t8010_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T8010 */
             
-#if defined(T8011_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8011_PAYLOAD))
+#if defined(T8011_CODE) && defined(T8011_PAYLOAD)
         case 0x8011:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = t8011_overwrite_len;
             payload.stage1_len = t8011_stage1_len;
             payload.stage2_len = t8011_stage2_len;
@@ -571,13 +412,11 @@ int main(int argc, char** argv)
             payload.stage1 = t8011_stage1;
             payload.stage2 = t8011_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T8011 */
             
-#if defined(T8012_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8012_PAYLOAD))
+#if defined(T8012_CODE) && defined(T8012_PAYLOAD)
         case 0x8012:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = t8012_overwrite_len;
             payload.stage1_len = t8012_stage1_len;
             payload.stage2_len = t8012_stage2_len;
@@ -586,13 +425,11 @@ int main(int argc, char** argv)
             payload.stage1 = t8012_stage1;
             payload.stage2 = t8012_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T8012 */
             
-#if defined(T8015_CODE) && (!defined(BUILTIN_PAYLOAD) || defined(T8015_PAYLOAD))
+#if defined(T8015_CODE) && defined(T8015_PAYLOAD)
         case 0x8015:
-#ifdef BUILTIN_PAYLOAD
             payload.overwrite_len = t8015_overwrite_len;
             payload.stage1_len = t8015_stage1_len;
             payload.stage2_len = t8015_stage2_len;
@@ -601,7 +438,6 @@ int main(int argc, char** argv)
             payload.stage1 = t8015_stage1;
             payload.stage2 = t8015_stage2;
             payload.pongoOS = pongoOS;
-#endif /* BUILTIN_PAYLOAD */
             break;
 #endif /* T8015 */
             
@@ -610,7 +446,7 @@ int main(int argc, char** argv)
             return -1;
     }
     
-#if defined(BUILTIN_PAYLOAD) && (defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR))
+#if defined(KPF_FLAGS_PTR) && defined(BOOTARGS_STR_PTR)
     char str[MAX_BOOTARGS_LEN];
     memset(&str, 0x0, MAX_BOOTARGS_LEN);
     
