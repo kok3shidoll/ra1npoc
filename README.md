@@ -24,10 +24,10 @@ A tool for re-jailbreak devices jailbroken by checkra1n/odysseyra1n on iOS/iPadO
 
 
 ### ホスト側のデバイス (このソフトウェアを実行する側)  
-- iOS 12+  
+- iOS 12-15  
     - 動作確認済 (lightning to USB camera adapter 経由)  
 
-- iOS 9+  
+- iOS 9-15  
     - 動作確認済 (lightning to USB camera adapter + 電源供給)  
 
 
@@ -45,8 +45,6 @@ make ra1npoc
 cd src/
 make old
 ```
-
-*iPhoneOS向けにビルドするために、IOKitなどの一部ヘッダーをmacOSからiPhoneOSのSDKにコピーする必要があります。*  
 
 
 ## 定義  
@@ -68,6 +66,7 @@ ra1npoc [option]
   -d, --debug                   enable debug log
   -e, --extra-bootargs <args>   set extra bootargs
   -s, --special                 use special pongo_2.5.0-0cb6126f
+  -m, --m1usbc                  use usb-c on apple silicon macs
 ```
 
 ### built-in (A9X)  

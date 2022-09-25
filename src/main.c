@@ -200,6 +200,7 @@ static void usage(char** argv)
     printf("  -d, --debug\t\t\t\x1b[36menable debug log\x1b[39m\n");
     printf("  -e, --extra-bootargs <args>\t\x1b[36mset extra bootargs\x1b[39m\n");
     printf("  -s, --special\t\t\t\x1b[36muse special pongo_2.5.0-0cb6126f\x1b[39m\n");
+    printf("  -m, --m1usbc\t\t\t\x1b[36muse usb-c on apple silicon macs\x1b[39m\n");
 #endif /* BUILTIN_PAYLOAD */
     
     printf("\n");
@@ -221,6 +222,7 @@ int main(int argc, char** argv)
 #else
     bool useRecovery = false;
     bool verboseBoot = false;
+    bool useAppleSilicon = false;
     char* extraBootArgs = NULL;
     
 #endif /* !BUILTIN_PAYLOAD */
@@ -280,10 +282,11 @@ int main(int argc, char** argv)
         { "debug",          no_argument,       NULL, 'd' },
         { "extra-bootargs", required_argument, NULL, 'e' },
         { "special",        no_argument,       NULL, 's' },
+        { "m1usbc",         no_argument,       NULL, 'm' },
         { NULL, 0, NULL, 0 }
     };
     
-    while ((opt = getopt_long(argc, argv, "hlvdce:s", longopts, NULL)) > 0) {
+    while ((opt = getopt_long(argc, argv, "hlvdce:sm", longopts, NULL)) > 0) {
         switch (opt) {
             case 'h':
                 usage(argv);
@@ -315,6 +318,10 @@ int main(int argc, char** argv)
                 
             case 's':
                 special_pongo = true;
+                break;
+                
+            case 'm':
+                useAppleSilicon = true;
                 break;
                 
             default:
@@ -636,6 +643,9 @@ int main(int argc, char** argv)
 #endif
     
     int flags = client->devinfo.checkm8_flag; // because checkm8_flag(s) will be lost
+    
+    if(useAppleSilicon)
+        flags |= APPLE_M1_WITH_USB_C;
     
     ret = checkm8_arm64(client, payload, flags);
     

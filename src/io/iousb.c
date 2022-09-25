@@ -176,19 +176,19 @@ static void load_devinfo(io_client_t client, const char* str)
             client->devinfo.checkm8_flag |= CHECKM8_A8_A9;
             break;
         case 0x8001:
-            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A10X;
             break;
         case 0x8010:
-            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A10X;
             break;
         case 0x8011:
-            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= CHECKM8_A9X_A10X;
             break;
         case 0x8012:
-            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= CHECKM8_A11; // ??
             break;
         case 0x8015:
-            client->devinfo.checkm8_flag |= CHECKM8_A9X_A11;
+            client->devinfo.checkm8_flag |= CHECKM8_A11;
             break;
         default:
             break;
@@ -313,6 +313,16 @@ void io_close(io_client_t client)
 
 void io_reset(io_client_t client, int flags)
 {
+    if(flags & USB_REPLUG)
+    {
+        printf("\x1b[32m Please disconnect and reconnect the lightning cable now\n");
+        printf("\x1b[32m After that, press <Enter> key >> ");
+        getchar();
+        printf("\n");
+        // skip
+        return;
+    }
+    
     IOReturn result;
     if(flags & USB_RESET) {
         result = io_resetdevice(client);
@@ -400,7 +410,8 @@ int io_reconnect(io_client_t *pclient,
                  unsigned long sec)
 {
     
-    if(*pclient) {
+    if(*pclient)
+    {
         io_reset(*pclient, flags);
         io_close(*pclient);
         *pclient = NULL;
