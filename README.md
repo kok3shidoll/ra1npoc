@@ -64,8 +64,6 @@ ra1npoc -s
 
 ### `-s`フラグを使用しない場合  
 ```
-ra1npoc [--a9x] [s8001_overwrite s8001_stage1 s8001_stage2 pongoOS.bin]
-
 pongoterm
 > /send /path/to/ramdisk
 > ramdisk
