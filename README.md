@@ -44,12 +44,8 @@ make ra1npoc
 `IPHONEOS_ARM`  
 - iOSデバイスからiOSデバイスに接続できるようにします。lightningデバイスの場合、接続にはlightning to USB camera adapterが必要となります。  
 
-`BUILTIN_PAYLOAD`   
-- Payloadをbuilt-inします。
-
 
 ## 実行  
-### built-in  
 ```
 ra1npoc [option]  
   -h, --help                    show usage
@@ -61,21 +57,12 @@ ra1npoc [option]
   -s, --special                 use special pongo_2.5.0-0cb6126f
   -m, --m1usbc                  use usb-c on apple silicon macs
 ```
-
-### built-in (A9X)  
 A9Xの場合、`-s`フラグを渡すことで、iPadOSが正常に起動するようになります。[checkra1n_issues#2074](https://github.com/checkra1n/BugTracker/issues/2074)  
 ```
 ra1npoc -s
 ```
 
-
-### 旧モードの場合  
-### A7/A10-A11  
-```
-ra1npoc [--{chipname}] [{Soc}_overwrite {Soc}_stage1 {Soc}_stage2 pongoOS]  
-```
-
-### A9X 
+### `-s`フラグを使用しない場合  
 ```
 ra1npoc [--a9x] [s8001_overwrite s8001_stage1 s8001_stage2 pongoOS.bin]
 
@@ -86,11 +73,6 @@ pongoterm
 > modload
 > xargs rootdev=md0
 > bootx
-```
-
-### A8/A9  
-```
-ra1npoc [--{chipname}] [/dev/null {Soc}_stage1 {Soc}_stage2 pongoOS]  
 ```
 
 
