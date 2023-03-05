@@ -75,7 +75,7 @@ pongoterm
 
 
 ## 使い方   
-[ra1npoc - How to use](https://dora2ios.github.io/info/ra1npoc/usage.html)  
+[ra1npoc - How to use](https://kok3shidoll.github.io/info/ra1npoc/usage.html)  
 
 
 ## Credit  
