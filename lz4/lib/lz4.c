@@ -359,9 +359,6 @@ typedef enum {
 #  endif
 #endif
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static unsigned LZ4_isLittleEndian(void)
 {
     const union { U32 u; BYTE c[4]; } one = { 1 };   /* don't use static : performance detrimental */
@@ -371,30 +368,14 @@ static unsigned LZ4_isLittleEndian(void)
 
 #if defined(LZ4_FORCE_MEMORY_ACCESS) && (LZ4_FORCE_MEMORY_ACCESS==2)
 /* lie to the compiler about data alignment; use with caution */
-
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U16 LZ4_read16(const void* memPtr) { return *(const U16*) memPtr; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U32 LZ4_read32(const void* memPtr) { return *(const U32*) memPtr; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static reg_t LZ4_read_ARCH(const void* memPtr) { return *(const reg_t*) memPtr; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write16(void* memPtr, U16 value) { *(U16*)memPtr = value; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write32(void* memPtr, U32 value) { *(U32*)memPtr = value; }
 
 #elif defined(LZ4_FORCE_MEMORY_ACCESS) && (LZ4_FORCE_MEMORY_ACCESS==1)
@@ -405,68 +386,38 @@ typedef struct { U16 u16; } __attribute__((packed)) LZ4_unalign16;
 typedef struct { U32 u32; } __attribute__((packed)) LZ4_unalign32;
 typedef struct { reg_t uArch; } __attribute__((packed)) LZ4_unalignST;
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U16 LZ4_read16(const void* ptr) { return ((const LZ4_unalign16*)ptr)->u16; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U32 LZ4_read32(const void* ptr) { return ((const LZ4_unalign32*)ptr)->u32; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static reg_t LZ4_read_ARCH(const void* ptr) { return ((const LZ4_unalignST*)ptr)->uArch; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write16(void* memPtr, U16 value) { ((LZ4_unalign16*)memPtr)->u16 = value; }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write32(void* memPtr, U32 value) { ((LZ4_unalign32*)memPtr)->u32 = value; }
 
 #else  /* safe and portable access using memcpy() */
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U16 LZ4_read16(const void* memPtr)
 {
     U16 val; LZ4_memcpy(&val, memPtr, sizeof(val)); return val;
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U32 LZ4_read32(const void* memPtr)
 {
     U32 val; LZ4_memcpy(&val, memPtr, sizeof(val)); return val;
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static reg_t LZ4_read_ARCH(const void* memPtr)
 {
     reg_t val; LZ4_memcpy(&val, memPtr, sizeof(val)); return val;
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write16(void* memPtr, U16 value)
 {
     LZ4_memcpy(memPtr, &value, sizeof(value));
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_write32(void* memPtr, U32 value)
 {
     LZ4_memcpy(memPtr, &value, sizeof(value));
@@ -474,9 +425,6 @@ static void LZ4_write32(void* memPtr, U32 value)
 
 #endif /* LZ4_FORCE_MEMORY_ACCESS */
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static U16 LZ4_readLE16(const void* memPtr)
 {
     if (LZ4_isLittleEndian()) {
@@ -487,9 +435,6 @@ static U16 LZ4_readLE16(const void* memPtr)
     }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static void LZ4_writeLE16(void* memPtr, U16 value)
 {
     if (LZ4_isLittleEndian()) {
@@ -502,11 +447,7 @@ static void LZ4_writeLE16(void* memPtr, U16 value)
 }
 
 /* customized variant of memcpy, which can overwrite up to 8 bytes beyond dstEnd */
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#else
 LZ4_FORCE_INLINE
-#endif
 void LZ4_wildCopy8(void* dstPtr, const void* srcPtr, void* dstEnd)
 {
     BYTE* d = (BYTE*)dstPtr;
@@ -537,12 +478,8 @@ static const int      dec64table[8] = {0, 0, 0, -1, -4,  1, 2, 3};
 
 #if LZ4_FAST_DEC_LOOP
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void
+
+LZ4_FORCE_INLINE void
 LZ4_memcpy_using_offset_base(BYTE* dstPtr, const BYTE* srcPtr, BYTE* dstEnd, const size_t offset)
 {
     assert(srcPtr + offset == dstPtr);
@@ -568,12 +505,7 @@ LZ4_memcpy_using_offset_base(BYTE* dstPtr, const BYTE* srcPtr, BYTE* dstEnd, con
 /* customized variant of memcpy, which can overwrite up to 32 bytes beyond dstEnd
  * this version copies two times 16 bytes (instead of one time 32 bytes)
  * because it must be compatible with offsets >= 16. */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void
+LZ4_FORCE_INLINE void
 LZ4_wildCopy32(void* dstPtr, const void* srcPtr, void* dstEnd)
 {
     BYTE* d = (BYTE*)dstPtr;
@@ -586,12 +518,7 @@ LZ4_wildCopy32(void* dstPtr, const void* srcPtr, void* dstEnd)
 /* LZ4_memcpy_using_offset()  presumes :
  * - dstEnd >= dstPtr + MINMATCH
  * - there is at least 8 bytes available to write after dstEnd */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void
+LZ4_FORCE_INLINE void
 LZ4_memcpy_using_offset(BYTE* dstPtr, const BYTE* srcPtr, BYTE* dstEnd, const size_t offset)
 {
     BYTE v[8];
@@ -636,9 +563,6 @@ LZ4_memcpy_using_offset(BYTE* dstPtr, const BYTE* srcPtr, BYTE* dstEnd, const si
 /*-************************************
 *  Common functions
 **************************************/
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static unsigned LZ4_NbCommonBytes (reg_t val)
 {
     assert(val != 0);
@@ -739,12 +663,8 @@ static unsigned LZ4_NbCommonBytes (reg_t val)
 
 
 #define STEPSIZE sizeof(reg_t)
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-unsigned LZ4_count(const BYTE* pIn, const BYTE* pMatch, const BYTE* pInLimit)
+LZ4_FORCE_INLINE unsigned
+LZ4_count(const BYTE* pIn, const BYTE* pMatch, const BYTE* pInLimit)
 {
     const BYTE* const pStart = pIn;
 
@@ -841,12 +761,9 @@ int LZ4_decompress_safe_partial_forceExtDict(const char* source, char* dest,
 /*-******************************
 *  Compression functions
 ********************************/
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-U32 LZ4_hash4(U32 sequence, tableType_t const tableType)
+
+LZ4_FORCE_INLINE U32
+LZ4_hash4(U32 sequence, tableType_t const tableType)
 {
     if (tableType == byU16)
         return ((sequence * 2654435761U) >> ((MINMATCH*8)-(LZ4_HASHLOG+1)));
@@ -854,12 +771,8 @@ U32 LZ4_hash4(U32 sequence, tableType_t const tableType)
         return ((sequence * 2654435761U) >> ((MINMATCH*8)-LZ4_HASHLOG));
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-U32 LZ4_hash5(U64 sequence, tableType_t const tableType)
+LZ4_FORCE_INLINE U32
+LZ4_hash5(U64 sequence, tableType_t const tableType)
 {
     const U32 hashLog = (tableType == byU16) ? LZ4_HASHLOG+1 : LZ4_HASHLOG;
     if (LZ4_isLittleEndian()) {
@@ -871,23 +784,14 @@ U32 LZ4_hash5(U64 sequence, tableType_t const tableType)
     }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-U32 LZ4_hashPosition(const void* const p, tableType_t const tableType)
+LZ4_FORCE_INLINE U32 LZ4_hashPosition(const void* const p, tableType_t const tableType)
 {
     if ((sizeof(reg_t)==8) && (tableType != byU16)) return LZ4_hash5(LZ4_read_ARCH(p), tableType);
     return LZ4_hash4(LZ4_read32(p), tableType);
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void LZ4_clearHash(U32 h, void* tableBase, tableType_t const tableType)
+LZ4_FORCE_INLINE void
+LZ4_clearHash(U32 h, void* tableBase, tableType_t const tableType)
 {
     switch (tableType)
     {
@@ -899,12 +803,8 @@ void LZ4_clearHash(U32 h, void* tableBase, tableType_t const tableType)
     }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void LZ4_putIndexOnHash(U32 idx, U32 h, void* tableBase, tableType_t const tableType)
+LZ4_FORCE_INLINE void
+LZ4_putIndexOnHash(U32 idx, U32 h, void* tableBase, tableType_t const tableType)
 {
     switch (tableType)
     {
@@ -917,12 +817,8 @@ void LZ4_putIndexOnHash(U32 idx, U32 h, void* tableBase, tableType_t const table
 }
 
 /* LZ4_putPosition*() : only used in byPtr mode */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void LZ4_putPositionOnHash(const BYTE* p, U32 h,
+LZ4_FORCE_INLINE void
+LZ4_putPositionOnHash(const BYTE* p, U32 h,
                                   void* tableBase, tableType_t const tableType)
 {
     const BYTE** const hashTable = (const BYTE**)tableBase;
@@ -930,12 +826,8 @@ void LZ4_putPositionOnHash(const BYTE* p, U32 h,
     hashTable[h] = p;
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void LZ4_putPosition(const BYTE* p, void* tableBase, tableType_t tableType)
+LZ4_FORCE_INLINE void
+LZ4_putPosition(const BYTE* p, void* tableBase, tableType_t tableType)
 {
     U32 const h = LZ4_hashPosition(p, tableType);
     LZ4_putPositionOnHash(p, h, tableBase, tableType);
@@ -947,12 +839,8 @@ void LZ4_putPosition(const BYTE* p, void* tableBase, tableType_t tableType)
  * Assumption 1 : only valid if tableType == byU32 or byU16.
  * Assumption 2 : h is presumed valid (within limits of hash table)
  */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-U32 LZ4_getIndexOnHash(U32 h, const void* tableBase, tableType_t tableType)
+LZ4_FORCE_INLINE U32
+LZ4_getIndexOnHash(U32 h, const void* tableBase, tableType_t tableType)
 {
     LZ4_STATIC_ASSERT(LZ4_MEMORY_USAGE > 2);
     if (tableType == byU32) {
@@ -968,21 +856,14 @@ U32 LZ4_getIndexOnHash(U32 h, const void* tableBase, tableType_t tableType)
     assert(0); return 0;  /* forbidden case */
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static const BYTE* LZ4_getPositionOnHash(U32 h, const void* tableBase, tableType_t tableType)
 {
     assert(tableType == byPtr); (void)tableType;
     { const BYTE* const* hashTable = (const BYTE* const*) tableBase; return hashTable[h]; }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-const BYTE*
+
+LZ4_FORCE_INLINE const BYTE*
 LZ4_getPosition(const BYTE* p,
                 const void* tableBase, tableType_t tableType)
 {
@@ -990,12 +871,8 @@ LZ4_getPosition(const BYTE* p,
     return LZ4_getPositionOnHash(h, tableBase, tableType);
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-void
+
+LZ4_FORCE_INLINE void
 LZ4_prepareTable(LZ4_stream_t_internal* const cctx,
            const int inputSize,
            const tableType_t tableType) {
@@ -1042,12 +919,8 @@ LZ4_prepareTable(LZ4_stream_t_internal* const cctx,
  *  - source != NULL
  *  - inputSize > 0
  */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-int LZ4_compress_generic_validated(
+LZ4_FORCE_INLINE int
+LZ4_compress_generic_validated(
                  LZ4_stream_t_internal* const cctx,
                  const char* const source,
                  char* const dest,
@@ -1458,12 +1331,8 @@ _last_literals:
  *  inlined, to ensure branches are decided at compilation time;
  *  takes care of src == (NULL, 0)
  *  and forward the rest to LZ4_compress_generic_validated */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#else
-LZ4_FORCE_INLINE
-#endif
-int LZ4_compress_generic(
+LZ4_FORCE_INLINE int
+LZ4_compress_generic(
                  LZ4_stream_t_internal* const cctx,
                  const char* const src,
                  char* const dst,
@@ -1500,9 +1369,6 @@ int LZ4_compress_generic(
                 tableType, dictDirective, dictIssue, acceleration);
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 int LZ4_compress_fast_extState(void* state, const char* source, char* dest, int inputSize, int maxOutputSize, int acceleration)
 {
     LZ4_stream_t_internal* const ctx = & LZ4_initStream(state, sizeof(LZ4_stream_t)) -> internal_donotuse;
@@ -1535,9 +1401,6 @@ int LZ4_compress_fast_extState(void* state, const char* source, char* dest, int 
  * (see comment in lz4.h on LZ4_resetStream_fast() for a definition of
  * "correctly initialized").
  */
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 int LZ4_compress_fast_extState_fastReset(void* state, const char* src, char* dst, int srcSize, int dstCapacity, int acceleration)
 {
     LZ4_stream_t_internal* const ctx = &((LZ4_stream_t*)state)->internal_donotuse;
@@ -1576,9 +1439,6 @@ int LZ4_compress_fast_extState_fastReset(void* state, const char* src, char* dst
     }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 int LZ4_compress_fast(const char* src, char* dest, int srcSize, int dstCapacity, int acceleration)
 {
     int result;
@@ -1597,9 +1457,6 @@ int LZ4_compress_fast(const char* src, char* dest, int srcSize, int dstCapacity,
     return result;
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 int LZ4_compress_default(const char* src, char* dst, int srcSize, int dstCapacity)
 {
     return LZ4_compress_fast(src, dst, srcSize, dstCapacity, 1);
@@ -1609,9 +1466,6 @@ int LZ4_compress_default(const char* src, char* dst, int srcSize, int dstCapacit
 /* Note!: This function leaves the stream in an unclean/broken state!
  * It is not safe to subsequently use the same state with a _fastReset() or
  * _continue() call without resetting it. */
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static int LZ4_compress_destSize_extState (LZ4_stream_t* state, const char* src, char* dst, int* srcSizePtr, int targetDstSize)
 {
     void* const s = LZ4_initStream(state, sizeof (*state));
@@ -1628,9 +1482,6 @@ static int LZ4_compress_destSize_extState (LZ4_stream_t* state, const char* src,
     }   }
 }
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 int LZ4_compress_destSize(const char* src, char* dst, int* srcSizePtr, int targetDstSize)
 {
 #if (LZ4_HEAPMODE)
@@ -1656,9 +1507,6 @@ int LZ4_compress_destSize(const char* src, char* dst, int* srcSizePtr, int targe
 ********************************/
 
 #if !defined(LZ4_STATIC_LINKING_ONLY_DISABLE_MEMORY_ALLOCATION)
-#ifndef DEVBUILD
-inline __attribute__((always_inline)) static
-#endif
 LZ4_stream_t* LZ4_createStream(void)
 {
     LZ4_stream_t* const lz4s = (LZ4_stream_t*)ALLOC(sizeof(LZ4_stream_t));
@@ -1670,9 +1518,6 @@ LZ4_stream_t* LZ4_createStream(void)
 }
 #endif
 
-#ifndef DEVBUILD
-inline __attribute__((always_inline))
-#endif
 static size_t LZ4_stream_t_alignment(void)
 {
 #if LZ4_ALIGN_TEST

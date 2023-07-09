@@ -12,7 +12,6 @@
 #ifdef DEVBUILD
 #define RA1NPOC_STATIC_API
 #else
-//#define RA1NPOC_STATIC_API inline __attribute__((always_inline))
 #define RA1NPOC_STATIC_API 
 #endif
 

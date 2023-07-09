@@ -186,9 +186,8 @@ LZ4LIB_API const char* LZ4_versionString (void);   /**< library version string; 
  *                or 0 if compression fails
  * Note : This function is protected against buffer overflow scenarios (never writes outside 'dst' buffer, nor read outside 'source' buffer).
  */
-#ifdef DEVBUILD
 LZ4LIB_API int LZ4_compress_default(const char* src, char* dst, int srcSize, int dstCapacity);
-#endif
+
 /*! LZ4_decompress_safe() :
  * @compressedSize : is the exact complete size of the compressed block.
  * @dstCapacity : is the size of destination buffer (which must be already allocated),
@@ -232,9 +231,7 @@ LZ4LIB_API int LZ4_compressBound(int inputSize);
     Values <= 0 will be replaced by LZ4_ACCELERATION_DEFAULT (currently == 1, see lz4.c).
     Values > LZ4_ACCELERATION_MAX will be replaced by LZ4_ACCELERATION_MAX (currently == 65537, see lz4.c).
 */
-#ifdef DEVBUILD
 LZ4LIB_API int LZ4_compress_fast (const char* src, char* dst, int srcSize, int dstCapacity, int acceleration);
-#endif
 
 /*! LZ4_compress_fast_extState() :
  *  Same as LZ4_compress_fast(), using an externally allocated memory space for its state.
@@ -243,9 +240,7 @@ LZ4LIB_API int LZ4_compress_fast (const char* src, char* dst, int srcSize, int d
  *  Then, provide this buffer as `void* state` to compression function.
  */
 LZ4LIB_API int LZ4_sizeofState(void);
-#ifdef DEVBUILD
 LZ4LIB_API int LZ4_compress_fast_extState (void* state, const char* src, char* dst, int srcSize, int dstCapacity, int acceleration);
-#endif
 
 
 /*! LZ4_compress_destSize() :
@@ -271,9 +266,7 @@ LZ4LIB_API int LZ4_compress_fast_extState (void* state, const char* src, char* d
  *        a dstCapacity which is > decompressedSize, by at least 1 byte.
  *        See https://github.com/lz4/lz4/issues/859 for details
  */
-#ifdef DEVBUILD
 LZ4LIB_API int LZ4_compress_destSize (const char* src, char* dst, int* srcSizePtr, int targetDstSize);
-#endif
 
 /*! LZ4_decompress_safe_partial() :
  *  Decompress an LZ4 compressed block, of size 'srcSize' at position 'src',
@@ -332,9 +325,7 @@ typedef union LZ4_stream_u LZ4_stream_t;  /* incomplete type (defined later) */
 */
 #if !defined(RC_INVOKED) /* https://docs.microsoft.com/en-us/windows/win32/menurc/predefined-macros */
 #if !defined(LZ4_STATIC_LINKING_ONLY_DISABLE_MEMORY_ALLOCATION)
-#ifdef DEVBUILD
 LZ4LIB_API LZ4_stream_t* LZ4_createStream(void);
-#endif
 LZ4LIB_API int           LZ4_freeStream (LZ4_stream_t* streamPtr);
 #endif /* !defined(LZ4_STATIC_LINKING_ONLY_DISABLE_MEMORY_ALLOCATION) */
 #endif
@@ -569,9 +560,7 @@ LZ4_decompress_safe_partial_usingDict(const char* src, char* dst,
  *  this function initializes the provided state with a call to something like LZ4_resetStream_fast()
  *  while LZ4_compress_fast_extState() starts with a call to LZ4_resetStream().
  */
-#ifdef DEVBUILD
 LZ4LIB_STATIC_API int LZ4_compress_fast_extState_fastReset (void* state, const char* src, char* dst, int srcSize, int dstCapacity, int acceleration);
-#endif
 
 /*! LZ4_attach_dictionary() :
  *  This is an experimental API that allows
