@@ -2,13 +2,13 @@
 checkra1n dump and poc for iOS  
 A tool for re-jailbreak devices jailbroken by checkra1n/odysseyra1n on iOS/iPadOS/macOS platforms.  
 
-## Notes  
-This is the demonstration code for running checkra1n on iOS, based on the Payload dumped from checkra1n 0.1337.x.  
-Please do not run on normal devices.  
+## 注意  
+これはcheckra1n 0.1337.xからダンプしたPayloadに基づいて作成された、iOS上でcheckra1nを動かすための実証コードです。  
+このツールは検証用です。通常のデバイスでは実行しないでください。  
 
 
-## Support  
-### iOS device you want to Jailbreak  
+## サポート  
+### JailbreakしたいiOSデバイス  
 | chip | name |
 |---------|----------|
 | S5L8960 | Apple A7 |
@@ -23,22 +23,22 @@ Please do not run on normal devices.
 | T8015 | Apple A11 |
 
 
-### Host-side device (device to run this software)  
+### ホスト側のデバイス (このソフトウェアを実行する側)  
 - iOS 12 - 17  
-    - via lightning to USB camera adapter  
+    - 動作確認済 (lightning to USB camera adapter 経由)  
 
 - iOS 9 - 17  
-    - via lightning to USB camera adapter + power supply  
+    - 動作確認済 (lightning to USB camera adapter + 電源供給)  
 
 
-## Build  
+## ビルド  
 ```
 git submodule update --init --recursive
 make
 ```
 
 
-## Run  
+## 実行  
 ```
 Usage: ./ra1npoc15 [-r] [-hcyEsv] [-e <boot-args>] [-k <override_pongo>]
   mode:
@@ -56,27 +56,26 @@ Usage: ./ra1npoc15 [-r] [-hcyEsv] [-e <boot-args>] [-k <override_pongo>]
   help:
 	-h, --help			: show usage
 ```
-- `--ra1npoc` mode is compatible with the old build.  
-- iOS 15+ only support boot pongoOS. Plase be sure to add the `-E` flag.  
+- `--ra1npoc`モードは旧ビルド互換です。  
 
-### Example
-- Boot pongoOS from DFU mode  
+### 例
+- DFU modeからpongoOSを起動する  
 ```
 ./ra1npoc15 -rE
 ```
 
-- Boot any `pongoOS.bin` from DFU mode  
+- DFU modeから任意のpongoOS.binを起動する  
 ```
 ./ra1npoc15 -rEk <Pongo.bin>
 ```
 
-- Jailbreak iOS 12 - 14 devices already jailbroken with checkra1n from Recovery mode  
+- Recovery modeからiOS 14のデバイスをverbose bootでre-jailbreakする  
 ```
-./ra1npoc15 -rc
+./ra1npoc15 -rcv
 ```
 
 
-## How to use  
+## 使い方   
 [ra1npoc - How to use](https://kok3shidoll.github.io/info/ra1npoc/usage.html)  
 
 
